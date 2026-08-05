@@ -1,0 +1,22 @@
+run:
+  timeout: 5m
+  modules-download: true
+
+linters:
+  enable:
+    - errcheck
+    - gofmt
+    - goimports
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+
+linters-settings:
+  goimports:
+    local-prefixes: github.com/kernul-io/cloudopt
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0

@@ -1,0 +1,14 @@
+/.cloudopt/
+/cloudopt.db
+/cloudopt.db-*
+*.exe
+/main
+/main-amd64
+/worker
+/build/
+/dist/
+/.env
+/config/local.yaml
+/coverage.out
+/.cursor/
+/.claude/

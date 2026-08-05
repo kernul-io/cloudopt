@@ -1,0 +1,90 @@
+package api
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"os"
+	"path/filepath"
+
+	"github.com/kernul-io/cloudopt/internal/adapters/config"
+)
+
+// Runtime implements operational commands for the CLI.
+type Runtime struct {
+	Settings config.Settings
+}
+
+func NewRuntime(settings config.Settings) *Runtime {
+	return &Runtime{Settings: settings}
+}
+
+func (r *Runtime) Init(ctx context.Context) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
+	dirs := []string{
+		r.Settings.ConfigDir,
+		r.Settings.DataDir,
+		r.Settings.ReportsDir,
+		r.Settings.TempDir,
+	}
+	for _, dir := range dirs {
+		if err := os.MkdirAll(dir, 0o750); err != nil {
+			return fmt.Errorf("create directory %q: %w", dir, err)
+		}
+	}
+
+	configPath := filepath.Join(r.Settings.ConfigDir, "config.yaml")
+	if _, err := os.Stat(configPath); err == nil {
+		return fmt.Errorf("config already exists at %q (refusing to overwrite)", configPath)
+	} else if !errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("stat config path: %w", err)
+	}
+
+	content := config.ExampleYAML(r.Settings.WorkspaceDir)
+	if err := os.WriteFile(configPath, []byte(content), 0o600); err != nil {
+		return fmt.Errorf("write config: %w", err)
+	}
+	return nil
+}
+
+func (r *Runtime) Collect(ctx context.Context) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	return ErrNotImplemented("collect")
+}
+
+func (r *Runtime) Analyze(ctx context.Context) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	return ErrNotImplemented("analyze")
+}
+
+func (r *Runtime) Report(ctx context.Context) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	return ErrNotImplemented("report")
+}
+
+// NotImplementedError indicates a command contract exists but behavior is deferred.
+type NotImplementedError struct {
+	Command string
+}
+
+func (e *NotImplementedError) Error() string {
+	return fmt.Sprintf("%q is not implemented yet; see steps/README.md for the delivery sequence", e.Command)
+}
+
+func ErrNotImplemented(command string) error {
+	return &NotImplementedError{Command: command}
+}
+
+func IsNotImplemented(err error) bool {
+	var ni *NotImplementedError
+	return errors.As(err, &ni)
+}
