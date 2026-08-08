@@ -1,0 +1,73 @@
+ruleset_version: "2026.01.1"
+rules:
+  - id: compute.stopped_instance_storage_cost
+    version: "1.0.0"
+    title: Stopped compute instance with ongoing charges
+    category: compute
+    severity: medium
+    evaluator: stopped_instance_storage_cost
+    enabled: true
+    applicability:
+      resource_kinds:
+        - compute_instance
+    thresholds:
+      min_cost_minor: "100"
+    required_signals:
+      - costs
+    remediation: |
+      Stop incurring charges by terminating the instance if it is no longer needed, or detach and delete unused EBS volumes.
+      Confirm no required data remains on attached storage before deletion.
+
+  - id: storage.unattached_block_volume
+    version: "1.0.0"
+    title: Unattached block volume
+    category: storage
+    severity: medium
+    evaluator: unattached_block_volume
+    enabled: true
+    applicability:
+      resource_kinds:
+        - block_volume
+    thresholds: {}
+    required_signals:
+      - resources
+      - relationships
+    remediation: |
+      Create a snapshot if backup is needed, then delete the unused volume to stop storage billing.
+
+  - id: storage.stale_volume_snapshot
+    version: "1.0.0"
+    title: Stale volume snapshot
+    category: storage
+    severity: low
+    evaluator: stale_volume_snapshot
+    enabled: true
+    applicability:
+      resource_kinds:
+        - volume_snapshot
+    thresholds:
+      max_age_days: "90"
+    required_signals:
+      - resources
+    remediation: |
+      Review whether the snapshot is still required for recovery or compliance.
+      Delete obsolete snapshots to reduce storage cost after confirming retention policy.
+
+  - id: governance.missing_cost_allocation_tags
+    version: "1.0.0"
+    title: Missing ownership or cost-allocation tags
+    category: governance
+    severity: low
+    evaluator: missing_cost_allocation_tags
+    enabled: true
+    applicability:
+      resource_kinds:
+        - compute_instance
+        - block_volume
+        - database_instance
+    thresholds:
+      required_tag_keys: "Owner,CostCenter"
+    required_signals:
+      - resources
+    remediation: |
+      Apply the required Owner and CostCenter tags (or your organization's equivalents) for cost allocation and accountability.

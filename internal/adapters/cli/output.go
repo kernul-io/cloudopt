@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/kernul-io/cloudopt/internal/application/api"
 )
 
 // Result is the stable machine-readable command outcome written to stdout.
@@ -13,6 +15,44 @@ type Result struct {
 	Command string `json:"command,omitempty"`
 	Message string `json:"message,omitempty"`
 	Version string `json:"version,omitempty"`
+
+	Analysis *AnalyzePayload `json:"analysis,omitempty"`
+}
+
+// AnalyzePayload is the detailed analyze output when --json is set.
+type AnalyzePayload struct {
+	AnalysisRunID  string              `json:"analysis_run_id,omitempty"`
+	SnapshotID     string              `json:"snapshot_id"`
+	RulesetVersion string              `json:"ruleset_version"`
+	Summary        AnalyzeSummary      `json:"summary"`
+	Findings       []AnalyzeFinding    `json:"findings,omitempty"`
+	Rules          []AnalyzeRuleStatus `json:"rules,omitempty"`
+}
+
+type AnalyzeSummary struct {
+	Passed       int `json:"passed"`
+	Failed       int `json:"failed"`
+	Suppressed   int `json:"suppressed"`
+	NotEvaluated int `json:"not_evaluated"`
+	Errors       int `json:"errors"`
+}
+
+type AnalyzeFinding struct {
+	ID          string   `json:"id"`
+	RuleID      string   `json:"rule_id"`
+	Fingerprint string   `json:"fingerprint"`
+	Severity    string   `json:"severity"`
+	Category    string   `json:"category"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	ResourceIDs []string `json:"resource_ids"`
+	Confidence  float64  `json:"confidence"`
+}
+
+type AnalyzeRuleStatus struct {
+	RuleID  string `json:"rule_id"`
+	Status  string `json:"status"`
+	Message string `json:"message,omitempty"`
 }
 
 const (
@@ -25,6 +65,51 @@ func writeResult(w io.Writer, r Result) error {
 	enc := json.NewEncoder(w)
 	enc.SetEscapeHTML(false)
 	return enc.Encode(r)
+}
+
+// EmitAnalyzeResult writes a successful analyze payload to stdout.
+func EmitAnalyzeResult(result *api.AnalyzeResult) error {
+	payload := AnalyzePayload{
+		AnalysisRunID:  string(result.AnalysisRunID),
+		SnapshotID:     string(result.SnapshotID),
+		RulesetVersion: result.RulesetVersion,
+		Summary: AnalyzeSummary{
+			Passed:       result.Summary.Passed,
+			Failed:       result.Summary.Failed,
+			Suppressed:   result.Summary.Suppressed,
+			NotEvaluated: result.Summary.NotEvaluated,
+			Errors:       result.Summary.Errors,
+		},
+	}
+	for _, f := range result.Findings {
+		ids := make([]string, len(f.ResourceIDs))
+		for i, id := range f.ResourceIDs {
+			ids[i] = string(id)
+		}
+		payload.Findings = append(payload.Findings, AnalyzeFinding{
+			ID:          string(f.ID),
+			RuleID:      f.RuleID,
+			Fingerprint: f.Fingerprint,
+			Severity:    string(f.Severity),
+			Category:    f.Category,
+			Title:       f.Title,
+			Description: f.Description,
+			ResourceIDs: ids,
+			Confidence:  f.Confidence.Float64(),
+		})
+	}
+	for _, ex := range result.RuleExecutions {
+		payload.Rules = append(payload.Rules, AnalyzeRuleStatus{
+			RuleID:  ex.RuleID,
+			Status:  string(ex.Status),
+			Message: ex.Message,
+		})
+	}
+	return writeResult(os.Stdout, Result{
+		Status:   StatusOK,
+		Command:  "analyze",
+		Analysis: &payload,
+	})
 }
 
 // EmitOK writes a successful command result to stdout.

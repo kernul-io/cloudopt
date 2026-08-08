@@ -18,13 +18,15 @@ const (
 
 // Settings holds local workspace paths and runtime preferences.
 type Settings struct {
-	WorkspaceDir string `yaml:"workspace_dir"`
-	ConfigDir    string `yaml:"config_dir"`
-	DataDir      string `yaml:"data_dir"`
-	ReportsDir   string `yaml:"reports_dir"`
-	TempDir      string `yaml:"temp_dir"`
-	LogFormat    string `yaml:"log_format"` // "text" or "json"
-	LogLevel     string `yaml:"log_level"`
+	WorkspaceDir      string `yaml:"workspace_dir"`
+	ConfigDir         string `yaml:"config_dir"`
+	DataDir           string `yaml:"data_dir"`
+	ReportsDir        string `yaml:"reports_dir"`
+	TempDir           string `yaml:"temp_dir"`
+	LogFormat         string `yaml:"log_format"` // "text" or "json"
+	LogLevel          string `yaml:"log_level"`
+	RulesManifestPath string `yaml:"rules_manifest_path"`
+	SuppressionsPath  string `yaml:"suppressions_path"`
 }
 
 // Overrides from flags and environment (higher precedence than file).

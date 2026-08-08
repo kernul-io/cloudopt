@@ -22,7 +22,7 @@ YAML files describe a **complete** collection snapshot for local development and
 
 ## Sample
 
-See [sample.yaml](sample.yaml) — one account, `us-east-1` and `eu-west-1`, running/stopped instances, attached/unattached volumes, RDS, NAT/subnet/VPC, costs, and CPU utilization metrics.
+See [sample.yaml](sample.yaml) — one account, `us-east-1` and `eu-west-1`, running/stopped instances, attached/unattached volumes, stale/recent volume snapshots, RDS, NAT/subnet/VPC, costs, and CPU utilization metrics.
 
 ## Usage (tests / future CLI)
 

@@ -8,11 +8,13 @@ import (
 	"path/filepath"
 
 	"github.com/kernul-io/cloudopt/internal/adapters/config"
+	"github.com/kernul-io/cloudopt/internal/application/ports"
 )
 
 // Runtime implements operational commands for the CLI.
 type Runtime struct {
-	Settings config.Settings
+	Settings    config.Settings
+	lastAnalyze *AnalyzeResult
 }
 
 func NewRuntime(settings config.Settings) *Runtime {
@@ -61,11 +63,30 @@ func (r *Runtime) Collect(ctx context.Context) error {
 	return ErrNotImplemented("collect")
 }
 
-func (r *Runtime) Analyze(ctx context.Context) error {
+func (r *Runtime) Analyze(ctx context.Context, opts ports.AnalyzeOptions) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	return ErrNotImplemented("analyze")
+	repo, err := OpenStorage(ctx, r.Settings)
+	if err != nil {
+		return err
+	}
+	svc := &AnalyzeService{Repo: repo}
+	result, err := svc.Analyze(ctx, AnalyzeSettings{
+		ConfigDir:         r.Settings.ConfigDir,
+		RulesManifestPath: r.Settings.RulesManifestPath,
+		SuppressionsPath:  r.Settings.SuppressionsPath,
+	}, opts)
+	if err != nil {
+		return err
+	}
+	r.lastAnalyze = result
+	return nil
+}
+
+// LastAnalyzeResult returns the most recent analyze output for CLI emission.
+func (r *Runtime) LastAnalyzeResult() *AnalyzeResult {
+	return r.lastAnalyze
 }
 
 func (r *Runtime) Report(ctx context.Context) error {
