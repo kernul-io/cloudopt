@@ -26,6 +26,7 @@ type StorageRepository interface {
 
 	SaveAnalysisRun(ctx context.Context, run *domain.AnalysisRun) error
 	GetAnalysisRun(ctx context.Context, id types.AnalysisRunID) (*domain.AnalysisRun, error)
+	GetLatestAnalysisRun(ctx context.Context, snapshotID types.SnapshotID) (*domain.AnalysisRun, error)
 
 	DeleteSnapshot(ctx context.Context, id types.SnapshotID) error
 	DeleteSnapshotsByAccount(ctx context.Context, accountID types.AccountID) (int, error)

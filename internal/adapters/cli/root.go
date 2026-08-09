@@ -10,6 +10,7 @@ import (
 	"github.com/kernul-io/cloudopt/internal/adapters/logging"
 	"github.com/kernul-io/cloudopt/internal/application/api"
 	"github.com/kernul-io/cloudopt/internal/application/domain/types"
+	"github.com/kernul-io/cloudopt/internal/application/ports"
 	"github.com/kernul-io/cloudopt/internal/domain/exitcodes"
 )
 
@@ -44,6 +45,7 @@ func NewRootCommand(cfg *Config) *cobra.Command {
 	root.AddCommand(newCollectCommand(cfg))
 	root.AddCommand(newAnalyzeCommand(cfg))
 	root.AddCommand(newReportCommand(cfg))
+	root.AddCommand(newImportFixtureCommand(cfg))
 
 	return root
 }
@@ -110,16 +112,47 @@ func newAnalyzeCommand(cfg *Config) *cobra.Command {
 }
 
 func newReportCommand(cfg *Config) *cobra.Command {
+	var format, output, analysisRunID string
+	var redact bool
+	var jsonOut bool
 	cmd := &cobra.Command{
 		Use:   "report",
 		Short: "Generate a shareable report from analysis results",
-		Long:  "Report is not implemented in step 01; output contract and flags are stable for later steps.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runOperational(cmd, cfg, "report", (*api.Runtime).Report)
+			f, err := parseReportFormat(format)
+			if err != nil {
+				_ = EmitError("report", err.Error())
+				return &ExitError{Code: exitcodes.InvalidInput, Err: err}
+			}
+			if jsonOut {
+				f = ports.ReportJSON
+			}
+			opts := ports.ReportOptions{
+				AnalysisRunID:     types.AnalysisRunID(analysisRunID),
+				RedactIdentifiers: redact,
+				Format:            f,
+				OutputPath:        output,
+			}
+			return runReport(cmd, cfg, opts)
 		},
 	}
-	cmd.Flags().String("format", "html", "Report format: html or json")
-	cmd.Flags().String("output", "", "Output file path (default: reports dir)")
+	cmd.Flags().StringVar(&format, "format", "html", "Report format: html or json")
+	cmd.Flags().StringVar(&output, "output", "", "Output file path (default: reports dir)")
+	cmd.Flags().StringVar(&analysisRunID, "analysis-run-id", "", "Analysis run to report (default: latest)")
+	cmd.Flags().BoolVar(&redact, "redact", false, "Redact account and resource identifiers using stable aliases")
+	cmd.Flags().BoolVar(&jsonOut, "json", false, "Write JSON report and emit result metadata on stdout")
+	return cmd
+}
+
+func newImportFixtureCommand(cfg *Config) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "import-fixture",
+		Short: "Import offline fixture YAML into local storage",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runImportFixture(cmd, cfg, args[0])
+		},
+	}
 	return cmd
 }
 
@@ -166,6 +199,8 @@ func mapCommandExit(command string, err error) int {
 		return CollectionExitCode(err)
 	case "analyze":
 		return AnalysisExitCode(err)
+	case "report":
+		return ReportExitCode(err)
 	default:
 		return ExitCode(err)
 	}

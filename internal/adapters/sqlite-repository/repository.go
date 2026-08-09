@@ -316,6 +316,31 @@ func (r *Repository) GetAnalysisRun(ctx context.Context, id types.AnalysisRunID)
 	return &run, nil
 }
 
+func (r *Repository) GetLatestAnalysisRun(ctx context.Context, snapshotID types.SnapshotID) (*domain.AnalysisRun, error) {
+	var id string
+	var err error
+	if snapshotID != "" {
+		err = r.db.QueryRowContext(ctx, `
+			SELECT id FROM analysis_runs
+			WHERE snapshot_id = ? AND status = ?
+			ORDER BY completed_at DESC, started_at DESC
+			LIMIT 1`, string(snapshotID), string(domain.AnalysisComplete)).Scan(&id)
+	} else {
+		err = r.db.QueryRowContext(ctx, `
+			SELECT id FROM analysis_runs
+			WHERE status = ?
+			ORDER BY completed_at DESC, started_at DESC
+			LIMIT 1`, string(domain.AnalysisComplete)).Scan(&id)
+	}
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrAnalysisRunNotFound
+		}
+		return nil, err
+	}
+	return r.GetAnalysisRun(ctx, types.AnalysisRunID(id))
+}
+
 func (r *Repository) DeleteSnapshot(ctx context.Context, id types.SnapshotID) error {
 	res, err := r.db.ExecContext(ctx, `DELETE FROM snapshots WHERE id = ?`, string(id))
 	if err != nil {
