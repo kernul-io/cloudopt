@@ -15,13 +15,14 @@ import (
 
 // Runtime implements operational commands for the CLI.
 type Runtime struct {
-	Settings        config.Settings
-	lastAnalyze     *AnalyzeResult
-	lastReport      *ports.ReportResult
-	lastCollect     *CollectResult
-	lastCostCollect *CostCollectResult
-	lastReconcile   *ReconcileCostResult
-	AnalyzerVersion string
+	Settings           config.Settings
+	lastAnalyze        *AnalyzeResult
+	lastReport         *ports.ReportResult
+	lastCollect        *CollectResult
+	lastCostCollect    *CostCollectResult
+	lastMetricsCollect *MetricsCollectResult
+	lastReconcile      *ReconcileCostResult
+	AnalyzerVersion    string
 }
 
 func NewRuntime(settings config.Settings) *Runtime {

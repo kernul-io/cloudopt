@@ -142,9 +142,31 @@ type RemediationEntry struct {
 }
 
 type Appendix struct {
-	Suppressed   []RuleOutcome `json:"suppressed_checks"`
-	NotEvaluated []RuleOutcome `json:"not_evaluated_checks"`
-	Passed       []RuleOutcome `json:"passed_checks,omitempty"`
+	Suppressed   []RuleOutcome        `json:"suppressed_checks"`
+	NotEvaluated []RuleOutcome        `json:"not_evaluated_checks"`
+	Passed       []RuleOutcome        `json:"passed_checks,omitempty"`
+	Utilization  *UtilizationAppendix `json:"utilization,omitempty"`
+}
+
+type UtilizationAppendix struct {
+	WindowStart   string                     `json:"observation_window_start,omitempty"`
+	WindowEnd     string                     `json:"observation_window_end,omitempty"`
+	PeriodSeconds int                        `json:"period_seconds,omitempty"`
+	Resources     []ResourceUtilizationEntry `json:"resources,omitempty"`
+}
+
+type ResourceUtilizationEntry struct {
+	Alias          string        `json:"alias"`
+	Metric         string        `json:"metric"`
+	SampleCoverage float64       `json:"sample_coverage"`
+	Signals        []SignalEntry `json:"signals"`
+}
+
+type SignalEntry struct {
+	Kind    string    `json:"kind"`
+	Value   float64   `json:"value"`
+	Unit    string    `json:"unit"`
+	KindTag ValueKind `json:"value_kind"`
 }
 
 type RuleOutcome struct {

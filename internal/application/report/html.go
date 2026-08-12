@@ -161,6 +161,29 @@ func RenderHTML(doc *Document) (string, error) {
 	b.WriteString("</section>\n")
 
 	b.WriteString("<section><h2>Appendix</h2>")
+	if doc.Appendix.Utilization != nil {
+		u := doc.Appendix.Utilization
+		b.WriteString("<h3>Utilization evidence</h3><p>Observation window: ")
+		b.WriteString(html.EscapeString(u.WindowStart))
+		b.WriteString(" — ")
+		b.WriteString(html.EscapeString(u.WindowEnd))
+		if u.PeriodSeconds > 0 {
+			fmt.Fprintf(&b, " (period %ds)", u.PeriodSeconds)
+		}
+		b.WriteString("</p><ul>")
+		for _, r := range u.Resources {
+			b.WriteString("<li>")
+			b.WriteString(html.EscapeString(r.Alias))
+			b.WriteString(" / ")
+			b.WriteString(html.EscapeString(r.Metric))
+			fmt.Fprintf(&b, " — coverage %.0f%%", r.SampleCoverage*100)
+			for _, s := range r.Signals {
+				fmt.Fprintf(&b, "; %s=%.2f %s", html.EscapeString(s.Kind), s.Value, html.EscapeString(s.Unit))
+			}
+			b.WriteString("</li>")
+		}
+		b.WriteString("</ul>")
+	}
 	writeAppendixList(&b, "Suppressed checks", doc.Appendix.Suppressed)
 	writeAppendixList(&b, "Not evaluated checks", doc.Appendix.NotEvaluated)
 	b.WriteString("</section>\n")

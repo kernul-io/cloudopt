@@ -23,13 +23,15 @@ type CollectionSnapshot struct {
 	StartedAt     types.Timestamp
 	CompletedAt   *types.Timestamp
 
-	Account       Account
-	Regions       []Region
-	Resources     []Resource
-	Relationships []Relationship
-	Costs         []CostRecord
-	Metrics       []MetricSeries
-	Coverage      CollectionCoverage
+	Account            Account
+	Regions            []Region
+	Resources          []Resource
+	Relationships      []Relationship
+	Costs              []CostRecord
+	Metrics            []MetricSeries
+	UtilizationSignals []UtilizationSignal
+	MetricsMeta        *MetricsCollectionMeta
+	Coverage           CollectionCoverage
 }
 
 // IsAnalyzable returns true when the snapshot finished successfully with full coverage.

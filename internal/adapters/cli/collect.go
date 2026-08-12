@@ -68,8 +68,10 @@ func newCollectAWSCommand(cfg *Config) *cobra.Command {
 		},
 	}
 	bindAWSCostFlags(cost, &costOpts)
+	metrics := newMetricsCommand(cfg)
 	cmd.AddCommand(inventory)
 	cmd.AddCommand(cost)
+	cmd.AddCommand(metrics)
 	return cmd
 }
 

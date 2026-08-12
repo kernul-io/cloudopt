@@ -49,6 +49,16 @@ func TestOfflineAWSCollectAnalyzeReport(t *testing.T) {
 	})
 	require.NoError(t, err)
 
+	metricsRoot := filepath.Join("..", "..", "..", "testdata", "aws-metrics")
+	_, err = rt.CollectMetrics(context.Background(), ports.MetricsCollectOptions{
+		Provider:     types.ProviderAWS,
+		SnapshotID:   res.SnapshotID,
+		Offline:      true,
+		FixtureRoot:  metricsRoot,
+		LookbackDays: 14,
+	})
+	require.NoError(t, err)
+
 	require.NoError(t, rt.Analyze(context.Background(), ports.AnalyzeOptions{Persist: true}))
 	require.NoError(t, rt.Report(context.Background(), ports.ReportOptions{Format: ports.ReportJSON}))
 }

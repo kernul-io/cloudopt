@@ -17,11 +17,12 @@ type Result struct {
 	Message string `json:"message,omitempty"`
 	Version string `json:"version,omitempty"`
 
-	Analysis  *AnalyzePayload       `json:"analysis,omitempty"`
-	Report    *ReportPayload        `json:"report,omitempty"`
-	Collect   *CollectPayload       `json:"collect,omitempty"`
-	Cost      *CostCollectPayload   `json:"cost_collect,omitempty"`
-	Reconcile *CostReconcilePayload `json:"cost_reconcile,omitempty"`
+	Analysis  *AnalyzePayload        `json:"analysis,omitempty"`
+	Report    *ReportPayload         `json:"report,omitempty"`
+	Collect   *CollectPayload        `json:"collect,omitempty"`
+	Cost      *CostCollectPayload    `json:"cost_collect,omitempty"`
+	Metrics   *MetricsCollectPayload `json:"metrics_collect,omitempty"`
+	Reconcile *CostReconcilePayload  `json:"cost_reconcile,omitempty"`
 }
 
 // AnalyzePayload is the detailed analyze output when --json is set.
@@ -205,6 +206,50 @@ func EmitCostCollectResult(result *api.CostCollectResult) error {
 		Status:  StatusOK,
 		Command: "collect",
 		Cost:    payload,
+	})
+}
+
+type MetricsCollectPayload struct {
+	SnapshotID string                          `json:"snapshot_id,omitempty"`
+	DryRun     bool                            `json:"dry_run,omitempty"`
+	Partial    bool                            `json:"partial,omitempty"`
+	Preflight  *MetricsCollectPreflightPayload `json:"preflight,omitempty"`
+	Series     int                             `json:"series_count,omitempty"`
+	Signals    int                             `json:"signals_count,omitempty"`
+}
+
+type MetricsCollectPreflightPayload struct {
+	ProviderAccountID string   `json:"provider_account_id"`
+	CallerARN         string   `json:"caller_arn"`
+	LookbackDays      int      `json:"lookback_days"`
+	PeriodSeconds     int      `json:"period_seconds"`
+	MissingActions    []string `json:"missing_actions,omitempty"`
+}
+
+func EmitMetricsCollectResult(result *api.MetricsCollectResult) error {
+	if result == nil {
+		return EmitOK("collect", "")
+	}
+	payload := &MetricsCollectPayload{
+		SnapshotID: result.SnapshotID,
+		DryRun:     result.DryRun,
+		Partial:    result.Partial,
+		Series:     result.Series,
+		Signals:    result.Signals,
+	}
+	if result.Preflight != nil {
+		payload.Preflight = &MetricsCollectPreflightPayload{
+			ProviderAccountID: result.Preflight.ProviderAccountID,
+			CallerARN:         result.Preflight.CallerARN,
+			LookbackDays:      result.Preflight.LookbackDays,
+			PeriodSeconds:     result.Preflight.PeriodSeconds,
+			MissingActions:    result.Preflight.MissingActions,
+		}
+	}
+	return writeResult(os.Stdout, Result{
+		Status:  StatusOK,
+		Command: "collect",
+		Metrics: payload,
 	})
 }
 

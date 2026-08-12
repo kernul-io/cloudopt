@@ -146,6 +146,79 @@ func (r *Repository) ReplaceSnapshotCosts(ctx context.Context, id types.Snapshot
 	return tx.Commit()
 }
 
+func (r *Repository) ReplaceSnapshotMetrics(ctx context.Context, id types.SnapshotID, series []domain.MetricSeries, signals []domain.UtilizationSignal, meta *domain.MetricsCollectionMeta, coverage []domain.ServiceCollectionStatus) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	var status string
+	if err := tx.QueryRowContext(ctx, `SELECT status FROM snapshots WHERE id = ?`, string(id)).Scan(&status); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrSnapshotNotFound
+		}
+		return err
+	}
+	if status != string(domain.SnapshotComplete) && status != string(domain.SnapshotPartial) {
+		return ErrSnapshotNotComplete
+	}
+
+	rows, err := tx.QueryContext(ctx, `SELECT id FROM metric_series WHERE snapshot_id = ?`, string(id))
+	if err != nil {
+		return err
+	}
+	var seriesIDs []int64
+	for rows.Next() {
+		var sid int64
+		if err := rows.Scan(&sid); err != nil {
+			_ = rows.Close()
+			return err
+		}
+		seriesIDs = append(seriesIDs, sid)
+	}
+	_ = rows.Close()
+	if len(seriesIDs) > 0 {
+		if _, err := tx.ExecContext(ctx, `DELETE FROM metric_points WHERE series_id IN (`+sqlPlaceholders(len(seriesIDs))+`)`, int64SliceToAny(seriesIDs)...); err != nil {
+			return err
+		}
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM metric_series WHERE snapshot_id = ?`, string(id)); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM utilization_signals WHERE snapshot_id = ?`, string(id)); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM snapshot_metrics_meta WHERE snapshot_id = ?`, string(id)); err != nil {
+		return err
+	}
+
+	snap := &domain.CollectionSnapshot{ID: id, Metrics: series}
+	if err := insertMetrics(ctx, tx, snap); err != nil {
+		return err
+	}
+	for i := range signals {
+		if err := insertUtilizationSignal(ctx, tx, id, &signals[i]); err != nil {
+			return err
+		}
+	}
+	if meta != nil {
+		if err := insertMetricsMeta(ctx, tx, id, meta); err != nil {
+			return err
+		}
+	}
+	for _, row := range coverage {
+		if _, err := tx.ExecContext(ctx, `
+			INSERT INTO snapshot_service_coverage (snapshot_id, service, region, status, message)
+			VALUES (?, ?, ?, ?, ?)
+			ON CONFLICT(snapshot_id, service, region) DO UPDATE SET status = excluded.status, message = excluded.message`,
+			string(id), row.Service, row.Region, string(row.Status), row.Message); err != nil {
+			return err
+		}
+	}
+	return tx.Commit()
+}
+
 func (r *Repository) GetSnapshotBillingSourceTotals(ctx context.Context, id types.SnapshotID) (map[string]types.Money, error) {
 	rows, err := r.db.QueryContext(ctx, `
 		SELECT currency, amount_minor FROM snapshot_billing_source_totals WHERE snapshot_id = ?`, string(id))
@@ -225,6 +298,18 @@ func (r *Repository) GetSnapshot(ctx context.Context, id types.SnapshotID) (*dom
 		return nil, err
 	}
 	snap.Metrics = metrics
+
+	meta, err := loadMetricsMeta(ctx, r.db, id)
+	if err != nil {
+		return nil, err
+	}
+	snap.MetricsMeta = meta
+
+	signals, err := loadUtilizationSignals(ctx, r.db, id)
+	if err != nil {
+		return nil, err
+	}
+	snap.UtilizationSignals = signals
 
 	coverage, err := loadServiceCoverage(ctx, r.db, id)
 	if err != nil {

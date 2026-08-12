@@ -47,7 +47,7 @@ func Build(in BuildInput) (*Document, error) {
 	savings := buildSavings(in.Snapshot, in.Run.Findings, recByFinding)
 
 	findings := buildFindings(in.Run.Findings, evidenceByID, recByFinding, in.Snapshot, aliases)
-	appendix := buildAppendix(in.Executions)
+	appendix := buildAppendix(in.Executions, in.Snapshot, aliases)
 
 	summary := rules.Summary{}
 	for _, ex := range in.Executions {
@@ -141,6 +141,16 @@ func buildScope(snap *domain.CollectionSnapshot, aliases *AliasMap) (ScopeSectio
 
 	if len(snap.Metrics) == 0 {
 		warnings = append(warnings, "No utilization metrics were present in the snapshot; utilization-based checks may be not evaluated.")
+	} else if snap.MetricsMeta != nil && snap.MetricsMeta.Partial {
+		warnings = append(warnings, "Utilization metrics collection was partial; review appendix for coverage and diagnostics.")
+	}
+	if snap.MetricsMeta != nil && !snap.MetricsMeta.Window.Start.IsZero() {
+		if obsStart.IsZero() || snap.MetricsMeta.Window.Start.Before(obsStart.Time) {
+			obsStart = snap.MetricsMeta.Window.Start
+		}
+		if obsEnd.IsZero() || snap.MetricsMeta.Window.End.After(obsEnd.Time) {
+			obsEnd = snap.MetricsMeta.Window.End
+		}
 	}
 	for _, rel := range snap.Relationships {
 		if rel.TargetMissing {
@@ -392,7 +402,7 @@ func rollbackForRule(ruleID string) string {
 	}
 }
 
-func buildAppendix(executions []rules.RuleExecution) Appendix {
+func buildAppendix(executions []rules.RuleExecution, snap *domain.CollectionSnapshot, aliases *AliasMap) Appendix {
 	var ap Appendix
 	for _, ex := range executions {
 		item := RuleOutcome{RuleID: ex.RuleID, Status: string(ex.Status), Message: ex.Message}
@@ -411,7 +421,57 @@ func buildAppendix(executions []rules.RuleExecution) Appendix {
 	sortOutcomes(ap.Suppressed)
 	sortOutcomes(ap.NotEvaluated)
 	sortOutcomes(ap.Passed)
+	ap.Utilization = buildUtilizationAppendix(snap, aliases)
 	return ap
+}
+
+func buildUtilizationAppendix(snap *domain.CollectionSnapshot, aliases *AliasMap) *UtilizationAppendix {
+	if snap == nil || len(snap.UtilizationSignals) == 0 {
+		return nil
+	}
+	out := &UtilizationAppendix{}
+	if snap.MetricsMeta != nil {
+		out.WindowStart = snap.MetricsMeta.Window.Start.Canonical()
+		out.WindowEnd = snap.MetricsMeta.Window.End.Canonical()
+		out.PeriodSeconds = snap.MetricsMeta.Window.PeriodSeconds
+	}
+	type key struct {
+		res, metric string
+	}
+	grouped := map[key]*ResourceUtilizationEntry{}
+	for _, sig := range snap.UtilizationSignals {
+		k := key{string(sig.ResourceID), sig.MetricName}
+		entry, ok := grouped[k]
+		if !ok {
+			alias := string(sig.ResourceID)
+			if aliases != nil {
+				alias = aliases.Resource(sig.ResourceID)
+			}
+			entry = &ResourceUtilizationEntry{Alias: alias, Metric: sig.MetricName}
+			grouped[k] = entry
+		}
+		if sig.Kind == domain.SignalSampleCoverage {
+			entry.SampleCoverage = sig.Value
+			continue
+		}
+		entry.Signals = append(entry.Signals, SignalEntry{
+			Kind:    string(sig.Kind),
+			Value:   sig.Value,
+			Unit:    sig.Unit,
+			KindTag: KindDerived,
+		})
+	}
+	for _, e := range grouped {
+		sort.Slice(e.Signals, func(i, j int) bool { return e.Signals[i].Kind < e.Signals[j].Kind })
+		out.Resources = append(out.Resources, *e)
+	}
+	sort.Slice(out.Resources, func(i, j int) bool {
+		if out.Resources[i].Alias == out.Resources[j].Alias {
+			return out.Resources[i].Metric < out.Resources[j].Metric
+		}
+		return out.Resources[i].Alias < out.Resources[j].Alias
+	})
+	return out
 }
 
 func severityRank(s domain.FindingSeverity) int {

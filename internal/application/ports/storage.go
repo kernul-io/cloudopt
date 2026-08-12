@@ -21,6 +21,7 @@ type StorageRepository interface {
 
 	SaveSnapshot(ctx context.Context, snap *domain.CollectionSnapshot) error
 	ReplaceSnapshotCosts(ctx context.Context, id types.SnapshotID, costs []domain.CostRecord, coverage []domain.ServiceCollectionStatus, sourceTotals map[string]types.Money) error
+	ReplaceSnapshotMetrics(ctx context.Context, id types.SnapshotID, series []domain.MetricSeries, signals []domain.UtilizationSignal, meta *domain.MetricsCollectionMeta, coverage []domain.ServiceCollectionStatus) error
 	GetSnapshot(ctx context.Context, id types.SnapshotID) (*domain.CollectionSnapshot, error)
 	GetSnapshotBillingSourceTotals(ctx context.Context, id types.SnapshotID) (map[string]types.Money, error)
 	ListSnapshots(ctx context.Context, filter ListSnapshotFilter) ([]domain.SnapshotSummary, error)
