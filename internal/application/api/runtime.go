@@ -19,6 +19,8 @@ type Runtime struct {
 	lastAnalyze     *AnalyzeResult
 	lastReport      *ports.ReportResult
 	lastCollect     *CollectResult
+	lastCostCollect *CostCollectResult
+	lastReconcile   *ReconcileCostResult
 	AnalyzerVersion string
 }
 

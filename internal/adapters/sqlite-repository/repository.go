@@ -98,6 +98,73 @@ func (r *Repository) SaveSnapshot(ctx context.Context, snap *domain.CollectionSn
 	return tx.Commit()
 }
 
+func (r *Repository) ReplaceSnapshotCosts(ctx context.Context, id types.SnapshotID, costs []domain.CostRecord, coverage []domain.ServiceCollectionStatus, sourceTotals map[string]types.Money) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	var status string
+	if err := tx.QueryRowContext(ctx, `SELECT status FROM snapshots WHERE id = ?`, string(id)).Scan(&status); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrSnapshotNotFound
+		}
+		return err
+	}
+	if status != string(domain.SnapshotComplete) && status != string(domain.SnapshotPartial) {
+		return ErrSnapshotNotComplete
+	}
+
+	if _, err := tx.ExecContext(ctx, `DELETE FROM cost_records WHERE snapshot_id = ?`, string(id)); err != nil {
+		return err
+	}
+	for i := range costs {
+		if err := insertOneCost(ctx, tx, id, &costs[i]); err != nil {
+			return err
+		}
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM snapshot_billing_source_totals WHERE snapshot_id = ?`, string(id)); err != nil {
+		return err
+	}
+	for cur, money := range sourceTotals {
+		if _, err := tx.ExecContext(ctx, `
+			INSERT INTO snapshot_billing_source_totals (snapshot_id, currency, amount_minor) VALUES (?, ?, ?)`,
+			string(id), cur, money.AmountMinor); err != nil {
+			return err
+		}
+	}
+	for _, row := range coverage {
+		if _, err := tx.ExecContext(ctx, `
+			INSERT INTO snapshot_service_coverage (snapshot_id, service, region, status, message)
+			VALUES (?, ?, ?, ?, ?)
+			ON CONFLICT(snapshot_id, service, region) DO UPDATE SET status = excluded.status, message = excluded.message`,
+			string(id), row.Service, row.Region, string(row.Status), row.Message); err != nil {
+			return err
+		}
+	}
+	return tx.Commit()
+}
+
+func (r *Repository) GetSnapshotBillingSourceTotals(ctx context.Context, id types.SnapshotID) (map[string]types.Money, error) {
+	rows, err := r.db.QueryContext(ctx, `
+		SELECT currency, amount_minor FROM snapshot_billing_source_totals WHERE snapshot_id = ?`, string(id))
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = rows.Close() }()
+	out := map[string]types.Money{}
+	for rows.Next() {
+		var cur string
+		var minor int64
+		if err := rows.Scan(&cur, &minor); err != nil {
+			return nil, err
+		}
+		out[cur] = types.Money{AmountMinor: minor, Currency: cur}
+	}
+	return out, rows.Err()
+}
+
 func (r *Repository) GetSnapshot(ctx context.Context, id types.SnapshotID) (*domain.CollectionSnapshot, error) {
 	row := r.db.QueryRowContext(ctx, `
 		SELECT account_id, provider, status, schema_version, external_key, started_at, completed_at

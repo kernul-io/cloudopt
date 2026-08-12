@@ -1,0 +1,71 @@
+{
+  "ResultsByTime": [
+    {
+      "TimePeriod": { "Start": "2025-06-01", "End": "2025-07-01" },
+      "Estimated": false,
+      "Total": {
+        "NetAmortizedCost": { "Amount": "142.50", "Unit": "USD" },
+        "UnblendedCost": { "Amount": "145.00", "Unit": "USD" }
+      },
+      "Groups": [
+        {
+          "Keys": ["Amazon Elastic Compute Cloud - Compute", "us-east-1", "i-0running01"],
+          "Metrics": {
+            "NetAmortizedCost": { "Amount": "77.00", "Unit": "USD" }
+          }
+        },
+        {
+          "Keys": ["Amazon Elastic Block Store", "us-east-1", "vol-orphan01"],
+          "Metrics": {
+            "NetAmortizedCost": { "Amount": "25.00", "Unit": "USD" }
+          }
+        },
+        {
+          "Keys": ["Amazon Relational Database Service", "us-east-1", "tag-owner:platform-team"],
+          "Metrics": {
+            "NetAmortizedCost": { "Amount": "18.50", "Unit": "USD" }
+          }
+        },
+        {
+          "Keys": ["AWS Support", "global", "shared"],
+          "Metrics": {
+            "NetAmortizedCost": { "Amount": "20.00", "Unit": "USD" }
+          }
+        },
+        {
+          "Keys": ["AmazonCloudWatch", "us-east-1", "i-unknown999"],
+          "Metrics": {
+            "NetAmortizedCost": { "Amount": "4.00", "Unit": "USD" }
+          }
+        },
+        {
+          "Keys": ["Refund", "global", ""],
+          "Metrics": {
+            "NetAmortizedCost": { "Amount": "-2.00", "Unit": "USD" }
+          }
+        },
+        {
+          "Keys": ["Amazon EC2", "eu-west-1", ""],
+          "Metrics": {
+            "NetAmortizedCost": { "Amount": "5.00", "Unit": "EUR" }
+          }
+        }
+      ]
+    },
+    {
+      "TimePeriod": { "Start": "2025-07-01", "End": "2025-08-01" },
+      "Estimated": true,
+      "Total": {
+        "NetAmortizedCost": { "Amount": "12.34", "Unit": "USD" }
+      },
+      "Groups": [
+        {
+          "Keys": ["Amazon Elastic Compute Cloud - Compute", "us-east-1", "i-0running01"],
+          "Metrics": {
+            "NetAmortizedCost": { "Amount": "12.34", "Unit": "USD" }
+          }
+        }
+      ]
+    }
+  ]
+}

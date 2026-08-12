@@ -1,0 +1,17 @@
+provider: aws
+schema: "1"
+billing:
+  - id: cost_explorer_service_region
+    description: Account- and service-level costs via Cost Explorer (SERVICE, REGION)
+    available: true
+    api_actions:
+      - ce:GetCostAndUsage
+      - ce:GetDimensionValues
+  - id: cost_explorer_resource
+    description: Resource-level costs where AWS exposes RESOURCE_ID granularity
+    available: true
+    api_actions:
+      - ce:GetCostAndUsage
+supported_checks:
+  - cost_attribution_coverage
+  - billing_lag

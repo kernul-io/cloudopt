@@ -83,7 +83,13 @@ func RenderHTML(doc *Document) (string, error) {
 	b.WriteString(html.EscapeString(string(doc.Costs.Kind)))
 	b.WriteString(" — ")
 	b.WriteString(html.EscapeString(doc.Costs.PeriodNote))
-	b.WriteString("</em></p><ul>")
+	b.WriteString("</em></p>")
+	if doc.Costs.AttributionNote != "" {
+		b.WriteString("<p>")
+		b.WriteString(html.EscapeString(doc.Costs.AttributionNote))
+		b.WriteString("</p>")
+	}
+	b.WriteString("<ul>")
 	for _, c := range doc.Costs.ByCurrency {
 		b.WriteString("<li>")
 		b.WriteString(html.EscapeString(fmt.Sprintf("%.2f %s", c.AmountMajor, c.Currency)))

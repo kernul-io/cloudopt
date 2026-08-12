@@ -189,9 +189,12 @@ func (im *Importer) Import(ctx context.Context, path string) (types.SnapshotID, 
 			ResourceID:  types.ResourceID(c.ResourceID),
 			Service:     c.Service,
 			Amount:      types.FromMajorUnits(c.AmountMajor, c.Currency, 100),
+			Basis:       domain.CostBasisAmortizedNet,
+			ChargeKind:  domain.ChargeUsage,
 			Granularity: domain.CostGranularity(c.Granularity),
 			PeriodStart: start,
 			PeriodEnd:   end,
+			Attribution: domain.CostAttribution{Method: domain.AttributionDirectResourceID, Confidence: 0.9},
 			Provenance:  prov,
 		})
 	}

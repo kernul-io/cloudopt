@@ -10,6 +10,7 @@ import (
 
 	"github.com/kernul-io/cloudopt/internal/adapters/cli"
 	"github.com/kernul-io/cloudopt/internal/application/api"
+	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
 )
 
@@ -38,6 +39,15 @@ func TestOfflineAWSCollectAnalyzeReport(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, res.SnapshotID)
+
+	billingRoot := filepath.Join("..", "..", "..", "testdata", "aws-billing")
+	_, err = rt.CollectCost(context.Background(), ports.CostCollectOptions{
+		Provider:    types.ProviderAWS,
+		SnapshotID:  res.SnapshotID,
+		Offline:     true,
+		FixtureRoot: billingRoot,
+	})
+	require.NoError(t, err)
 
 	require.NoError(t, rt.Analyze(context.Background(), ports.AnalyzeOptions{Persist: true}))
 	require.NoError(t, rt.Report(context.Background(), ports.ReportOptions{Format: ports.ReportJSON}))
