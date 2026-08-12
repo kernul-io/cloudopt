@@ -7,7 +7,7 @@ on:
 
 env:
   GO_VERSION: "1.25.3"
-  RELEASE_TAG: ${{ github.event.inputs.tag }}
+  RELEASE_TAG: ${{ github.ref_name }}
   CGO_ENABLED: "0"
 
 jobs:
@@ -40,13 +40,13 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
 
       - name: Build
-        run: go build -ldflags="-s -w" -o main ./cmd/
+        run: go build -ldflags="-s -w" -o cloudopt ./cmd/
 
       - name: Package + checksum (Linux AMD64)
         if: ${{ startsWith(matrix.os, 'ubuntu') && matrix.platform == 'linux/amd64' }}
         run: |
           mkdir -p out/linux_amd64
-          mv cmd/* out/linux_amd64/cloudopt
+          mv cloudopt out/linux_amd64/cloudopt
           tar -C out/linux_amd64 -czf cloudopt_${{ env.RELEASE_TAG }}_linux_amd64.tar.gz .
           shasum -a 256 cloudopt_${{ env.RELEASE_TAG }}_linux_amd64.tar.gz > cloudopt_${{ env.RELEASE_TAG }}_linux_amd64_checksums.txt
 
@@ -54,7 +54,7 @@ jobs:
         if: ${{ startsWith(matrix.os, 'ubuntu') && matrix.platform == 'linux/arm64' }}
         run: |
           mkdir -p out/linux_arm64
-          mv cmd/* out/linux_arm64/cloudopt
+          mv cloudopt out/linux_arm64/cloudopt
           tar -C out/linux_arm64 -czf cloudopt_${{ env.RELEASE_TAG }}_linux_arm64.tar.gz .
           shasum -a 256 cloudopt_${{ env.RELEASE_TAG }}_linux_arm64.tar.gz > cloudopt_${{ env.RELEASE_TAG }}_linux_arm64_checksums.txt
 
@@ -62,7 +62,7 @@ jobs:
         if: ${{ matrix.os == 'macos-latest' }}
         run: |
           mkdir -p out/darwin
-          mv cmd/* out/darwin/cloudopt
+          mv cloudopt out/darwin/cloudopt
           tar -C out/darwin -czf cloudopt_${{ env.RELEASE_TAG }}_darwin.tar.gz .
           shasum -a 256 cloudopt_${{ env.RELEASE_TAG }}_darwin.tar.gz > cloudopt_${{ env.RELEASE_TAG }}_darwin_checksums.txt
 
@@ -71,7 +71,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path out\windows_amd64 | Out-Null
-          Move-Item cmd\* out\windows_amd64\cloudopt.exe
+          Move-Item cloudopt out\windows_amd64\cloudopt.exe
           Compress-Archive -Path out\windows_amd64\* -DestinationPath "cloudopt_${{ env.RELEASE_TAG }}_windows_amd64.zip" -Force
           (Get-FileHash "cloudopt_${{ env.RELEASE_TAG }}_windows_amd64.zip" -Algorithm SHA256).Hash + "  cloudopt_${{ env.RELEASE_TAG }}_windows_amd64.zip" | Out-File -Encoding ASCII "cloudopt_${{ env.RELEASE_TAG }}_windows_amd64_checksums.txt"
 
