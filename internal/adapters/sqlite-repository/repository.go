@@ -45,8 +45,8 @@ func (r *Repository) SaveSnapshot(ctx context.Context, snap *domain.CollectionSn
 	if snap == nil {
 		return fmt.Errorf("snapshot is nil")
 	}
-	if snap.Status != domain.SnapshotComplete {
-		return fmt.Errorf("only complete snapshots can be saved atomically")
+	if snap.Status != domain.SnapshotComplete && snap.Status != domain.SnapshotPartial {
+		return fmt.Errorf("only complete or partial snapshots can be saved atomically")
 	}
 
 	tx, err := r.db.BeginTx(ctx, nil)
@@ -89,6 +89,9 @@ func (r *Repository) SaveSnapshot(ctx context.Context, snap *domain.CollectionSn
 		return err
 	}
 	if err := insertMetrics(ctx, tx, snap); err != nil {
+		return err
+	}
+	if err := insertServiceCoverage(ctx, tx, snap); err != nil {
 		return err
 	}
 
@@ -155,6 +158,12 @@ func (r *Repository) GetSnapshot(ctx context.Context, id types.SnapshotID) (*dom
 		return nil, err
 	}
 	snap.Metrics = metrics
+
+	coverage, err := loadServiceCoverage(ctx, r.db, id)
+	if err != nil {
+		return nil, err
+	}
+	snap.Coverage = coverage
 
 	return &snap, nil
 }

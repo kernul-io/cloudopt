@@ -7,6 +7,7 @@ type ResourceKind string
 
 const (
 	KindComputeInstance ResourceKind = "compute_instance"
+	KindInstanceType    ResourceKind = "instance_type"
 	KindBlockVolume     ResourceKind = "block_volume"
 	KindDatabase        ResourceKind = "database_instance"
 	KindNATGateway      ResourceKind = "nat_gateway"
@@ -14,6 +15,7 @@ const (
 	KindVPC             ResourceKind = "vpc"
 	KindElasticIP       ResourceKind = "elastic_ip"
 	KindSnapshot        ResourceKind = "volume_snapshot"
+	KindRouteTable      ResourceKind = "route_table"
 )
 
 // Resource is a node in the inventory graph.

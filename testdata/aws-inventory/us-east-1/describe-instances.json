@@ -1,0 +1,18 @@
+{
+  "Reservations": [
+    {
+      "Instances": [
+        {
+          "InstanceId": "i-0running01",
+          "InstanceType": "m5.large",
+          "State": { "Name": "running" },
+          "SubnetId": "subnet-0abc1234",
+          "Tags": [
+            { "Key": "Name", "Value": "app-server-1" },
+            { "Key": "Owner", "Value": "platform-team" }
+          ]
+        }
+      ]
+    }
+  ]
+}

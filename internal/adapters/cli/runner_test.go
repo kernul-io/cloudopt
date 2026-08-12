@@ -1,7 +1,6 @@
 package cli_test
 
 import (
-	"bytes"
 	"context"
 	"io"
 	"os"
@@ -75,26 +74,13 @@ func TestExecute_versionJSON(t *testing.T) {
 	}
 }
 
-func TestExecute_collectNotImplemented(t *testing.T) {
+func TestExecute_collectHelp(t *testing.T) {
 	oldArgs := os.Args
 	defer func() { os.Args = oldArgs }()
-	dir := t.TempDir()
-	os.Args = []string{"cloudopt", "collect", "--workspace-dir", dir}
+	os.Args = []string{"cloudopt", "collect"}
 
-	oldStdout := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
 	code := cli.Execute(&cli.Config{})
-	if err := w.Close(); err != nil {
-		t.Fatalf("close pipe: %v", err)
-	}
-	os.Stdout = oldStdout
-	out, _ := io.ReadAll(r)
-
 	if code != 0 {
-		t.Fatalf("exit code %d, want 0 for not_implemented", code)
-	}
-	if !bytes.Contains(out, []byte(`"status":"not_implemented"`)) {
-		t.Fatalf("stdout = %s", out)
+		t.Fatalf("exit code %d, want 0 for help", code)
 	}
 }

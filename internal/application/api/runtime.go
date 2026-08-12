@@ -18,6 +18,7 @@ type Runtime struct {
 	Settings        config.Settings
 	lastAnalyze     *AnalyzeResult
 	lastReport      *ports.ReportResult
+	lastCollect     *CollectResult
 	AnalyzerVersion string
 }
 
@@ -58,13 +59,6 @@ func (r *Runtime) Init(ctx context.Context) error {
 		return fmt.Errorf("initialize storage: %w", err)
 	}
 	return nil
-}
-
-func (r *Runtime) Collect(ctx context.Context) error {
-	if err := ctx.Err(); err != nil {
-		return err
-	}
-	return ErrNotImplemented("collect")
 }
 
 func (r *Runtime) Analyze(ctx context.Context, opts ports.AnalyzeOptions) error {

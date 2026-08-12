@@ -153,6 +153,41 @@ func insertMetrics(ctx context.Context, tx *sql.Tx, snap *domain.CollectionSnaps
 	return nil
 }
 
+func insertServiceCoverage(ctx context.Context, tx *sql.Tx, snap *domain.CollectionSnapshot) error {
+	for _, svc := range snap.Coverage.Services {
+		_, err := tx.ExecContext(ctx, `
+			INSERT INTO snapshot_service_coverage (snapshot_id, service, region, status, message)
+			VALUES (?, ?, ?, ?, ?)`,
+			string(snap.ID), svc.Service, svc.Region, string(svc.Status), svc.Message,
+		)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func loadServiceCoverage(ctx context.Context, db queryer, snapID types.SnapshotID) (domain.CollectionCoverage, error) {
+	rows, err := db.QueryContext(ctx, `
+		SELECT service, region, status, message
+		FROM snapshot_service_coverage WHERE snapshot_id = ? ORDER BY service, region`, string(snapID))
+	if err != nil {
+		return domain.CollectionCoverage{}, err
+	}
+	defer func() { _ = rows.Close() }()
+	var out domain.CollectionCoverage
+	for rows.Next() {
+		var svc domain.ServiceCollectionStatus
+		var status string
+		if err := rows.Scan(&svc.Service, &svc.Region, &status, &svc.Message); err != nil {
+			return domain.CollectionCoverage{}, err
+		}
+		svc.Status = domain.ServiceCollectionState(status)
+		out.Services = append(out.Services, svc)
+	}
+	return out, rows.Err()
+}
+
 func loadAccount(ctx context.Context, db queryer, id types.AccountID) (domain.Account, error) {
 	row := db.QueryRowContext(ctx, `
 		SELECT id, provider, provider_account_id, display_name, default_currency, quality, source, observed_at

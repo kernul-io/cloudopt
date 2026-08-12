@@ -1,0 +1,45 @@
+provider: aws
+schema: "1"
+inventory:
+  - id: ec2_instances
+    description: EC2 instances with instance type and state
+    available: true
+    api_actions:
+      - ec2:DescribeInstances
+  - id: ec2_instance_types
+    description: EC2 instance type catalog for types in use
+    available: true
+    api_actions:
+      - ec2:DescribeInstanceTypes
+  - id: ebs_volumes
+    description: EBS volumes
+    available: true
+    api_actions:
+      - ec2:DescribeVolumes
+  - id: ebs_snapshots
+    description: EBS snapshots owned by the account
+    available: true
+    api_actions:
+      - ec2:DescribeSnapshots
+  - id: rds_instances
+    description: RDS DB instances
+    available: true
+    api_actions:
+      - rds:DescribeDBInstances
+  - id: vpc_network
+    description: VPCs, subnets, route tables, NAT gateways, elastic IPs
+    available: true
+    api_actions:
+      - ec2:DescribeVpcs
+      - ec2:DescribeSubnets
+      - ec2:DescribeRouteTables
+      - ec2:DescribeNatGateways
+      - ec2:DescribeAddresses
+billing: []
+metrics: []
+pricing: []
+supported_checks:
+  - stopped_instance
+  - unattached_volume
+  - missing_tags
+  - stale_snapshot

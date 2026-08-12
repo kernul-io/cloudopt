@@ -56,7 +56,7 @@ func (s *AnalyzeService) Analyze(ctx context.Context, settings AnalyzeSettings, 
 		return nil, err
 	}
 
-	snap, err := s.resolveSnapshot(ctx, opts.SnapshotID)
+	snap, err := s.resolveSnapshot(ctx, opts.SnapshotID, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -120,14 +120,20 @@ func (s *AnalyzeService) Analyze(ctx context.Context, settings AnalyzeSettings, 
 	return result, nil
 }
 
-func (s *AnalyzeService) resolveSnapshot(ctx context.Context, id types.SnapshotID) (*domain.CollectionSnapshot, error) {
+func (s *AnalyzeService) resolveSnapshot(ctx context.Context, id types.SnapshotID, opts AnalyzeOptions) (*domain.CollectionSnapshot, error) {
 	if id != "" {
 		snap, err := s.Repo.GetSnapshot(ctx, id)
 		if err != nil {
 			return nil, err
 		}
 		if !snap.IsAnalyzable() {
-			return nil, fmt.Errorf("snapshot %q is not complete", id)
+			if snap.Status == domain.SnapshotPartial {
+				if !opts.AllowPartialSnapshot {
+					return nil, fmt.Errorf("snapshot %q is partial; re-run collect or pass --allow-partial-snapshot", id)
+				}
+			} else {
+				return nil, fmt.Errorf("snapshot %q is not complete", id)
+			}
 		}
 		return snap, nil
 	}

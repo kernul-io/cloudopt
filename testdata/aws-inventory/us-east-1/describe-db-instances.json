@@ -1,0 +1,10 @@
+{
+  "DBInstances": [
+    {
+      "DBInstanceIdentifier": "demo-db-1",
+      "DBInstanceStatus": "available",
+      "Engine": "postgres",
+      "DBInstanceClass": "db.t3.medium"
+    }
+  ]
+}

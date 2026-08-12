@@ -1,0 +1,11 @@
+{
+  "NatGateways": [
+    {
+      "NatGatewayId": "nat-0deadbeef",
+      "State": "available",
+      "NatGatewayAddresses": [{ "SubnetId": "subnet-0abc1234" }],
+      "SubnetId": "subnet-0abc1234",
+      "Tags": [{ "Key": "Name", "Value": "demo-nat" }]
+    }
+  ]
+}
