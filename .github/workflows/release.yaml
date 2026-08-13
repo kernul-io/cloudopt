@@ -66,7 +66,7 @@ jobs:
           tar -C out/darwin -czf cloudopt_${{ env.RELEASE_TAG }}_darwin.tar.gz .
           shasum -a 256 cloudopt_${{ env.RELEASE_TAG }}_darwin.tar.gz > cloudopt_${{ env.RELEASE_TAG }}_darwin_checksums.txt
 
-      - name: Package + checksum (Windows)
+      - name: Package + checksum (Windows using zip)
         if: ${{ matrix.os == 'windows-latest' }}
         shell: pwsh
         run: |
@@ -74,6 +74,12 @@ jobs:
           Move-Item cloudopt out\windows_amd64\cloudopt.exe
           Compress-Archive -Path out\windows_amd64\* -DestinationPath "cloudopt_${{ env.RELEASE_TAG }}_windows_amd64.zip" -Force
           (Get-FileHash "cloudopt_${{ env.RELEASE_TAG }}_windows_amd64.zip" -Algorithm SHA256).Hash + "  cloudopt_${{ env.RELEASE_TAG }}_windows_amd64.zip" | Out-File -Encoding ASCII "cloudopt_${{ env.RELEASE_TAG }}_windows_amd64_checksums.txt"
+
+      - name: Package + checksum (Windows using tar)
+        if: ${{ matrix.os == 'windows-latest' }}
+        shell: pwsh
+        run: |
+          tar -czf cloudopt_${{ env.RELEASE_TAG }}_windows_amd64.tar.gz -C out\windows_amd64 .
 
       - name: Publish to GitHub Release
         uses: softprops/action-gh-release@v2
@@ -91,4 +97,5 @@ jobs:
             cloudopt_${{ env.RELEASE_TAG }}_darwin.tar.gz
             cloudopt_${{ env.RELEASE_TAG }}_darwin_checksums.txt
             cloudopt_${{ env.RELEASE_TAG }}_windows_amd64.zip
+            cloudopt_${{ env.RELEASE_TAG }}_windows_amd64.tar.gz
             cloudopt_${{ env.RELEASE_TAG }}_windows_amd64_checksums.txt

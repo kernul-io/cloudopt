@@ -4,7 +4,7 @@
 
 ## Installation
 
-### Linux or Mac
+### Linux, Mac or Windows (using `git bash`)
 
 ``` bash
 curl https://raw.githubusercontent.com/kernul-io/cloudopt/main/install/install.sh | bash
@@ -12,7 +12,7 @@ curl https://raw.githubusercontent.com/kernul-io/cloudopt/main/install/install.s
 
 ### Windows
 
-commin soon
+<!-- comming soon -->
 
 ## Build from source
 
