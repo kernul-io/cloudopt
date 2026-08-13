@@ -1,0 +1,153 @@
+format_version: 1
+external_key: sample-offline-v1
+observed_at: "2026-01-15T12:00:00Z"
+source: fixture/sample.yaml
+
+account:
+  id: acct-fixture-001
+  provider: fixture
+  provider_account_id: "111122223333"
+  display_name: Demo Account
+  default_currency: USD
+
+regions:
+  - id: reg-use1
+    provider_region_id: us-east-1
+    display_name: US East (N. Virginia)
+  - id: reg-euw1
+    provider_region_id: eu-west-1
+    display_name: Europe (Ireland)
+
+resources:
+  - id: res-vpc-use1
+    kind: vpc
+    region_id: reg-use1
+    provider_resource_id: vpc-0a1b2c3d
+    name: demo-vpc
+    state: available
+    tags:
+      Environment: demo
+  - id: res-subnet-use1
+    kind: subnet
+    region_id: reg-use1
+    provider_resource_id: subnet-0abc1234
+    name: demo-private-a
+    state: available
+  - id: res-nat-use1
+    kind: nat_gateway
+    region_id: reg-use1
+    provider_resource_id: nat-0deadbeef
+    name: demo-nat
+    state: available
+  - id: res-i-running
+    kind: compute_instance
+    region_id: reg-use1
+    provider_resource_id: i-0running01
+    name: app-server-1
+    state: running
+    tags:
+      Owner: platform-team
+      CostCenter: CC-100
+    attributes:
+      instance_type: m5.large
+  - id: res-i-stopped
+    kind: compute_instance
+    region_id: reg-use1
+    provider_resource_id: i-0stopped01
+    name: batch-worker-old
+    state: stopped
+    tags:
+      Owner: data-team
+  - id: res-vol-attached
+    kind: block_volume
+    region_id: reg-use1
+    provider_resource_id: vol-attached01
+    name: app-data
+    state: in-use
+    attributes:
+      size_gib: "100"
+  - id: res-vol-unattached
+    kind: block_volume
+    region_id: reg-euw1
+    provider_resource_id: vol-orphan01
+    name: forgotten-data
+    state: available
+    attributes:
+      size_gib: "250"
+  - id: res-rds-primary
+    kind: database_instance
+    region_id: reg-use1
+    provider_resource_id: db-primary01
+    name: orders-db
+    state: available
+    attributes:
+      engine: postgres
+      instance_class: db.t3.medium
+
+relationships:
+  - kind: in_vpc
+    from_resource_id: res-subnet-use1
+    to_resource_id: res-vpc-use1
+  - kind: in_subnet
+    from_resource_id: res-i-running
+    to_resource_id: res-subnet-use1
+  - kind: attached_to
+    from_resource_id: res-vol-attached
+    to_resource_id: res-i-running
+  - kind: routes_via
+    from_resource_id: res-subnet-use1
+    to_resource_id: res-nat-use1
+  - kind: associated_with
+    from_resource_id: res-vol-unattached
+    to_resource_id: res-missing-peer
+    to_provider_resource_id: vol-external-ref
+    target_missing: true
+
+costs:
+  - resource_id: res-i-running
+    service: AmazonEC2
+    amount_major: 42.50
+    currency: USD
+    granularity: daily
+    period_start: "2026-01-14T00:00:00Z"
+    period_end: "2026-01-15T00:00:00Z"
+  - resource_id: res-i-stopped
+    service: AmazonEC2
+    amount_major: 3.20
+    currency: USD
+    granularity: daily
+    period_start: "2026-01-14T00:00:00Z"
+    period_end: "2026-01-15T00:00:00Z"
+  - resource_id: res-vol-unattached
+    service: AmazonEBS
+    amount_major: 25.00
+    currency: USD
+    granularity: monthly
+    period_start: "2026-01-01T00:00:00Z"
+    period_end: "2026-02-01T00:00:00Z"
+  - resource_id: res-nat-use1
+    service: AmazonVPC
+    amount_major: 18.75
+    currency: USD
+    granularity: daily
+    period_start: "2026-01-14T00:00:00Z"
+    period_end: "2026-01-15T00:00:00Z"
+
+metrics:
+  - resource_id: res-i-running
+    name: CPUUtilization
+    statistic: Average
+    points:
+      - timestamp: "2026-01-14T18:00:00Z"
+        value: 12.5
+        unit: Percent
+      - timestamp: "2026-01-14T19:00:00Z"
+        value: 15.1
+        unit: Percent
+  - resource_id: res-i-stopped
+    name: CPUUtilization
+    statistic: Average
+    points:
+      - timestamp: "2026-01-14T18:00:00Z"
+        value: 0.0
+        unit: Percent

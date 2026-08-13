@@ -47,6 +47,10 @@ func (r *Runtime) Init(ctx context.Context) error {
 	if err := os.WriteFile(configPath, []byte(content), 0o600); err != nil {
 		return fmt.Errorf("write config: %w", err)
 	}
+
+	if _, err := OpenStorage(ctx, r.Settings); err != nil {
+		return fmt.Errorf("initialize storage: %w", err)
+	}
 	return nil
 }
 
@@ -77,7 +81,7 @@ type NotImplementedError struct {
 }
 
 func (e *NotImplementedError) Error() string {
-	return fmt.Sprintf("%q is not implemented yet; see steps/README.md for the delivery sequence", e.Command)
+	return fmt.Sprintf("%q is not implemented yet", e.Command)
 }
 
 func ErrNotImplemented(command string) error {
