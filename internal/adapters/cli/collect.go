@@ -46,6 +46,7 @@ func newCollectCommand(cfg *Config) *cobra.Command {
 
 func newCollectAWSCommand(cfg *Config) *cobra.Command {
 	var opts ports.CollectOptions
+	var costOpts ports.CostCollectOptions
 	cmd := &cobra.Command{
 		Use:   "aws",
 		Short: "Amazon Web Services collection commands",
@@ -59,8 +60,28 @@ func newCollectAWSCommand(cfg *Config) *cobra.Command {
 		},
 	}
 	bindAWSInventoryFlags(inventory, &opts)
+	cost := &cobra.Command{
+		Use:   "cost",
+		Short: "Collect AWS billing costs and attribute them to inventory resources",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runCollectCost(cmd, cfg, costOpts)
+		},
+	}
+	bindAWSCostFlags(cost, &costOpts)
 	cmd.AddCommand(inventory)
+	cmd.AddCommand(cost)
 	return cmd
+}
+
+func bindAWSCostFlags(cmd *cobra.Command, opts *ports.CostCollectOptions) {
+	cmd.Flags().StringVar((*string)(&opts.AccountID), "account-id", "", "Canonical account id filter when selecting latest snapshot")
+	cmd.Flags().StringVar(&opts.RoleARN, "role-arn", "", "Optional IAM role ARN to assume")
+	cmd.Flags().StringVar(&opts.ExternalID, "external-id", "", "External ID for role assumption")
+	cmd.Flags().StringVar((*string)(&opts.SnapshotID), "snapshot-id", "", "Snapshot to attach costs to (default: latest)")
+	cmd.Flags().IntVar(&opts.LookbackDays, "lookback-days", 30, "Billing lookback window in days")
+	cmd.Flags().BoolVar(&opts.DryRun, "dry-run", false, "Preflight billing access without collecting")
+	cmd.Flags().BoolVar(&opts.Offline, "offline", false, "Use recorded Cost Explorer fixtures")
+	cmd.Flags().StringVar(&opts.FixtureRoot, "fixture-root", "", "Fixture directory for --offline (default testdata/aws-billing)")
 }
 
 func bindAWSInventoryFlags(cmd *cobra.Command, opts *ports.CollectOptions) {

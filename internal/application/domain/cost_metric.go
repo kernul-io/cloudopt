@@ -16,14 +16,19 @@ const (
 
 // CostRecord attributes spend to a resource for a period.
 type CostRecord struct {
-	ID          int64
-	ResourceID  types.ResourceID
-	Service     string
-	Amount      types.Money
-	Granularity CostGranularity
-	PeriodStart types.Timestamp
-	PeriodEnd   types.Timestamp
-	Provenance  Provenance
+	ID             int64
+	ResourceID     types.ResourceID
+	Service        string
+	RegionID       types.RegionID
+	Amount         types.Money
+	Basis          CostBasis
+	ChargeKind     CostChargeKind
+	Granularity    CostGranularity
+	PeriodStart    types.Timestamp
+	PeriodEnd      types.Timestamp
+	Attribution    CostAttribution
+	SourceInterval BillingInterval
+	Provenance     Provenance
 }
 
 // MetricPoint is a single utilization observation.

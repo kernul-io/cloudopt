@@ -17,9 +17,11 @@ type Result struct {
 	Message string `json:"message,omitempty"`
 	Version string `json:"version,omitempty"`
 
-	Analysis *AnalyzePayload `json:"analysis,omitempty"`
-	Report   *ReportPayload  `json:"report,omitempty"`
-	Collect  *CollectPayload `json:"collect,omitempty"`
+	Analysis  *AnalyzePayload       `json:"analysis,omitempty"`
+	Report    *ReportPayload        `json:"report,omitempty"`
+	Collect   *CollectPayload       `json:"collect,omitempty"`
+	Cost      *CostCollectPayload   `json:"cost_collect,omitempty"`
+	Reconcile *CostReconcilePayload `json:"cost_reconcile,omitempty"`
 }
 
 // AnalyzePayload is the detailed analyze output when --json is set.
@@ -158,6 +160,65 @@ func EmitCollectResult(result *api.CollectResult) error {
 		Status:  StatusOK,
 		Command: "collect",
 		Collect: payload,
+	})
+}
+
+type CostCollectPayload struct {
+	SnapshotID string                           `json:"snapshot_id,omitempty"`
+	DryRun     bool                             `json:"dry_run,omitempty"`
+	Partial    bool                             `json:"partial,omitempty"`
+	Preflight  *CostCollectPreflightPayload     `json:"preflight,omitempty"`
+	Reconcile  *ports.CostReconciliationSummary `json:"reconciliation,omitempty"`
+}
+
+type CostCollectPreflightPayload struct {
+	ProviderAccountID string   `json:"provider_account_id"`
+	CallerARN         string   `json:"caller_arn"`
+	LookbackDays      int      `json:"lookback_days"`
+	MissingActions    []string `json:"missing_actions,omitempty"`
+}
+
+type CostReconcilePayload struct {
+	SnapshotID string                           `json:"snapshot_id"`
+	Reconcile  *ports.CostReconciliationSummary `json:"reconciliation"`
+}
+
+func EmitCostCollectResult(result *api.CostCollectResult) error {
+	if result == nil {
+		return EmitOK("collect", "")
+	}
+	payload := &CostCollectPayload{
+		SnapshotID: result.SnapshotID,
+		DryRun:     result.DryRun,
+		Partial:    result.Partial,
+		Reconcile:  result.Reconcile,
+	}
+	if result.Preflight != nil {
+		payload.Preflight = &CostCollectPreflightPayload{
+			ProviderAccountID: result.Preflight.ProviderAccountID,
+			CallerARN:         result.Preflight.CallerARN,
+			LookbackDays:      result.Preflight.LookbackDays,
+			MissingActions:    result.Preflight.MissingActions,
+		}
+	}
+	return writeResult(os.Stdout, Result{
+		Status:  StatusOK,
+		Command: "collect",
+		Cost:    payload,
+	})
+}
+
+func EmitCostReconcileResult(result *api.ReconcileCostResult) error {
+	if result == nil {
+		return EmitOK("cost-reconcile", "")
+	}
+	return writeResult(os.Stdout, Result{
+		Status:  StatusOK,
+		Command: "cost-reconcile",
+		Reconcile: &CostReconcilePayload{
+			SnapshotID: result.SnapshotID,
+			Reconcile:  result.Reconcile,
+		},
 	})
 }
 

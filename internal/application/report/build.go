@@ -44,7 +44,7 @@ func Build(in BuildInput) (*Document, error) {
 
 	scope, warnings := buildScope(in.Snapshot, aliases)
 	costs := buildCosts(in.Snapshot)
-	savings := buildSavings(in.Run.Findings, recByFinding)
+	savings := buildSavings(in.Snapshot, in.Run.Findings, recByFinding)
 
 	findings := buildFindings(in.Run.Findings, evidenceByID, recByFinding, in.Snapshot, aliases)
 	appendix := buildAppendix(in.Executions)
@@ -170,12 +170,42 @@ func buildScope(snap *domain.CollectionSnapshot, aliases *AliasMap) (ScopeSectio
 
 func buildCosts(snap *domain.CollectionSnapshot) CostSection {
 	totals := map[string]int64{}
+	byService := map[string]int64{}
+	byRegion := map[string]int64{}
+	byOwner := map[string]int64{}
+	var attributed, unattributed int64
+	resourceOwners := map[types.ResourceID]string{}
+	for _, res := range snap.Resources {
+		for _, tag := range res.Tags {
+			if tag.Key == "Owner" {
+				resourceOwners[res.ID] = tag.Value
+			}
+		}
+	}
 	for _, c := range snap.Costs {
 		cur := c.Amount.Currency
 		if cur == "" {
 			continue
 		}
 		totals[cur] += c.Amount.AmountMinor
+		if c.ResourceID == domain.UnattributedResourceID {
+			unattributed += c.Amount.AmountMinor
+		} else {
+			attributed += c.Amount.AmountMinor
+		}
+		if c.Service != "" {
+			byService[c.Service] += c.Amount.AmountMinor
+		}
+		if c.RegionID != "" {
+			byRegion[string(c.RegionID)] += c.Amount.AmountMinor
+		}
+		owner := resourceOwners[c.ResourceID]
+		if owner == "" {
+			owner = "unknown"
+		}
+		if c.ResourceID != domain.UnattributedResourceID {
+			byOwner[owner] += c.Amount.AmountMinor
+		}
 	}
 	var byCur []CurrencyTotal
 	for cur, minor := range totals {
@@ -188,21 +218,43 @@ func buildCosts(snap *domain.CollectionSnapshot) CostSection {
 	}
 	sort.Slice(byCur, func(i, j int) bool { return byCur[i].Currency < byCur[j].Currency })
 
+	covNote := ""
+	if attributed+unattributed > 0 {
+		pct := float64(attributed) / float64(attributed+unattributed) * 100
+		covNote = fmt.Sprintf("Attribution coverage: %.1f%% attributed by volume (%d minor units attributed, %d unattributed).", pct, attributed, unattributed)
+	}
+
 	return CostSection{
-		Kind:       KindMeasured,
-		ByCurrency: byCur,
-		PeriodNote: "Totals are per recorded billing periods and must not be treated as annualized spend without normalization.",
+		Kind:                KindMeasured,
+		ByCurrency:          byCur,
+		PeriodNote:          "Totals are per recorded billing periods and must not be treated as annualized spend without normalization.",
+		AttributionNote:     covNote,
+		SpendByServiceMinor: byService,
+		SpendByRegionMinor:  byRegion,
+		SpendByOwnerMinor:   byOwner,
 	}
 }
 
-func buildSavings(findings []domain.Finding, recByFinding map[types.FindingID]domain.Recommendation) SavingsSection {
+func buildSavings(snap *domain.CollectionSnapshot, findings []domain.Finding, recByFinding map[types.FindingID]domain.Recommendation) SavingsSection {
 	sec := SavingsSection{
 		Kind: KindEstimate,
 		Note: "No guaranteed savings. Amounts below are estimates when present; overlapping findings are not summed.",
 	}
+	costByResource := map[types.ResourceID]int64{}
+	if snap != nil {
+		for _, c := range snap.Costs {
+			if c.ResourceID == domain.UnattributedResourceID {
+				continue
+			}
+			costByResource[c.ResourceID] += c.Amount.AmountMinor
+		}
+	}
 	for _, f := range findings {
 		rec, ok := recByFinding[f.ID]
 		if !ok || rec.EstSavings == nil {
+			continue
+		}
+		if !findingHasAttributableCost(f, costByResource) {
 			continue
 		}
 		line := SavingsLine{
@@ -222,6 +274,18 @@ func buildSavings(findings []domain.Finding, recByFinding map[types.FindingID]do
 		return sec.MonthlyRecurring[i].Description < sec.MonthlyRecurring[j].Description
 	})
 	return sec
+}
+
+func findingHasAttributableCost(f domain.Finding, costByResource map[types.ResourceID]int64) bool {
+	if len(f.ResourceIDs) == 0 {
+		return false
+	}
+	for _, id := range f.ResourceIDs {
+		if costByResource[id] != 0 {
+			return true
+		}
+	}
+	return false
 }
 
 func buildFindings(

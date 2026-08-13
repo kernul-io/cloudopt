@@ -71,9 +71,13 @@ type ExecutiveSummary struct {
 }
 
 type CostSection struct {
-	Kind       ValueKind       `json:"kind"`
-	ByCurrency []CurrencyTotal `json:"by_currency"`
-	PeriodNote string          `json:"period_note"`
+	Kind                ValueKind        `json:"kind"`
+	ByCurrency          []CurrencyTotal  `json:"by_currency"`
+	PeriodNote          string           `json:"period_note"`
+	AttributionNote     string           `json:"attribution_note,omitempty"`
+	SpendByServiceMinor map[string]int64 `json:"spend_by_service_minor,omitempty"`
+	SpendByRegionMinor  map[string]int64 `json:"spend_by_region_minor,omitempty"`
+	SpendByOwnerMinor   map[string]int64 `json:"spend_by_owner_minor,omitempty"`
 }
 
 type CurrencyTotal struct {

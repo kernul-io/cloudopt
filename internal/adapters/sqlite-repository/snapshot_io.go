@@ -110,19 +110,47 @@ func insertRelationships(ctx context.Context, tx *sql.Tx, snap *domain.Collectio
 
 func insertCosts(ctx context.Context, tx *sql.Tx, snap *domain.CollectionSnapshot) error {
 	for _, c := range snap.Costs {
-		q, s, o := provColumns(c.Provenance)
-		res, err := tx.ExecContext(ctx, `
-			INSERT INTO cost_records (snapshot_id, resource_id, service, amount_minor, currency, granularity, period_start, period_end, quality, source, observed_at)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-			string(snap.ID), string(c.ResourceID), c.Service, c.Amount.AmountMinor, c.Amount.Currency,
-			string(c.Granularity), c.PeriodStart.Canonical(), c.PeriodEnd.Canonical(), q, s, o,
-		)
-		if err != nil {
+		if err := insertOneCost(ctx, tx, snap.ID, &c); err != nil {
 			return err
 		}
-		id, _ := res.LastInsertId()
-		c.ID = id
 	}
+	return nil
+}
+
+func insertOneCost(ctx context.Context, tx *sql.Tx, snapID types.SnapshotID, c *domain.CostRecord) error {
+	q, s, o := provColumns(c.Provenance)
+	basis := string(c.Basis)
+	if basis == "" {
+		basis = string(domain.CostBasisAmortizedNet)
+	}
+	charge := string(c.ChargeKind)
+	if charge == "" {
+		charge = string(domain.ChargeUsage)
+	}
+	attrMethod := string(c.Attribution.Method)
+	if attrMethod == "" {
+		attrMethod = string(domain.AttributionDirectResourceID)
+	}
+	srcStart := c.SourceInterval.Start.Canonical()
+	srcEnd := c.SourceInterval.End.Canonical()
+	srcCollected := c.SourceInterval.Collected.Canonical()
+	res, err := tx.ExecContext(ctx, `
+			INSERT INTO cost_records (
+				snapshot_id, resource_id, service, amount_minor, currency, granularity,
+				period_start, period_end, quality, source, observed_at,
+				cost_basis, charge_kind, region_id, attribution_method, attribution_heuristic,
+				attribution_confidence, source_interval_start, source_interval_end, source_collected_at
+			) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		string(snapID), string(c.ResourceID), c.Service, c.Amount.AmountMinor, c.Amount.Currency,
+		string(c.Granularity), c.PeriodStart.Canonical(), c.PeriodEnd.Canonical(), q, s, o,
+		basis, charge, string(c.RegionID), attrMethod, c.Attribution.HeuristicID, c.Attribution.Confidence,
+		srcStart, srcEnd, srcCollected,
+	)
+	if err != nil {
+		return err
+	}
+	id, _ := res.LastInsertId()
+	c.ID = id
 	return nil
 }
 
@@ -312,7 +340,9 @@ func loadRelationships(ctx context.Context, db queryer, snapID types.SnapshotID)
 
 func loadCosts(ctx context.Context, db queryer, snapID types.SnapshotID) ([]domain.CostRecord, error) {
 	rows, err := db.QueryContext(ctx, `
-		SELECT id, resource_id, service, amount_minor, currency, granularity, period_start, period_end, quality, source, observed_at
+		SELECT id, resource_id, service, amount_minor, currency, granularity, period_start, period_end,
+			quality, source, observed_at, cost_basis, charge_kind, region_id, attribution_method,
+			attribution_heuristic, attribution_confidence, source_interval_start, source_interval_end, source_collected_at
 		FROM cost_records WHERE snapshot_id = ? ORDER BY id`, string(snapID))
 	if err != nil {
 		return nil, err
@@ -323,9 +353,35 @@ func loadCosts(ctx context.Context, db queryer, snapID types.SnapshotID) ([]doma
 		var c domain.CostRecord
 		var q, s string
 		var observed types.Timestamp
+		var basis, charge, regionID, attrMethod, heuristic, srcStart, srcEnd, srcCollected string
+		var confidence float64
 		if err := rows.Scan(&c.ID, &c.ResourceID, &c.Service, &c.Amount.AmountMinor, &c.Amount.Currency,
-			&c.Granularity, &tsScan{&c.PeriodStart}, &tsScan{&c.PeriodEnd}, &q, &s, &tsScan{&observed}); err != nil {
+			&c.Granularity, &tsScan{&c.PeriodStart}, &tsScan{&c.PeriodEnd}, &q, &s, &tsScan{&observed},
+			&basis, &charge, &regionID, &attrMethod, &heuristic, &confidence, &srcStart, &srcEnd, &srcCollected); err != nil {
 			return nil, err
+		}
+		c.Basis = domain.CostBasis(basis)
+		c.ChargeKind = domain.CostChargeKind(charge)
+		c.RegionID = types.RegionID(regionID)
+		c.Attribution = domain.CostAttribution{
+			Method:      domain.AttributionMethod(attrMethod),
+			HeuristicID: heuristic,
+			Confidence:  confidence,
+		}
+		if srcStart != "" {
+			if t, err := types.ParseTimestamp(srcStart); err == nil {
+				c.SourceInterval.Start = t
+			}
+		}
+		if srcEnd != "" {
+			if t, err := types.ParseTimestamp(srcEnd); err == nil {
+				c.SourceInterval.End = t
+			}
+		}
+		if srcCollected != "" {
+			if t, err := types.ParseTimestamp(srcCollected); err == nil {
+				c.SourceInterval.Collected = t
+			}
 		}
 		c.Provenance = domain.Provenance{Quality: domain.DataQuality(q), Source: s, ObservedAt: observed}
 		out = append(out, c)

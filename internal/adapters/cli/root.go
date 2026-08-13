@@ -43,6 +43,7 @@ func NewRootCommand(cfg *Config) *cobra.Command {
 	root.AddCommand(newVersionCommand())
 	root.AddCommand(newInitCommand(cfg))
 	root.AddCommand(newCollectCommand(cfg))
+	root.AddCommand(newCostReconcileCommand(cfg))
 	root.AddCommand(newAnalyzeCommand(cfg))
 	root.AddCommand(newReportCommand(cfg))
 	root.AddCommand(newImportFixtureCommand(cfg))
