@@ -1,0 +1,1991 @@
+{
+  "series": [
+    {
+      "provider_resource_id": "i-0running01",
+      "namespace": "AWS/EC2",
+      "metric_name": "CPUUtilization",
+      "dimension_name": "InstanceId",
+      "dimension_value": "i-0running01",
+      "statistic": "Average",
+      "period_seconds": 3600,
+      "unit": "Percent",
+      "scenario": "steady",
+      "missing": false,
+      "datapoints": [
+        {
+          "offset_hours": -168,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -162,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -156,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -150,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -144,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -138,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -132,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -126,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -120,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -114,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -108,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -102,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -96,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -90,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -84,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -78,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -72,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -66,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -60,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -54,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -48,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -42,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -36,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -30,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -24,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -18,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -12,
+          "v": 12.0
+        },
+        {
+          "offset_hours": -6,
+          "v": 12.0
+        }
+      ]
+    },
+    {
+      "provider_resource_id": "i-0running01",
+      "namespace": "AWS/EC2",
+      "metric_name": "NetworkIn",
+      "dimension_name": "InstanceId",
+      "dimension_value": "i-0running01",
+      "statistic": "Sum",
+      "period_seconds": 3600,
+      "unit": "Bytes",
+      "scenario": "steady",
+      "missing": false,
+      "datapoints": [
+        {
+          "offset_hours": -168,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -162,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -156,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -150,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -144,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -138,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -132,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -126,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -120,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -114,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -108,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -102,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -96,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -90,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -84,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -78,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -72,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -66,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -60,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -54,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -48,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -42,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -36,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -30,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -24,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -18,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -12,
+          "v": 1000000
+        },
+        {
+          "offset_hours": -6,
+          "v": 1000000
+        }
+      ]
+    },
+    {
+      "provider_resource_id": "i-0running01",
+      "namespace": "AWS/EC2",
+      "metric_name": "NetworkOut",
+      "dimension_name": "InstanceId",
+      "dimension_value": "i-0running01",
+      "statistic": "Sum",
+      "period_seconds": 3600,
+      "unit": "Bytes",
+      "scenario": "steady",
+      "missing": false,
+      "datapoints": [
+        {
+          "offset_hours": -168,
+          "v": 800000
+        },
+        {
+          "offset_hours": -162,
+          "v": 800000
+        },
+        {
+          "offset_hours": -156,
+          "v": 800000
+        },
+        {
+          "offset_hours": -150,
+          "v": 800000
+        },
+        {
+          "offset_hours": -144,
+          "v": 800000
+        },
+        {
+          "offset_hours": -138,
+          "v": 800000
+        },
+        {
+          "offset_hours": -132,
+          "v": 800000
+        },
+        {
+          "offset_hours": -126,
+          "v": 800000
+        },
+        {
+          "offset_hours": -120,
+          "v": 800000
+        },
+        {
+          "offset_hours": -114,
+          "v": 800000
+        },
+        {
+          "offset_hours": -108,
+          "v": 800000
+        },
+        {
+          "offset_hours": -102,
+          "v": 800000
+        },
+        {
+          "offset_hours": -96,
+          "v": 800000
+        },
+        {
+          "offset_hours": -90,
+          "v": 800000
+        },
+        {
+          "offset_hours": -84,
+          "v": 800000
+        },
+        {
+          "offset_hours": -78,
+          "v": 800000
+        },
+        {
+          "offset_hours": -72,
+          "v": 800000
+        },
+        {
+          "offset_hours": -66,
+          "v": 800000
+        },
+        {
+          "offset_hours": -60,
+          "v": 800000
+        },
+        {
+          "offset_hours": -54,
+          "v": 800000
+        },
+        {
+          "offset_hours": -48,
+          "v": 800000
+        },
+        {
+          "offset_hours": -42,
+          "v": 800000
+        },
+        {
+          "offset_hours": -36,
+          "v": 800000
+        },
+        {
+          "offset_hours": -30,
+          "v": 800000
+        },
+        {
+          "offset_hours": -24,
+          "v": 800000
+        },
+        {
+          "offset_hours": -18,
+          "v": 800000
+        },
+        {
+          "offset_hours": -12,
+          "v": 800000
+        },
+        {
+          "offset_hours": -6,
+          "v": 800000
+        }
+      ]
+    },
+    {
+      "provider_resource_id": "i-0running01",
+      "namespace": "AWS/EC2",
+      "metric_name": "DiskReadOps",
+      "dimension_name": "InstanceId",
+      "dimension_value": "i-0running01",
+      "statistic": "Sum",
+      "period_seconds": 3600,
+      "unit": "Count",
+      "scenario": "steady",
+      "missing": false,
+      "datapoints": [
+        {
+          "offset_hours": -168,
+          "v": 50
+        },
+        {
+          "offset_hours": -162,
+          "v": 50
+        },
+        {
+          "offset_hours": -156,
+          "v": 50
+        },
+        {
+          "offset_hours": -150,
+          "v": 50
+        },
+        {
+          "offset_hours": -144,
+          "v": 50
+        },
+        {
+          "offset_hours": -138,
+          "v": 50
+        },
+        {
+          "offset_hours": -132,
+          "v": 50
+        },
+        {
+          "offset_hours": -126,
+          "v": 50
+        },
+        {
+          "offset_hours": -120,
+          "v": 50
+        },
+        {
+          "offset_hours": -114,
+          "v": 50
+        },
+        {
+          "offset_hours": -108,
+          "v": 50
+        },
+        {
+          "offset_hours": -102,
+          "v": 50
+        },
+        {
+          "offset_hours": -96,
+          "v": 50
+        },
+        {
+          "offset_hours": -90,
+          "v": 50
+        },
+        {
+          "offset_hours": -84,
+          "v": 50
+        },
+        {
+          "offset_hours": -78,
+          "v": 50
+        },
+        {
+          "offset_hours": -72,
+          "v": 50
+        },
+        {
+          "offset_hours": -66,
+          "v": 50
+        },
+        {
+          "offset_hours": -60,
+          "v": 50
+        },
+        {
+          "offset_hours": -54,
+          "v": 50
+        },
+        {
+          "offset_hours": -48,
+          "v": 50
+        },
+        {
+          "offset_hours": -42,
+          "v": 50
+        },
+        {
+          "offset_hours": -36,
+          "v": 50
+        },
+        {
+          "offset_hours": -30,
+          "v": 50
+        },
+        {
+          "offset_hours": -24,
+          "v": 50
+        },
+        {
+          "offset_hours": -18,
+          "v": 50
+        },
+        {
+          "offset_hours": -12,
+          "v": 50
+        },
+        {
+          "offset_hours": -6,
+          "v": 50
+        }
+      ]
+    },
+    {
+      "provider_resource_id": "i-0running01",
+      "namespace": "AWS/EC2",
+      "metric_name": "DiskWriteOps",
+      "dimension_name": "InstanceId",
+      "dimension_value": "i-0running01",
+      "statistic": "Sum",
+      "period_seconds": 3600,
+      "unit": "Count",
+      "scenario": "steady",
+      "missing": false,
+      "datapoints": [
+        {
+          "offset_hours": -168,
+          "v": 40
+        },
+        {
+          "offset_hours": -162,
+          "v": 40
+        },
+        {
+          "offset_hours": -156,
+          "v": 40
+        },
+        {
+          "offset_hours": -150,
+          "v": 40
+        },
+        {
+          "offset_hours": -144,
+          "v": 40
+        },
+        {
+          "offset_hours": -138,
+          "v": 40
+        },
+        {
+          "offset_hours": -132,
+          "v": 40
+        },
+        {
+          "offset_hours": -126,
+          "v": 40
+        },
+        {
+          "offset_hours": -120,
+          "v": 40
+        },
+        {
+          "offset_hours": -114,
+          "v": 40
+        },
+        {
+          "offset_hours": -108,
+          "v": 40
+        },
+        {
+          "offset_hours": -102,
+          "v": 40
+        },
+        {
+          "offset_hours": -96,
+          "v": 40
+        },
+        {
+          "offset_hours": -90,
+          "v": 40
+        },
+        {
+          "offset_hours": -84,
+          "v": 40
+        },
+        {
+          "offset_hours": -78,
+          "v": 40
+        },
+        {
+          "offset_hours": -72,
+          "v": 40
+        },
+        {
+          "offset_hours": -66,
+          "v": 40
+        },
+        {
+          "offset_hours": -60,
+          "v": 40
+        },
+        {
+          "offset_hours": -54,
+          "v": 40
+        },
+        {
+          "offset_hours": -48,
+          "v": 40
+        },
+        {
+          "offset_hours": -42,
+          "v": 40
+        },
+        {
+          "offset_hours": -36,
+          "v": 40
+        },
+        {
+          "offset_hours": -30,
+          "v": 40
+        },
+        {
+          "offset_hours": -24,
+          "v": 40
+        },
+        {
+          "offset_hours": -18,
+          "v": 40
+        },
+        {
+          "offset_hours": -12,
+          "v": 40
+        },
+        {
+          "offset_hours": -6,
+          "v": 40
+        }
+      ]
+    },
+    {
+      "provider_resource_id": "i-0running01",
+      "namespace": "AWS/EC2",
+      "metric_name": "StatusCheckFailed",
+      "dimension_name": "InstanceId",
+      "dimension_value": "i-0running01",
+      "statistic": "Average",
+      "period_seconds": 3600,
+      "unit": "Count",
+      "scenario": "steady",
+      "missing": false,
+      "datapoints": [
+        {
+          "offset_hours": -168,
+          "v": 0
+        },
+        {
+          "offset_hours": -162,
+          "v": 0
+        },
+        {
+          "offset_hours": -156,
+          "v": 0
+        },
+        {
+          "offset_hours": -150,
+          "v": 0
+        },
+        {
+          "offset_hours": -144,
+          "v": 0
+        },
+        {
+          "offset_hours": -138,
+          "v": 0
+        },
+        {
+          "offset_hours": -132,
+          "v": 0
+        },
+        {
+          "offset_hours": -126,
+          "v": 0
+        },
+        {
+          "offset_hours": -120,
+          "v": 0
+        },
+        {
+          "offset_hours": -114,
+          "v": 0
+        },
+        {
+          "offset_hours": -108,
+          "v": 0
+        },
+        {
+          "offset_hours": -102,
+          "v": 0
+        },
+        {
+          "offset_hours": -96,
+          "v": 0
+        },
+        {
+          "offset_hours": -90,
+          "v": 0
+        },
+        {
+          "offset_hours": -84,
+          "v": 0
+        },
+        {
+          "offset_hours": -78,
+          "v": 0
+        },
+        {
+          "offset_hours": -72,
+          "v": 0
+        },
+        {
+          "offset_hours": -66,
+          "v": 0
+        },
+        {
+          "offset_hours": -60,
+          "v": 0
+        },
+        {
+          "offset_hours": -54,
+          "v": 0
+        },
+        {
+          "offset_hours": -48,
+          "v": 0
+        },
+        {
+          "offset_hours": -42,
+          "v": 0
+        },
+        {
+          "offset_hours": -36,
+          "v": 0
+        },
+        {
+          "offset_hours": -30,
+          "v": 0
+        },
+        {
+          "offset_hours": -24,
+          "v": 0
+        },
+        {
+          "offset_hours": -18,
+          "v": 0
+        },
+        {
+          "offset_hours": -12,
+          "v": 0
+        },
+        {
+          "offset_hours": -6,
+          "v": 0
+        }
+      ]
+    },
+    {
+      "provider_resource_id": "vol-attached01",
+      "namespace": "AWS/EBS",
+      "metric_name": "VolumeReadOps",
+      "dimension_name": "VolumeId",
+      "dimension_value": "vol-attached01",
+      "statistic": "Sum",
+      "period_seconds": 3600,
+      "unit": "Count",
+      "scenario": "steady",
+      "missing": false,
+      "datapoints": [
+        {
+          "offset_hours": -168,
+          "v": 100
+        },
+        {
+          "offset_hours": -162,
+          "v": 100
+        },
+        {
+          "offset_hours": -156,
+          "v": 100
+        },
+        {
+          "offset_hours": -150,
+          "v": 100
+        },
+        {
+          "offset_hours": -144,
+          "v": 100
+        },
+        {
+          "offset_hours": -138,
+          "v": 100
+        },
+        {
+          "offset_hours": -132,
+          "v": 100
+        },
+        {
+          "offset_hours": -126,
+          "v": 100
+        },
+        {
+          "offset_hours": -120,
+          "v": 100
+        },
+        {
+          "offset_hours": -114,
+          "v": 100
+        },
+        {
+          "offset_hours": -108,
+          "v": 100
+        },
+        {
+          "offset_hours": -102,
+          "v": 100
+        },
+        {
+          "offset_hours": -96,
+          "v": 100
+        },
+        {
+          "offset_hours": -90,
+          "v": 100
+        },
+        {
+          "offset_hours": -84,
+          "v": 100
+        },
+        {
+          "offset_hours": -78,
+          "v": 100
+        },
+        {
+          "offset_hours": -72,
+          "v": 100
+        },
+        {
+          "offset_hours": -66,
+          "v": 100
+        },
+        {
+          "offset_hours": -60,
+          "v": 100
+        },
+        {
+          "offset_hours": -54,
+          "v": 100
+        },
+        {
+          "offset_hours": -48,
+          "v": 100
+        },
+        {
+          "offset_hours": -42,
+          "v": 100
+        },
+        {
+          "offset_hours": -36,
+          "v": 100
+        },
+        {
+          "offset_hours": -30,
+          "v": 100
+        },
+        {
+          "offset_hours": -24,
+          "v": 100
+        },
+        {
+          "offset_hours": -18,
+          "v": 100
+        },
+        {
+          "offset_hours": -12,
+          "v": 100
+        },
+        {
+          "offset_hours": -6,
+          "v": 100
+        }
+      ]
+    },
+    {
+      "provider_resource_id": "vol-attached01",
+      "namespace": "AWS/EBS",
+      "metric_name": "VolumeWriteOps",
+      "dimension_name": "VolumeId",
+      "dimension_value": "vol-attached01",
+      "statistic": "Sum",
+      "period_seconds": 3600,
+      "unit": "Count",
+      "scenario": "steady",
+      "missing": false,
+      "datapoints": [
+        {
+          "offset_hours": -168,
+          "v": 80
+        },
+        {
+          "offset_hours": -162,
+          "v": 80
+        },
+        {
+          "offset_hours": -156,
+          "v": 80
+        },
+        {
+          "offset_hours": -150,
+          "v": 80
+        },
+        {
+          "offset_hours": -144,
+          "v": 80
+        },
+        {
+          "offset_hours": -138,
+          "v": 80
+        },
+        {
+          "offset_hours": -132,
+          "v": 80
+        },
+        {
+          "offset_hours": -126,
+          "v": 80
+        },
+        {
+          "offset_hours": -120,
+          "v": 80
+        },
+        {
+          "offset_hours": -114,
+          "v": 80
+        },
+        {
+          "offset_hours": -108,
+          "v": 80
+        },
+        {
+          "offset_hours": -102,
+          "v": 80
+        },
+        {
+          "offset_hours": -96,
+          "v": 80
+        },
+        {
+          "offset_hours": -90,
+          "v": 80
+        },
+        {
+          "offset_hours": -84,
+          "v": 80
+        },
+        {
+          "offset_hours": -78,
+          "v": 80
+        },
+        {
+          "offset_hours": -72,
+          "v": 80
+        },
+        {
+          "offset_hours": -66,
+          "v": 80
+        },
+        {
+          "offset_hours": -60,
+          "v": 80
+        },
+        {
+          "offset_hours": -54,
+          "v": 80
+        },
+        {
+          "offset_hours": -48,
+          "v": 80
+        },
+        {
+          "offset_hours": -42,
+          "v": 80
+        },
+        {
+          "offset_hours": -36,
+          "v": 80
+        },
+        {
+          "offset_hours": -30,
+          "v": 80
+        },
+        {
+          "offset_hours": -24,
+          "v": 80
+        },
+        {
+          "offset_hours": -18,
+          "v": 80
+        },
+        {
+          "offset_hours": -12,
+          "v": 80
+        },
+        {
+          "offset_hours": -6,
+          "v": 80
+        }
+      ]
+    },
+    {
+      "provider_resource_id": "vol-attached01",
+      "namespace": "AWS/EBS",
+      "metric_name": "VolumeQueueLength",
+      "dimension_name": "VolumeId",
+      "dimension_value": "vol-attached01",
+      "statistic": "Average",
+      "period_seconds": 3600,
+      "unit": "Count",
+      "scenario": "steady",
+      "missing": false,
+      "datapoints": [
+        {
+          "offset_hours": -168,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -162,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -156,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -150,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -144,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -138,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -132,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -126,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -120,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -114,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -108,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -102,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -96,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -90,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -84,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -78,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -72,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -66,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -60,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -54,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -48,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -42,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -36,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -30,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -24,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -18,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -12,
+          "v": 0.2
+        },
+        {
+          "offset_hours": -6,
+          "v": 0.2
+        }
+      ]
+    },
+    {
+      "provider_resource_id": "vol-attached01",
+      "namespace": "AWS/EBS",
+      "metric_name": "BurstBalance",
+      "dimension_name": "VolumeId",
+      "dimension_value": "vol-attached01",
+      "statistic": "Average",
+      "period_seconds": 3600,
+      "unit": "Percent",
+      "scenario": "steady",
+      "missing": false,
+      "datapoints": [
+        {
+          "offset_hours": -168,
+          "v": 98
+        },
+        {
+          "offset_hours": -162,
+          "v": 98
+        },
+        {
+          "offset_hours": -156,
+          "v": 98
+        },
+        {
+          "offset_hours": -150,
+          "v": 98
+        },
+        {
+          "offset_hours": -144,
+          "v": 98
+        },
+        {
+          "offset_hours": -138,
+          "v": 98
+        },
+        {
+          "offset_hours": -132,
+          "v": 98
+        },
+        {
+          "offset_hours": -126,
+          "v": 98
+        },
+        {
+          "offset_hours": -120,
+          "v": 98
+        },
+        {
+          "offset_hours": -114,
+          "v": 98
+        },
+        {
+          "offset_hours": -108,
+          "v": 98
+        },
+        {
+          "offset_hours": -102,
+          "v": 98
+        },
+        {
+          "offset_hours": -96,
+          "v": 98
+        },
+        {
+          "offset_hours": -90,
+          "v": 98
+        },
+        {
+          "offset_hours": -84,
+          "v": 98
+        },
+        {
+          "offset_hours": -78,
+          "v": 98
+        },
+        {
+          "offset_hours": -72,
+          "v": 98
+        },
+        {
+          "offset_hours": -66,
+          "v": 98
+        },
+        {
+          "offset_hours": -60,
+          "v": 98
+        },
+        {
+          "offset_hours": -54,
+          "v": 98
+        },
+        {
+          "offset_hours": -48,
+          "v": 98
+        },
+        {
+          "offset_hours": -42,
+          "v": 98
+        },
+        {
+          "offset_hours": -36,
+          "v": 98
+        },
+        {
+          "offset_hours": -30,
+          "v": 98
+        },
+        {
+          "offset_hours": -24,
+          "v": 98
+        },
+        {
+          "offset_hours": -18,
+          "v": 98
+        },
+        {
+          "offset_hours": -12,
+          "v": 98
+        },
+        {
+          "offset_hours": -6,
+          "v": 98
+        }
+      ]
+    },
+    {
+      "provider_resource_id": "vol-orphan01",
+      "namespace": "AWS/EBS",
+      "metric_name": "VolumeReadOps",
+      "dimension_name": "VolumeId",
+      "dimension_value": "vol-orphan01",
+      "statistic": "Sum",
+      "period_seconds": 3600,
+      "unit": "Count",
+      "scenario": "sparse",
+      "missing": false,
+      "datapoints": [
+        {
+          "offset_hours": -72,
+          "v": 4.0
+        },
+        {
+          "offset_hours": -48,
+          "v": 6.0
+        }
+      ]
+    },
+    {
+      "provider_resource_id": "demo-db-1",
+      "namespace": "AWS/RDS",
+      "metric_name": "CPUUtilization",
+      "dimension_name": "DBInstanceIdentifier",
+      "dimension_value": "demo-db-1",
+      "statistic": "Average",
+      "period_seconds": 3600,
+      "unit": "Percent",
+      "scenario": "seasonal",
+      "missing": false,
+      "datapoints": [
+        {
+          "offset_hours": -168,
+          "v": 10
+        },
+        {
+          "offset_hours": -156,
+          "v": 10
+        },
+        {
+          "offset_hours": -144,
+          "v": 18
+        },
+        {
+          "offset_hours": -132,
+          "v": 18
+        },
+        {
+          "offset_hours": -120,
+          "v": 26
+        },
+        {
+          "offset_hours": -108,
+          "v": 26
+        },
+        {
+          "offset_hours": -96,
+          "v": 34
+        },
+        {
+          "offset_hours": -84,
+          "v": 34
+        },
+        {
+          "offset_hours": -72,
+          "v": 42
+        },
+        {
+          "offset_hours": -60,
+          "v": 42
+        },
+        {
+          "offset_hours": -48,
+          "v": 50
+        },
+        {
+          "offset_hours": -36,
+          "v": 50
+        },
+        {
+          "offset_hours": -24,
+          "v": 58
+        },
+        {
+          "offset_hours": -12,
+          "v": 58
+        }
+      ]
+    },
+    {
+      "provider_resource_id": "demo-db-1",
+      "namespace": "AWS/RDS",
+      "metric_name": "FreeableMemory",
+      "dimension_name": "DBInstanceIdentifier",
+      "dimension_value": "demo-db-1",
+      "statistic": "Average",
+      "period_seconds": 3600,
+      "unit": "Bytes",
+      "scenario": "steady",
+      "missing": false,
+      "datapoints": [
+        {
+          "offset_hours": -168,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -162,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -156,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -150,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -144,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -138,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -132,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -126,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -120,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -114,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -108,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -102,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -96,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -90,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -84,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -78,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -72,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -66,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -60,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -54,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -48,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -42,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -36,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -30,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -24,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -18,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -12,
+          "v": 2000000000
+        },
+        {
+          "offset_hours": -6,
+          "v": 2000000000
+        }
+      ]
+    },
+    {
+      "provider_resource_id": "demo-db-1",
+      "namespace": "AWS/RDS",
+      "metric_name": "DatabaseConnections",
+      "dimension_name": "DBInstanceIdentifier",
+      "dimension_value": "demo-db-1",
+      "statistic": "Average",
+      "period_seconds": 3600,
+      "unit": "Count",
+      "scenario": "steady",
+      "missing": false,
+      "datapoints": [
+        {
+          "offset_hours": -168,
+          "v": 25
+        },
+        {
+          "offset_hours": -162,
+          "v": 25
+        },
+        {
+          "offset_hours": -156,
+          "v": 25
+        },
+        {
+          "offset_hours": -150,
+          "v": 25
+        },
+        {
+          "offset_hours": -144,
+          "v": 25
+        },
+        {
+          "offset_hours": -138,
+          "v": 25
+        },
+        {
+          "offset_hours": -132,
+          "v": 25
+        },
+        {
+          "offset_hours": -126,
+          "v": 25
+        },
+        {
+          "offset_hours": -120,
+          "v": 25
+        },
+        {
+          "offset_hours": -114,
+          "v": 25
+        },
+        {
+          "offset_hours": -108,
+          "v": 25
+        },
+        {
+          "offset_hours": -102,
+          "v": 25
+        },
+        {
+          "offset_hours": -96,
+          "v": 25
+        },
+        {
+          "offset_hours": -90,
+          "v": 25
+        },
+        {
+          "offset_hours": -84,
+          "v": 25
+        },
+        {
+          "offset_hours": -78,
+          "v": 25
+        },
+        {
+          "offset_hours": -72,
+          "v": 25
+        },
+        {
+          "offset_hours": -66,
+          "v": 25
+        },
+        {
+          "offset_hours": -60,
+          "v": 25
+        },
+        {
+          "offset_hours": -54,
+          "v": 25
+        },
+        {
+          "offset_hours": -48,
+          "v": 25
+        },
+        {
+          "offset_hours": -42,
+          "v": 25
+        },
+        {
+          "offset_hours": -36,
+          "v": 25
+        },
+        {
+          "offset_hours": -30,
+          "v": 25
+        },
+        {
+          "offset_hours": -24,
+          "v": 25
+        },
+        {
+          "offset_hours": -18,
+          "v": 25
+        },
+        {
+          "offset_hours": -12,
+          "v": 25
+        },
+        {
+          "offset_hours": -6,
+          "v": 25
+        }
+      ]
+    },
+    {
+      "provider_resource_id": "nat-0deadbeef",
+      "namespace": "AWS/NATGateway",
+      "metric_name": "BytesInFromDestination",
+      "dimension_name": "NatGatewayId",
+      "dimension_value": "nat-0deadbeef",
+      "statistic": "Sum",
+      "period_seconds": 3600,
+      "unit": "Bytes",
+      "scenario": "bursty",
+      "missing": false,
+      "datapoints": [
+        {
+          "offset_hours": -168,
+          "v": 8
+        },
+        {
+          "offset_hours": -162,
+          "v": 8
+        },
+        {
+          "offset_hours": -156,
+          "v": 8
+        },
+        {
+          "offset_hours": -150,
+          "v": 8
+        },
+        {
+          "offset_hours": -144,
+          "v": 85
+        },
+        {
+          "offset_hours": -138,
+          "v": 8
+        },
+        {
+          "offset_hours": -132,
+          "v": 8
+        },
+        {
+          "offset_hours": -126,
+          "v": 8
+        },
+        {
+          "offset_hours": -120,
+          "v": 8
+        },
+        {
+          "offset_hours": -114,
+          "v": 8
+        },
+        {
+          "offset_hours": -108,
+          "v": 8
+        },
+        {
+          "offset_hours": -102,
+          "v": 8
+        },
+        {
+          "offset_hours": -96,
+          "v": 85
+        },
+        {
+          "offset_hours": -90,
+          "v": 8
+        },
+        {
+          "offset_hours": -84,
+          "v": 8
+        },
+        {
+          "offset_hours": -78,
+          "v": 8
+        },
+        {
+          "offset_hours": -72,
+          "v": 8
+        },
+        {
+          "offset_hours": -66,
+          "v": 8
+        },
+        {
+          "offset_hours": -60,
+          "v": 8
+        },
+        {
+          "offset_hours": -54,
+          "v": 8
+        },
+        {
+          "offset_hours": -48,
+          "v": 85
+        },
+        {
+          "offset_hours": -42,
+          "v": 8
+        },
+        {
+          "offset_hours": -36,
+          "v": 8
+        },
+        {
+          "offset_hours": -30,
+          "v": 8
+        },
+        {
+          "offset_hours": -24,
+          "v": 8
+        },
+        {
+          "offset_hours": -18,
+          "v": 8
+        },
+        {
+          "offset_hours": -12,
+          "v": 8
+        }
+      ]
+    },
+    {
+      "provider_resource_id": "nat-0deadbeef",
+      "namespace": "AWS/NATGateway",
+      "metric_name": "ActiveConnectionCount",
+      "dimension_name": "NatGatewayId",
+      "dimension_value": "nat-0deadbeef",
+      "statistic": "Average",
+      "period_seconds": 3600,
+      "unit": "Count",
+      "scenario": "bursty",
+      "missing": false,
+      "datapoints": [
+        {
+          "offset_hours": -168,
+          "v": 8
+        },
+        {
+          "offset_hours": -162,
+          "v": 8
+        },
+        {
+          "offset_hours": -156,
+          "v": 8
+        },
+        {
+          "offset_hours": -150,
+          "v": 8
+        },
+        {
+          "offset_hours": -144,
+          "v": 85
+        },
+        {
+          "offset_hours": -138,
+          "v": 8
+        },
+        {
+          "offset_hours": -132,
+          "v": 8
+        },
+        {
+          "offset_hours": -126,
+          "v": 8
+        },
+        {
+          "offset_hours": -120,
+          "v": 8
+        },
+        {
+          "offset_hours": -114,
+          "v": 8
+        },
+        {
+          "offset_hours": -108,
+          "v": 8
+        },
+        {
+          "offset_hours": -102,
+          "v": 8
+        },
+        {
+          "offset_hours": -96,
+          "v": 85
+        },
+        {
+          "offset_hours": -90,
+          "v": 8
+        },
+        {
+          "offset_hours": -84,
+          "v": 8
+        },
+        {
+          "offset_hours": -78,
+          "v": 8
+        },
+        {
+          "offset_hours": -72,
+          "v": 8
+        },
+        {
+          "offset_hours": -66,
+          "v": 8
+        },
+        {
+          "offset_hours": -60,
+          "v": 8
+        },
+        {
+          "offset_hours": -54,
+          "v": 8
+        },
+        {
+          "offset_hours": -48,
+          "v": 85
+        },
+        {
+          "offset_hours": -42,
+          "v": 8
+        },
+        {
+          "offset_hours": -36,
+          "v": 8
+        },
+        {
+          "offset_hours": -30,
+          "v": 8
+        },
+        {
+          "offset_hours": -24,
+          "v": 8
+        },
+        {
+          "offset_hours": -18,
+          "v": 8
+        },
+        {
+          "offset_hours": -12,
+          "v": 8
+        }
+      ]
+    },
+    {
+      "provider_resource_id": "i-0stopped01",
+      "namespace": "AWS/EC2",
+      "metric_name": "CPUUtilization",
+      "dimension_name": "InstanceId",
+      "dimension_value": "i-0stopped01",
+      "statistic": "Average",
+      "period_seconds": 3600,
+      "unit": "Percent",
+      "scenario": "idle",
+      "missing": false,
+      "datapoints": [
+        {
+          "offset_hours": -168,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -162,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -156,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -150,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -144,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -138,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -132,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -126,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -120,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -114,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -108,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -102,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -96,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -90,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -84,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -78,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -72,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -66,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -60,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -54,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -48,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -42,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -36,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -30,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -24,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -18,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -12,
+          "v": 1.5
+        },
+        {
+          "offset_hours": -6,
+          "v": 1.5
+        }
+      ]
+    },
+    {
+      "provider_resource_id": "i-ghost",
+      "namespace": "AWS/EC2",
+      "metric_name": "CPUUtilization",
+      "dimension_name": "InstanceId",
+      "dimension_value": "i-ghost",
+      "statistic": "Average",
+      "period_seconds": 3600,
+      "unit": "Percent",
+      "scenario": "missing",
+      "missing": true,
+      "datapoints": []
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+provider: aws
+schema: "1"
+metrics:
+  - id: cloudwatch_ec2
+    description: EC2 CPU, network, disk, and status check metrics
+    available: true
+    api_actions:
+      - cloudwatch:GetMetricData
+      - cloudwatch:ListMetrics
+  - id: cloudwatch_ebs
+    description: EBS throughput, IOPS, queue depth, and burst balance
+    available: true
+    api_actions:
+      - cloudwatch:GetMetricData
+  - id: cloudwatch_rds
+    description: RDS CPU, connections, storage, IOPS, latency, and memory
+    available: true
+    api_actions:
+      - cloudwatch:GetMetricData
+  - id: cloudwatch_nat
+    description: NAT gateway bytes, connections, packets, and errors
+    available: true
+    api_actions:
+      - cloudwatch:GetMetricData
+supported_checks:
+  - utilization_coverage
+  - idle_compute
+  - rightsizing_evidence

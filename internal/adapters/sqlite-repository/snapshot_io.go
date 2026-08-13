@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/kernul-io/cloudopt/internal/application/domain"
@@ -179,6 +180,123 @@ func insertMetrics(ctx context.Context, tx *sql.Tx, snap *domain.CollectionSnaps
 		}
 	}
 	return nil
+}
+
+func insertUtilizationSignal(ctx context.Context, tx *sql.Tx, snapID types.SnapshotID, s *domain.UtilizationSignal) error {
+	q, src, o := provColumns(s.Provenance)
+	queryJSON, err := json.Marshal(s.Query)
+	if err != nil {
+		return err
+	}
+	notesJSON, err := json.Marshal(s.Notes)
+	if err != nil {
+		return err
+	}
+	res, err := tx.ExecContext(ctx, `
+		INSERT INTO utilization_signals (
+			snapshot_id, resource_id, metric_name, kind, value, unit,
+			sample_count, expected_samples, coverage_ratio, zero_samples, missing_samples,
+			query_json, notes_json, quality, source, observed_at
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		string(snapID), string(s.ResourceID), s.MetricName, string(s.Kind), s.Value, s.Unit,
+		s.SampleCount, s.ExpectedSamples, s.CoverageRatio, s.ZeroSamples, s.MissingSamples,
+		string(queryJSON), string(notesJSON), q, src, o,
+	)
+	if err != nil {
+		return err
+	}
+	id, _ := res.LastInsertId()
+	s.ID = id
+	return nil
+}
+
+func insertMetricsMeta(ctx context.Context, tx *sql.Tx, snapID types.SnapshotID, meta *domain.MetricsCollectionMeta) error {
+	diagJSON, err := json.Marshal(meta.Diagnostics)
+	if err != nil {
+		return err
+	}
+	partial := 0
+	if meta.Partial {
+		partial = 1
+	}
+	_, err = tx.ExecContext(ctx, `
+		INSERT INTO snapshot_metrics_meta (
+			snapshot_id, window_start, window_end, period_seconds, timezone,
+			business_hour_start, business_hour_end, source, partial, diagnostics_json
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		string(snapID),
+		meta.Window.Start.Canonical(),
+		meta.Window.End.Canonical(),
+		meta.Window.PeriodSeconds,
+		meta.Window.TimeZone,
+		meta.Window.BusinessHourStart,
+		meta.Window.BusinessHourEnd,
+		meta.Source,
+		partial,
+		string(diagJSON),
+	)
+	return err
+}
+
+func loadMetricsMeta(ctx context.Context, db queryer, snapID types.SnapshotID) (*domain.MetricsCollectionMeta, error) {
+	row := db.QueryRowContext(ctx, `
+		SELECT window_start, window_end, period_seconds, timezone, business_hour_start, business_hour_end,
+			source, partial, diagnostics_json
+		FROM snapshot_metrics_meta WHERE snapshot_id = ?`, string(snapID))
+	var meta domain.MetricsCollectionMeta
+	var partial int
+	var diagJSON string
+	var wStart, wEnd string
+	if err := row.Scan(&wStart, &wEnd, &meta.Window.PeriodSeconds, &meta.Window.TimeZone,
+		&meta.Window.BusinessHourStart, &meta.Window.BusinessHourEnd, &meta.Source, &partial, &diagJSON); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	start, err := types.ParseTimestamp(wStart)
+	if err != nil {
+		return nil, err
+	}
+	end, err := types.ParseTimestamp(wEnd)
+	if err != nil {
+		return nil, err
+	}
+	meta.Window.Start = start
+	meta.Window.End = end
+	meta.Partial = partial != 0
+	if diagJSON != "" {
+		_ = json.Unmarshal([]byte(diagJSON), &meta.Diagnostics)
+	}
+	return &meta, nil
+}
+
+func loadUtilizationSignals(ctx context.Context, db queryer, snapID types.SnapshotID) ([]domain.UtilizationSignal, error) {
+	rows, err := db.QueryContext(ctx, `
+		SELECT id, resource_id, metric_name, kind, value, unit, sample_count, expected_samples,
+			coverage_ratio, zero_samples, missing_samples, query_json, notes_json, quality, source, observed_at
+		FROM utilization_signals WHERE snapshot_id = ? ORDER BY id`, string(snapID))
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = rows.Close() }()
+	var out []domain.UtilizationSignal
+	for rows.Next() {
+		var s domain.UtilizationSignal
+		var q, src string
+		var observed types.Timestamp
+		var queryJSON, notesJSON string
+		if err := rows.Scan(&s.ID, &s.ResourceID, &s.MetricName, &s.Kind, &s.Value, &s.Unit,
+			&s.SampleCount, &s.ExpectedSamples, &s.CoverageRatio, &s.ZeroSamples, &s.MissingSamples,
+			&queryJSON, &notesJSON, &q, &src, &tsScan{&observed}); err != nil {
+			return nil, err
+		}
+		s.Provenance = domain.Provenance{Quality: domain.DataQuality(q), Source: src, ObservedAt: observed}
+		_ = json.Unmarshal([]byte(queryJSON), &s.Query)
+		_ = json.Unmarshal([]byte(notesJSON), &s.Notes)
+		out = append(out, s)
+	}
+	return out, rows.Err()
 }
 
 func insertServiceCoverage(ctx context.Context, tx *sql.Tx, snap *domain.CollectionSnapshot) error {
