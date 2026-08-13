@@ -62,6 +62,7 @@ func newCostReconcileCommand(cfg *Config) *cobra.Command {
 					if err != nil {
 						return err
 					}
+					defer repo.Close() //nolint: errcheck
 					list, err := repo.ListSnapshots(ctx, ports.ListSnapshotFilter{Limit: 1})
 					if err != nil {
 						return err

@@ -26,6 +26,10 @@ func (r *Repository) Migrate(ctx context.Context) error {
 	return Migrate(ctx, r.db)
 }
 
+func (r *Repository) Close() error {
+	return r.db.Close()
+}
+
 func (r *Repository) SchemaVersion(ctx context.Context) (int, error) {
 	return SchemaVersion(ctx, r.db)
 }

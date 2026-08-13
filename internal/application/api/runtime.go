@@ -58,9 +58,15 @@ func (r *Runtime) Init(ctx context.Context) error {
 		return fmt.Errorf("write config: %w", err)
 	}
 
-	if _, err := OpenStorage(ctx, r.Settings); err != nil {
+	db, err := OpenStorage(ctx, r.Settings)
+	if err != nil {
 		return fmt.Errorf("initialize storage: %w", err)
 	}
+
+	if err := db.Close(); err != nil {
+		return fmt.Errorf("close storage: %w", err)
+	}
+
 	return nil
 }
 
@@ -72,6 +78,7 @@ func (r *Runtime) Analyze(ctx context.Context, opts ports.AnalyzeOptions) error 
 	if err != nil {
 		return err
 	}
+	defer repo.Close() //nolint: errcheck
 	svc := &AnalyzeService{Repo: repo}
 	result, err := svc.Analyze(ctx, AnalyzeSettings{
 		ConfigDir:         r.Settings.ConfigDir,
@@ -98,6 +105,7 @@ func (r *Runtime) Report(ctx context.Context, opts ports.ReportOptions) error {
 	if err != nil {
 		return err
 	}
+	defer repo.Close() //nolint: errcheck
 	opts.AnalyzerVersion = r.AnalyzerVersion
 	if opts.AnalyzerVersion == "" {
 		opts.AnalyzerVersion = "dev"
@@ -128,6 +136,7 @@ func (r *Runtime) ImportFixture(ctx context.Context, path string) (types.Snapsho
 	if err != nil {
 		return "", err
 	}
+	defer repo.Close() //nolint: errcheck
 	importer := fixture.NewImporter(repo)
 	return importer.Import(ctx, path)
 }

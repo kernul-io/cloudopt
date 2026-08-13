@@ -29,6 +29,7 @@ func (r *Runtime) CollectMetrics(ctx context.Context, opts ports.MetricsCollectO
 	if err != nil {
 		return nil, err
 	}
+	defer repo.Close() //nolint: errcheck
 	progress := opts.Progress
 	if progress == nil {
 		progress = ports.NopProgress{}

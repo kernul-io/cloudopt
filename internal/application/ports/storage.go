@@ -17,6 +17,7 @@ type ListSnapshotFilter struct {
 // StorageRepository persists canonical snapshots and analysis runs.
 type StorageRepository interface {
 	Migrate(ctx context.Context) error
+	Close() error
 	SchemaVersion(ctx context.Context) (int, error)
 
 	SaveSnapshot(ctx context.Context, snap *domain.CollectionSnapshot) error

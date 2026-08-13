@@ -34,6 +34,7 @@ func (r *Runtime) CollectCost(ctx context.Context, opts ports.CostCollectOptions
 	if err != nil {
 		return nil, err
 	}
+	defer repo.Close() //nolint: errcheck
 	progress := opts.Progress
 	if progress == nil {
 		progress = ports.NopProgress{}
@@ -53,6 +54,7 @@ func (r *Runtime) ReconcileCost(ctx context.Context, snapshotID string) (*Reconc
 	if err != nil {
 		return nil, err
 	}
+	defer repo.Close() //nolint: errcheck
 	svc := &CostCollectService{Repo: repo}
 	recon, err := svc.ReconcileSnapshot(ctx, types.SnapshotID(snapshotID))
 	if err != nil {

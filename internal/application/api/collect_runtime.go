@@ -40,6 +40,7 @@ func (r *Runtime) Collect(ctx context.Context, opts CollectOptions) (*ports.Coll
 	if err != nil {
 		return nil, err
 	}
+	defer repo.Close() //nolint: errcheck
 	progress := opts.Progress
 	if progress == nil {
 		progress = ports.NopProgress{}
