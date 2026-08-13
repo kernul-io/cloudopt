@@ -74,6 +74,24 @@ resources:
     state: available
     attributes:
       size_gib: "250"
+  - id: res-snap-stale
+    kind: volume_snapshot
+    region_id: reg-use1
+    provider_resource_id: snap-old001
+    name: backup-2024-q1
+    state: completed
+    attributes:
+      created_at: "2024-03-01T00:00:00Z"
+      size_gib: "100"
+  - id: res-snap-recent
+    kind: volume_snapshot
+    region_id: reg-use1
+    provider_resource_id: snap-new001
+    name: backup-2026-01
+    state: completed
+    attributes:
+      created_at: "2026-01-10T00:00:00Z"
+      size_gib: "50"
   - id: res-rds-primary
     kind: database_instance
     region_id: reg-use1

@@ -9,6 +9,7 @@ import (
 	"github.com/kernul-io/cloudopt/internal/adapters/config"
 	"github.com/kernul-io/cloudopt/internal/adapters/logging"
 	"github.com/kernul-io/cloudopt/internal/application/api"
+	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/domain/exitcodes"
 )
 
@@ -81,14 +82,31 @@ func newCollectCommand(cfg *Config) *cobra.Command {
 }
 
 func newAnalyzeCommand(cfg *Config) *cobra.Command {
-	return &cobra.Command{
+	var snapshotID, rulesCSV, categoriesCSV string
+	var jsonOut bool
+	cmd := &cobra.Command{
 		Use:   "analyze",
 		Short: "Run deterministic optimization rules on collected data",
-		Long:  "Analyze is not implemented in step 01; output contract and flags are stable for later steps.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runOperational(cmd, cfg, "analyze", (*api.Runtime).Analyze)
+			opts := api.AnalyzeOptions{
+				SnapshotID: types.SnapshotID(snapshotID),
+				Persist:    true,
+				JSONDetail: jsonOut,
+			}
+			if rulesCSV != "" {
+				opts.RuleIDs = splitCSV(rulesCSV)
+			}
+			if categoriesCSV != "" {
+				opts.Categories = splitCSV(categoriesCSV)
+			}
+			return runAnalyze(cmd, cfg, opts)
 		},
 	}
+	cmd.Flags().StringVar(&snapshotID, "snapshot-id", "", "Snapshot to analyze (default: latest complete)")
+	cmd.Flags().StringVar(&rulesCSV, "rules", "", "Comma-separated rule IDs to run")
+	cmd.Flags().StringVar(&categoriesCSV, "category", "", "Comma-separated rule categories to run")
+	cmd.Flags().BoolVar(&jsonOut, "json", false, "Emit full analysis JSON on stdout")
+	return cmd
 }
 
 func newReportCommand(cfg *Config) *cobra.Command {

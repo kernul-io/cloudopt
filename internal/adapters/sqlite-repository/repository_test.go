@@ -52,7 +52,7 @@ func TestFixtureRoundTrip(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, domain.SnapshotComplete, loaded.Status)
 	require.Len(t, loaded.Regions, 2)
-	require.Len(t, loaded.Resources, 8)
+	require.Len(t, loaded.Resources, 10)
 	require.True(t, loaded.Relationships[len(loaded.Relationships)-1].TargetMissing)
 	require.NotEmpty(t, loaded.Costs)
 	require.NotEmpty(t, loaded.Metrics)

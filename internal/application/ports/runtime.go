@@ -6,6 +6,6 @@ import "context"
 type CommandRunner interface {
 	Init(ctx context.Context) error
 	Collect(ctx context.Context) error
-	Analyze(ctx context.Context) error
+	Analyze(ctx context.Context, opts AnalyzeOptions) error
 	Report(ctx context.Context) error
 }
