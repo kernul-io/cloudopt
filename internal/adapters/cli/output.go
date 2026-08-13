@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/kernul-io/cloudopt/internal/application/api"
+	"github.com/kernul-io/cloudopt/internal/application/ports"
 )
 
 // Result is the stable machine-readable command outcome written to stdout.
@@ -17,6 +18,7 @@ type Result struct {
 	Version string `json:"version,omitempty"`
 
 	Analysis *AnalyzePayload `json:"analysis,omitempty"`
+	Report   *ReportPayload  `json:"report,omitempty"`
 }
 
 // AnalyzePayload is the detailed analyze output when --json is set.
@@ -53,6 +55,14 @@ type AnalyzeRuleStatus struct {
 	RuleID  string `json:"rule_id"`
 	Status  string `json:"status"`
 	Message string `json:"message,omitempty"`
+}
+
+// ReportPayload is emitted when report --json is set.
+type ReportPayload struct {
+	Path          string `json:"path"`
+	Format        string `json:"format"`
+	AnalysisRunID string `json:"analysis_run_id"`
+	SnapshotID    string `json:"snapshot_id"`
 }
 
 const (
@@ -109,6 +119,23 @@ func EmitAnalyzeResult(result *api.AnalyzeResult) error {
 		Status:   StatusOK,
 		Command:  "analyze",
 		Analysis: &payload,
+	})
+}
+
+// EmitReportResult writes successful report metadata to stdout.
+func EmitReportResult(result *ports.ReportResult) error {
+	if result == nil {
+		return fmt.Errorf("report result is nil")
+	}
+	return writeResult(os.Stdout, Result{
+		Status:  StatusOK,
+		Command: "report",
+		Report: &ReportPayload{
+			Path:          result.DocumentPath,
+			Format:        string(result.Format),
+			AnalysisRunID: string(result.AnalysisRunID),
+			SnapshotID:    string(result.SnapshotID),
+		},
 	})
 }
 

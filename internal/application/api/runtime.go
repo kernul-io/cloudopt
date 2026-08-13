@@ -8,13 +8,17 @@ import (
 	"path/filepath"
 
 	"github.com/kernul-io/cloudopt/internal/adapters/config"
+	"github.com/kernul-io/cloudopt/internal/adapters/fixture"
+	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
 )
 
 // Runtime implements operational commands for the CLI.
 type Runtime struct {
-	Settings    config.Settings
-	lastAnalyze *AnalyzeResult
+	Settings        config.Settings
+	lastAnalyze     *AnalyzeResult
+	lastReport      *ports.ReportResult
+	AnalyzerVersion string
 }
 
 func NewRuntime(settings config.Settings) *Runtime {
@@ -89,11 +93,46 @@ func (r *Runtime) LastAnalyzeResult() *AnalyzeResult {
 	return r.lastAnalyze
 }
 
-func (r *Runtime) Report(ctx context.Context) error {
+func (r *Runtime) Report(ctx context.Context, opts ports.ReportOptions) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	return ErrNotImplemented("report")
+	repo, err := OpenStorage(ctx, r.Settings)
+	if err != nil {
+		return err
+	}
+	opts.AnalyzerVersion = r.AnalyzerVersion
+	if opts.AnalyzerVersion == "" {
+		opts.AnalyzerVersion = "dev"
+	}
+	svc := &ReportService{Repo: repo, ReportsDir: r.Settings.ReportsDir}
+	result, err := svc.Generate(ctx, AnalyzeSettings{
+		ConfigDir:         r.Settings.ConfigDir,
+		RulesManifestPath: r.Settings.RulesManifestPath,
+		SuppressionsPath:  r.Settings.SuppressionsPath,
+	}, opts)
+	if err != nil {
+		return err
+	}
+	r.lastReport = result
+	return nil
+}
+
+// LastReportResult returns the most recent report output for CLI emission.
+func (r *Runtime) LastReportResult() *ports.ReportResult {
+	return r.lastReport
+}
+
+func (r *Runtime) ImportFixture(ctx context.Context, path string) (types.SnapshotID, error) {
+	if err := ctx.Err(); err != nil {
+		return "", err
+	}
+	repo, err := OpenStorage(ctx, r.Settings)
+	if err != nil {
+		return "", err
+	}
+	importer := fixture.NewImporter(repo)
+	return importer.Import(ctx, path)
 }
 
 // NotImplementedError indicates a command contract exists but behavior is deferred.

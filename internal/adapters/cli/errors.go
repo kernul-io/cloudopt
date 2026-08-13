@@ -68,3 +68,14 @@ func AnalysisExitCode(err error) int {
 	}
 	return exitcodes.AnalysisFail
 }
+
+// ReportExitCode maps report generation failures.
+func ReportExitCode(err error) int {
+	if err == nil {
+		return exitcodes.Success
+	}
+	if api.IsNotImplemented(err) {
+		return exitcodes.Success
+	}
+	return exitcodes.GeneralError
+}
