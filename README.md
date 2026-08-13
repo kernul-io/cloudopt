@@ -1,12 +1,18 @@
-# Cloud Optimization Analyzer (COA)
+# Cloud Optimization Analyzer
 
 **Cloud Optimization Analyzer** is a read-only CLI for multi-cloud cost and utilization analysis. It collects inventory and usage evidence from cloud providers, runs deterministic optimization rules, and produces shareable reports—all without mutating your infrastructure.
 
 ## Installation
 
-<!-- TODO: add install one-liner when release artifacts or package manager distribution is available -->
+### Linux or Mac
 
-_Pre-built binaries and install scripts will be documented here._
+``` bash
+curl https://raw.githubusercontent.com/kernul-io/cloudopt/main/install/install.sh | bash
+```
+
+### Windows
+
+commin soon
 
 ## Build from source
 
@@ -24,24 +30,11 @@ go mod tidy
 make build          # produces ./main
 ```
 
-Run tests and lint before submitting changes:
-
-```bash
-make test
-make lint           # requires golangci-lint
-```
-
-Cross-compile for Linux ARM64 (typical container target):
-
-```bash
-CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -o main ./cmd/
-```
-
 ## What it does
 
 <!-- TODO: expand as collect, analyze, and report capabilities ship -->
 
-COA is designed to:
+CloudOpt is designed to:
 
 - **Collect** read-only snapshots from cloud APIs (inventory, billing, metrics) into a local workspace backed by SQLite.
 - **Analyze** collected data with deterministic, evidence-backed rules (rightsizing, waste, attribution, and related findings).
