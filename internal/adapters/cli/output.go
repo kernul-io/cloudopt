@@ -19,6 +19,7 @@ type Result struct {
 
 	Analysis *AnalyzePayload `json:"analysis,omitempty"`
 	Report   *ReportPayload  `json:"report,omitempty"`
+	Collect  *CollectPayload `json:"collect,omitempty"`
 }
 
 // AnalyzePayload is the detailed analyze output when --json is set.
@@ -57,12 +58,25 @@ type AnalyzeRuleStatus struct {
 	Message string `json:"message,omitempty"`
 }
 
-// ReportPayload is emitted when report --json is set.
 type ReportPayload struct {
 	Path          string `json:"path"`
 	Format        string `json:"format"`
 	AnalysisRunID string `json:"analysis_run_id"`
 	SnapshotID    string `json:"snapshot_id"`
+}
+
+type CollectPayload struct {
+	SnapshotID string            `json:"snapshot_id,omitempty"`
+	DryRun     bool              `json:"dry_run,omitempty"`
+	Partial    bool              `json:"partial,omitempty"`
+	Preflight  *CollectPreflight `json:"preflight,omitempty"`
+}
+
+type CollectPreflight struct {
+	ProviderAccountID string   `json:"provider_account_id"`
+	CallerARN         string   `json:"caller_arn"`
+	SelectedRegions   []string `json:"selected_regions"`
+	MissingActions    []string `json:"missing_actions,omitempty"`
 }
 
 const (
@@ -119,6 +133,31 @@ func EmitAnalyzeResult(result *api.AnalyzeResult) error {
 		Status:   StatusOK,
 		Command:  "analyze",
 		Analysis: &payload,
+	})
+}
+
+// EmitCollectResult writes successful collect metadata to stdout.
+func EmitCollectResult(result *api.CollectResult) error {
+	if result == nil {
+		return EmitOK("collect", "")
+	}
+	payload := &CollectPayload{
+		SnapshotID: string(result.SnapshotID),
+		DryRun:     result.DryRun,
+		Partial:    result.Partial,
+	}
+	if result.Preflight != nil {
+		payload.Preflight = &CollectPreflight{
+			ProviderAccountID: result.Preflight.ProviderAccountID,
+			CallerARN:         result.Preflight.CallerARN,
+			SelectedRegions:   result.Preflight.SelectedRegions,
+			MissingActions:    result.Preflight.MissingActions,
+		}
+	}
+	return writeResult(os.Stdout, Result{
+		Status:  StatusOK,
+		Command: "collect",
+		Collect: payload,
 	})
 }
 

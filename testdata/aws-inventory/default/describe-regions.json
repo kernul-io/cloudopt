@@ -1,0 +1,8 @@
+{
+  "Regions": [
+    {
+      "RegionName": "us-east-1",
+      "OptInStatus": "opt-in-not-required"
+    }
+  ]
+}

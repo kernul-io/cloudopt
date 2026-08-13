@@ -1,0 +1,11 @@
+{
+  "Snapshots": [
+    {
+      "SnapshotId": "snap-old001",
+      "State": "completed",
+      "VolumeId": "vol-attached01",
+      "StartTime": "2025-06-01T12:00:00Z",
+      "Tags": [{ "Key": "Name", "Value": "old-backup" }]
+    }
+  ]
+}

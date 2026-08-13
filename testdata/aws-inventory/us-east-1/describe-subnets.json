@@ -1,0 +1,9 @@
+{
+  "Subnets": [
+    {
+      "SubnetId": "subnet-0abc1234",
+      "VpcId": "vpc-0a1b2c3d",
+      "Tags": [{ "Key": "Name", "Value": "demo-private-a" }]
+    }
+  ]
+}

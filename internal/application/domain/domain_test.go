@@ -14,6 +14,10 @@ func TestSnapshotAnalyzable(t *testing.T) {
 
 	failed := domain.CollectionSnapshot{Status: domain.SnapshotFailed}
 	require.False(t, failed.IsAnalyzable())
+
+	partial := domain.CollectionSnapshot{Status: domain.SnapshotPartial}
+	require.False(t, partial.IsAnalyzable())
+	require.True(t, partial.IsAnalyzableAllowPartial())
 }
 
 func TestCompareSnapshotsMatch(t *testing.T) {

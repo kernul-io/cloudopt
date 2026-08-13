@@ -1,0 +1,17 @@
+{
+  "Volumes": [
+    {
+      "VolumeId": "vol-attached01",
+      "State": "in-use",
+      "Size": 100,
+      "Attachments": [{ "InstanceId": "i-0running01", "State": "attached" }],
+      "Tags": [{ "Key": "Name", "Value": "app-data" }]
+    },
+    {
+      "VolumeId": "vol-orphan01",
+      "State": "available",
+      "Size": 250,
+      "Tags": [{ "Key": "Name", "Value": "forgotten-data" }]
+    }
+  ]
+}

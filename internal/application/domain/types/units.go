@@ -48,6 +48,11 @@ func NewTimestamp(t time.Time) Timestamp {
 	return Timestamp{Time: t.UTC()}
 }
 
+// NowUTC returns the current instant as a canonical timestamp.
+func NowUTC() Timestamp {
+	return NewTimestamp(time.Now())
+}
+
 func ParseTimestamp(s string) (Timestamp, error) {
 	t, err := time.Parse(time.RFC3339Nano, s)
 	if err != nil {

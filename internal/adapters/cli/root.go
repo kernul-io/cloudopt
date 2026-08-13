@@ -70,30 +70,18 @@ func newInitCommand(cfg *Config) *cobra.Command {
 	}
 }
 
-func newCollectCommand(cfg *Config) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "collect",
-		Short: "Collect read-only snapshots from configured cloud accounts",
-		Long:  "Collect is not implemented in step 01; output contract and flags are stable for later steps.",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return runOperational(cmd, cfg, "collect", (*api.Runtime).Collect)
-		},
-	}
-	cmd.Flags().String("provider", "", "Limit collection to one provider (aws, gcp, azure, digitalocean)")
-	return cmd
-}
-
 func newAnalyzeCommand(cfg *Config) *cobra.Command {
 	var snapshotID, rulesCSV, categoriesCSV string
-	var jsonOut bool
+	var jsonOut, allowPartial bool
 	cmd := &cobra.Command{
 		Use:   "analyze",
 		Short: "Run deterministic optimization rules on collected data",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts := api.AnalyzeOptions{
-				SnapshotID: types.SnapshotID(snapshotID),
-				Persist:    true,
-				JSONDetail: jsonOut,
+				SnapshotID:           types.SnapshotID(snapshotID),
+				Persist:              true,
+				JSONDetail:           jsonOut,
+				AllowPartialSnapshot: allowPartial,
 			}
 			if rulesCSV != "" {
 				opts.RuleIDs = splitCSV(rulesCSV)
@@ -108,6 +96,7 @@ func newAnalyzeCommand(cfg *Config) *cobra.Command {
 	cmd.Flags().StringVar(&rulesCSV, "rules", "", "Comma-separated rule IDs to run")
 	cmd.Flags().StringVar(&categoriesCSV, "category", "", "Comma-separated rule categories to run")
 	cmd.Flags().BoolVar(&jsonOut, "json", false, "Emit full analysis JSON on stdout")
+	cmd.Flags().BoolVar(&allowPartial, "allow-partial-snapshot", false, "Allow analysis on partial inventory snapshots")
 	return cmd
 }
 

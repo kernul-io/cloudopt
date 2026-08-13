@@ -3,7 +3,6 @@ package report
 import (
 	"fmt"
 	"sort"
-	"strconv"
 
 	"github.com/kernul-io/cloudopt/internal/application/domain"
 	"github.com/kernul-io/cloudopt/internal/application/domain/types"

@@ -1,0 +1,9 @@
+{
+  "RouteTables": [
+    {
+      "RouteTableId": "rtb-0123456789abcdef0",
+      "VpcId": "vpc-0a1b2c3d",
+      "Tags": [{ "Key": "Name", "Value": "demo-rt" }]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "Vpcs": [
+    {
+      "VpcId": "vpc-0a1b2c3d",
+      "CidrBlock": "10.0.0.0/16",
+      "State": "available",
+      "Tags": [{ "Key": "Name", "Value": "demo-vpc" }]
+    }
+  ]
+}
