@@ -1,12 +1,9 @@
 name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: "Specify a Git tag to process (e.g., v1.0.0)"
-        required: true
-        type: string
+  push:
+    tags:
+      - '*'
 
 env:
   GO_VERSION: "1.25.3"
