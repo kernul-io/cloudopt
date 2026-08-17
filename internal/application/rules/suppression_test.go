@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/rules"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 func TestSuppressionActiveByFingerprint(t *testing.T) {

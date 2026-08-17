@@ -9,8 +9,8 @@ import (
 
 	"github.com/kernul-io/cloudopt/internal/adapters/config"
 	"github.com/kernul-io/cloudopt/internal/adapters/fixture"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // Runtime implements operational commands for the CLI.

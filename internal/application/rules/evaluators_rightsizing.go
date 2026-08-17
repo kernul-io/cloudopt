@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/pricing"
 	"github.com/kernul-io/cloudopt/internal/application/savings"
+	"github.com/kernul-io/cloudopt/internal/domain"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // EC2DownsizeCandidate recommends same-family instance downsizing from utilization + catalog pricing.

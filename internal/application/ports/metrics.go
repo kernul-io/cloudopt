@@ -3,8 +3,8 @@ package ports
 import (
 	"context"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
+	"github.com/kernul-io/cloudopt/internal/domain"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // MetricsCollectOptions configures CloudWatch (or other) utilization collection.

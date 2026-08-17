@@ -5,8 +5,8 @@ import (
 	"math"
 	"sort"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
+	"github.com/kernul-io/cloudopt/internal/domain"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // DefaultReconcileToleranceBasisPoints allows 0.5% rounding drift between CE totals and attributed rows.

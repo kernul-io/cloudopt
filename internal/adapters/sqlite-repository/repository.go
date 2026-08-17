@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
+	"github.com/kernul-io/cloudopt/internal/domain"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // Repository implements ports.StorageRepository with SQLite.

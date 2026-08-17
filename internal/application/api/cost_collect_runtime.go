@@ -3,8 +3,8 @@ package api
 import (
 	"context"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // CostCollectResult is the CLI JSON payload for billing collection.

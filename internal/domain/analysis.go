@@ -1,6 +1,6 @@
 package domain
 
-import "github.com/kernul-io/cloudopt/internal/application/domain/types"
+import "github.com/kernul-io/cloudopt/internal/domain/types"
 
 // EvidenceKind classifies supporting data for a finding.
 type EvidenceKind string

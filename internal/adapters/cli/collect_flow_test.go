@@ -10,8 +10,8 @@ import (
 
 	"github.com/kernul-io/cloudopt/internal/adapters/cli"
 	"github.com/kernul-io/cloudopt/internal/application/api"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 func TestOfflineAWSCollectAnalyzeReport(t *testing.T) {

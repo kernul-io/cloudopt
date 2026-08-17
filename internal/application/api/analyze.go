@@ -6,11 +6,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
 	"github.com/kernul-io/cloudopt/internal/application/pricing"
 	"github.com/kernul-io/cloudopt/internal/application/rules"
+	"github.com/kernul-io/cloudopt/internal/domain"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // AnalyzeOptions configures a single analyze invocation.

@@ -8,11 +8,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
 	"github.com/kernul-io/cloudopt/internal/application/report"
 	"github.com/kernul-io/cloudopt/internal/application/rules"
+	"github.com/kernul-io/cloudopt/internal/domain"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // ReportService builds consultant reports from persisted analysis runs.

@@ -1,6 +1,6 @@
 package ports
 
-import "github.com/kernul-io/cloudopt/internal/application/domain/types"
+import "github.com/kernul-io/cloudopt/internal/domain/types"
 
 // AnalyzeOptions configures a single analyze invocation from the CLI.
 type AnalyzeOptions struct {

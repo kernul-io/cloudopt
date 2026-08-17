@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // CollectOptions re-exports ports collect configuration for the runtime.

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
+	"github.com/kernul-io/cloudopt/internal/domain"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 const defaultPricingUncertaintyBps int64 = 500 // ±5%
@@ -141,8 +141,8 @@ func ApplyOverlapPolicy(findings []domain.Finding, recs *[]domain.Recommendation
 }
 
 func overlapPriority(overlapKey string) int {
-	switch {
-	case overlapKey == "":
+	switch overlapKey {
+	case "":
 		return 0
 	default:
 		return 1

@@ -1,7 +1,7 @@
 package ports
 
 import (
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // ReportFormat selects export encoding.

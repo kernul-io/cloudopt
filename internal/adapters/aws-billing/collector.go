@@ -19,9 +19,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 
 	appbilling "github.com/kernul-io/cloudopt/internal/application/billing"
-	"github.com/kernul-io/cloudopt/internal/application/domain"
-	domaintypes "github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
+	"github.com/kernul-io/cloudopt/internal/domain"
+	domaintypes "github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 const collectorSource = "aws-billing/cost-explorer"

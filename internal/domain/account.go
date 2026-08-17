@@ -1,6 +1,6 @@
 package domain
 
-import "github.com/kernul-io/cloudopt/internal/application/domain/types"
+import "github.com/kernul-io/cloudopt/internal/domain/types"
 
 // Account is a provider-linked billing and inventory scope.
 type Account struct {

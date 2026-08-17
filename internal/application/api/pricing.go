@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 
 	awspricing "github.com/kernul-io/cloudopt/internal/adapters/aws-pricing"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
 	"github.com/kernul-io/cloudopt/internal/application/pricing"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // LoadPricingCatalog resolves an offline catalog for analyze (live API deferred).

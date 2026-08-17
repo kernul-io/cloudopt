@@ -3,7 +3,7 @@ package domain
 import (
 	"time"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // CostGranularity describes the billing period for a cost record.

@@ -9,8 +9,8 @@ import (
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
+	"github.com/kernul-io/cloudopt/internal/domain"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 func (c *Collector) collectVPCs(ctx context.Context, client EC2API, region string, accountID types.AccountID, regID types.RegionID, obs types.Timestamp, index map[string]types.ResourceID) ([]domain.Resource, error) {

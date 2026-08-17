@@ -8,9 +8,9 @@ import (
 
 	"github.com/kernul-io/cloudopt/internal/adapters/logging"
 	"github.com/kernul-io/cloudopt/internal/application/api"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
 	"github.com/kernul-io/cloudopt/internal/domain/exitcodes"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 func newCollectCommand(cfg *Config) *cobra.Command {

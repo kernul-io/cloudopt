@@ -1,6 +1,6 @@
 package domain
 
-import "github.com/kernul-io/cloudopt/internal/application/domain/types"
+import "github.com/kernul-io/cloudopt/internal/domain/types"
 
 // ServiceCollectionStatus tracks read-only inventory collection for one service scope.
 type ServiceCollectionStatus struct {

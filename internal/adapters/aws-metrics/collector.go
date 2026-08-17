@@ -18,10 +18,10 @@ import (
 	cwtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain"
-	domaintypes "github.com/kernul-io/cloudopt/internal/application/domain/types"
 	appmetrics "github.com/kernul-io/cloudopt/internal/application/metrics"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
+	"github.com/kernul-io/cloudopt/internal/domain"
+	domaintypes "github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 const collectorSource = "aws-metrics/cloudwatch"

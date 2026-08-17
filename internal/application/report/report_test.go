@@ -14,11 +14,11 @@ import (
 	"github.com/kernul-io/cloudopt/internal/adapters/fixture"
 	sqliterepository "github.com/kernul-io/cloudopt/internal/adapters/sqlite-repository"
 	"github.com/kernul-io/cloudopt/internal/application/api"
-	"github.com/kernul-io/cloudopt/internal/application/domain"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
 	"github.com/kernul-io/cloudopt/internal/application/report"
 	"github.com/kernul-io/cloudopt/internal/application/rules"
+	"github.com/kernul-io/cloudopt/internal/domain"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 func TestReportFixtureGoldenJSON(t *testing.T) {

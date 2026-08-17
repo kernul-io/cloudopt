@@ -11,8 +11,8 @@ import (
 	"github.com/aws/smithy-go"
 	"github.com/stretchr/testify/require"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
+	"github.com/kernul-io/cloudopt/internal/domain"
 )
 
 func TestFixtureMetricsCollection(t *testing.T) {

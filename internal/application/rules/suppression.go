@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // SuppressionEntry suppresses findings matching fingerprint, resource, and/or rule.

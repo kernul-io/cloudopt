@@ -7,8 +7,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
+	"github.com/kernul-io/cloudopt/internal/domain"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 func upsertAccount(ctx context.Context, tx *sql.Tx, acc domain.Account) error {

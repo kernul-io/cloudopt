@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	awsmetrics "github.com/kernul-io/cloudopt/internal/adapters/aws-metrics"
-	"github.com/kernul-io/cloudopt/internal/application/domain"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
+	"github.com/kernul-io/cloudopt/internal/domain"
 )
 
 const metricsCollectorSource = "aws-metrics/cloudwatch"

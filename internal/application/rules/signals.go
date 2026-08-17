@@ -4,10 +4,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	appmetrics "github.com/kernul-io/cloudopt/internal/application/metrics"
 	"github.com/kernul-io/cloudopt/internal/application/pricing"
+	"github.com/kernul-io/cloudopt/internal/domain"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // Catalog returns the pricing catalog attached to the snapshot view.

@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"sort"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // Fingerprint returns a stable identifier for a finding instance.

@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/pricing"
 	"github.com/kernul-io/cloudopt/internal/application/savings"
+	"github.com/kernul-io/cloudopt/internal/domain"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // RuleStatus describes per-rule execution outcome for summaries.

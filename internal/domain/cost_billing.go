@@ -1,6 +1,6 @@
 package domain
 
-import "github.com/kernul-io/cloudopt/internal/application/domain/types"
+import "github.com/kernul-io/cloudopt/internal/domain/types"
 
 // UnattributedResourceID marks spend that could not be mapped to inventory.
 const UnattributedResourceID types.ResourceID = "__unattributed__"

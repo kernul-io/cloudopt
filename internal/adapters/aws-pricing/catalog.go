@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
 	"github.com/kernul-io/cloudopt/internal/application/pricing"
+	"github.com/kernul-io/cloudopt/internal/domain"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // Collector loads AWS list prices from offline fixtures (live API deferred).
@@ -63,7 +63,7 @@ func (c *Collector) LoadCatalog(ctx context.Context, opts ports.PricingLoadOptio
 		return nil, fmt.Errorf("parse pricing fixture: %w", err)
 	}
 	effective, _ := types.ParseTimestamp(doc.EffectiveDate)
-	if effective.Time.IsZero() {
+	if effective.IsZero() {
 		effective = types.NewTimestamp(time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC))
 	}
 	source := doc.Source

@@ -6,8 +6,8 @@ import (
 
 	awsinventory "github.com/kernul-io/cloudopt/internal/adapters/aws-inventory"
 	"github.com/kernul-io/cloudopt/internal/adapters/config"
-	"github.com/kernul-io/cloudopt/internal/application/domain"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
+	"github.com/kernul-io/cloudopt/internal/domain"
 )
 
 // CollectService orchestrates provider inventory collectors and persistence.

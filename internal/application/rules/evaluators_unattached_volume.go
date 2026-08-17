@@ -3,8 +3,8 @@ package rules
 import (
 	"fmt"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
+	"github.com/kernul-io/cloudopt/internal/domain"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // UnattachedBlockVolume flags block volumes that are not attached to an instance.

@@ -9,8 +9,8 @@ import (
 
 	"github.com/kernul-io/cloudopt/internal/adapters/logging"
 	"github.com/kernul-io/cloudopt/internal/application/api"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 func runReport(cmd *cobra.Command, cfg *Config, opts ports.ReportOptions) error {

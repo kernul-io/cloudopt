@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kernul-io/cloudopt/internal/application/domain"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
+	"github.com/kernul-io/cloudopt/internal/domain"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 const hoursPerMonth = 730
@@ -112,10 +112,10 @@ func RecomputeInputs(kind string, fields map[string]string) map[string]string {
 
 // StalePricing returns true when catalog effective date is older than maxAge from observedAt.
 func StalePricing(effective types.Timestamp, observedAt types.Timestamp, maxAge time.Duration) bool {
-	if effective.Time.IsZero() || observedAt.Time.IsZero() {
+	if effective.IsZero() || observedAt.IsZero() {
 		return false
 	}
-	return observedAt.Time.Sub(effective.Time) > maxAge
+	return observedAt.Sub(effective.Time) > maxAge
 }
 
 // SortedEC2Alternatives returns same-family smaller instance types with prices, plus rejections.

@@ -6,9 +6,9 @@ import (
 
 	awsbilling "github.com/kernul-io/cloudopt/internal/adapters/aws-billing"
 	appbilling "github.com/kernul-io/cloudopt/internal/application/billing"
-	"github.com/kernul-io/cloudopt/internal/application/domain"
-	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
+	"github.com/kernul-io/cloudopt/internal/domain"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // CostCollectService orchestrates billing collection and snapshot updates.
