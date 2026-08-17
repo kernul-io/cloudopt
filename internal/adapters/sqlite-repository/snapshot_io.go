@@ -646,15 +646,48 @@ func insertRecommendations(ctx context.Context, tx *sql.Tx, run *domain.Analysis
 		q, s, o := provColumns(rec.Provenance)
 		var savingsMinor sql.NullInt64
 		var savingsCurrency sql.NullString
+		var savingsLow sql.NullInt64
+		var savingsHigh sql.NullInt64
+		var savingsClass sql.NullString
+		var overlapKey sql.NullString
+		var inputsJSON sql.NullString
 		if rec.EstSavings != nil {
 			savingsMinor = sql.NullInt64{Int64: rec.EstSavings.AmountMinor, Valid: true}
 			savingsCurrency = sql.NullString{String: rec.EstSavings.Currency, Valid: true}
 		}
+		if rec.EstSavingsLow != nil {
+			savingsLow = sql.NullInt64{Int64: rec.EstSavingsLow.AmountMinor, Valid: true}
+		}
+		if rec.EstSavingsHigh != nil {
+			savingsHigh = sql.NullInt64{Int64: rec.EstSavingsHigh.AmountMinor, Valid: true}
+		}
+		if rec.SavingsClass != "" {
+			savingsClass = sql.NullString{String: string(rec.SavingsClass), Valid: true}
+		}
+		if rec.OverlapKey != "" {
+			overlapKey = sql.NullString{String: rec.OverlapKey, Valid: true}
+		}
+		if len(rec.SavingsInputs) > 0 {
+			raw, err := encodeJSON(rec.SavingsInputs)
+			if err != nil {
+				return err
+			}
+			inputsJSON = sql.NullString{String: raw, Valid: true}
+		}
+		inv := 0
+		if rec.InvestigationOnly {
+			inv = 1
+		}
 		res, err := tx.ExecContext(ctx, `
-			INSERT INTO recommendations (analysis_run_id, finding_id, summary, steps_json, risk_level, savings_minor, savings_currency, quality, source, observed_at)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			INSERT INTO recommendations (
+				analysis_run_id, finding_id, summary, steps_json, risk_level,
+				savings_minor, savings_currency, savings_low_minor, savings_high_minor,
+				savings_class, investigation_only, overlap_key, savings_inputs_json,
+				quality, source, observed_at)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 			string(run.ID), string(rec.FindingID), rec.Summary, steps, rec.RiskLevel,
-			savingsMinor, savingsCurrency, q, s, o,
+			savingsMinor, savingsCurrency, savingsLow, savingsHigh, savingsClass, inv, overlapKey, inputsJSON,
+			q, s, o,
 		)
 		if err != nil {
 			return err
@@ -725,7 +758,10 @@ func loadFindings(ctx context.Context, db queryer, runID types.AnalysisRunID) ([
 
 func loadRecommendations(ctx context.Context, db queryer, runID types.AnalysisRunID) ([]domain.Recommendation, error) {
 	rows, err := db.QueryContext(ctx, `
-		SELECT id, finding_id, summary, steps_json, risk_level, savings_minor, savings_currency, quality, source, observed_at
+		SELECT id, finding_id, summary, steps_json, risk_level,
+			savings_minor, savings_currency, savings_low_minor, savings_high_minor,
+			savings_class, investigation_only, overlap_key, savings_inputs_json,
+			quality, source, observed_at
 		FROM recommendations WHERE analysis_run_id = ? ORDER BY id`, string(runID))
 	if err != nil {
 		return nil, err
@@ -738,9 +774,16 @@ func loadRecommendations(ctx context.Context, db queryer, runID types.AnalysisRu
 		var stepsJSON string
 		var savingsMinor sql.NullInt64
 		var savingsCurrency sql.NullString
+		var savingsLow sql.NullInt64
+		var savingsHigh sql.NullInt64
+		var savingsClass sql.NullString
+		var inv int
+		var overlapKey sql.NullString
+		var inputsJSON sql.NullString
 		var observed types.Timestamp
 		if err := rows.Scan(&rec.ID, &rec.FindingID, &rec.Summary, &stepsJSON, &rec.RiskLevel,
-			&savingsMinor, &savingsCurrency, &q, &s, &tsScan{&observed}); err != nil {
+			&savingsMinor, &savingsCurrency, &savingsLow, &savingsHigh, &savingsClass, &inv, &overlapKey, &inputsJSON,
+			&q, &s, &tsScan{&observed}); err != nil {
 			return nil, err
 		}
 		if err := json.Unmarshal([]byte(stepsJSON), &rec.Steps); err != nil {
@@ -748,6 +791,22 @@ func loadRecommendations(ctx context.Context, db queryer, runID types.AnalysisRu
 		}
 		if savingsMinor.Valid {
 			rec.EstSavings = &types.Money{AmountMinor: savingsMinor.Int64, Currency: savingsCurrency.String}
+		}
+		if savingsLow.Valid {
+			rec.EstSavingsLow = &types.Money{AmountMinor: savingsLow.Int64, Currency: savingsCurrency.String}
+		}
+		if savingsHigh.Valid {
+			rec.EstSavingsHigh = &types.Money{AmountMinor: savingsHigh.Int64, Currency: savingsCurrency.String}
+		}
+		if savingsClass.Valid {
+			rec.SavingsClass = domain.SavingsClassification(savingsClass.String)
+		}
+		rec.InvestigationOnly = inv != 0
+		if overlapKey.Valid {
+			rec.OverlapKey = overlapKey.String
+		}
+		if inputsJSON.Valid && inputsJSON.String != "" {
+			_ = json.Unmarshal([]byte(inputsJSON.String), &rec.SavingsInputs)
 		}
 		rec.Provenance = domain.Provenance{Quality: domain.DataQuality(q), Source: s, ObservedAt: observed}
 		out = append(out, rec)

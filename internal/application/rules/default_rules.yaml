@@ -71,3 +71,95 @@ rules:
       - resources
     remediation: |
       Apply the required Owner and CostCenter tags (or your organization's equivalents) for cost allocation and accountability.
+
+  - id: compute.ec2_downsize_candidate
+    version: "1.0.0"
+    title: EC2 downsize candidate from utilization
+    category: compute
+    severity: medium
+    evaluator: ec2_downsize_candidate
+    enabled: true
+    applicability:
+      resource_kinds:
+        - compute_instance
+    thresholds:
+      max_p95_cpu_percent: "25"
+      min_sample_coverage_percent: "50"
+      safety_headroom_bps: "1500"
+    required_signals:
+      - metrics
+      - pricing
+    remediation: |
+      Validate memory and disk performance, then resize to the recommended instance type during a maintenance window.
+
+  - id: compute.ec2_idle_instance
+    version: "1.0.0"
+    title: Persistently idle EC2 instance
+    category: compute
+    severity: medium
+    evaluator: ec2_idle_instance
+    enabled: true
+    applicability:
+      resource_kinds:
+        - compute_instance
+    thresholds:
+      min_idle_periods: "3"
+    required_signals:
+      - metrics
+      - pricing
+    remediation: |
+      Confirm the workload is decommissioned, then stop or terminate the instance and release unused elastic IPs.
+
+  - id: storage.ebs_volume_type_optimize
+    version: "1.0.0"
+    title: EBS gp2 to gp3 optimization
+    category: storage
+    severity: low
+    evaluator: ebs_volume_type_optimize
+    enabled: true
+    applicability:
+      resource_kinds:
+        - block_volume
+    thresholds: {}
+    required_signals:
+      - resources
+      - pricing
+    remediation: |
+      Modify volume type to gp3 after confirming baseline IOPS and throughput requirements.
+
+  - id: database.rds_downsize_candidate
+    version: "1.0.0"
+    title: RDS downsize candidate
+    category: database
+    severity: medium
+    evaluator: rds_downsize_candidate
+    enabled: true
+    applicability:
+      resource_kinds:
+        - database_instance
+    thresholds:
+      max_p95_cpu_percent: "30"
+      safety_headroom_bps: "1500"
+    required_signals:
+      - metrics
+      - pricing
+    remediation: |
+      Validate memory and connection limits, then modify the DB instance class during a maintenance window.
+
+  - id: network.nat_gateway_low_utilization
+    version: "1.0.0"
+    title: Low-utilization NAT gateway
+    category: network
+    severity: low
+    evaluator: nat_gateway_low_utilization
+    enabled: true
+    applicability:
+      resource_kinds:
+        - nat_gateway
+    thresholds:
+      max_bytes_out_per_hour: "104857600"
+    required_signals:
+      - metrics
+      - pricing
+    remediation: |
+      Review whether VPC endpoints or consolidated egress can reduce NAT dependency before changing network topology.

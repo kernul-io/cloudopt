@@ -35,7 +35,7 @@ func (s *ReportService) Generate(ctx context.Context, settings AnalyzeSettings, 
 		return nil, fmt.Errorf("load snapshot: %w", err)
 	}
 
-	reg := rules.DefaultRegistry()
+	reg := rules.DefaultRegistry(nil)
 	manifestPath := settings.RulesManifestPath
 	if manifestPath == "" {
 		manifestPath = os.Getenv("COA_RULES_MANIFEST")

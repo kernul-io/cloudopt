@@ -25,7 +25,7 @@ func TestReportFixtureGoldenJSON(t *testing.T) {
 	doc := buildFixtureReportDoc(t, false, time.Date(2026, 1, 20, 12, 0, 0, 0, time.UTC))
 	require.NoError(t, report.ValidateDocument(doc))
 	require.Equal(t, report.SchemaVersion, doc.SchemaVersion)
-	require.Len(t, doc.Findings, 7)
+	require.Len(t, doc.Findings, 8)
 	require.NotEmpty(t, doc.Disclaimer)
 	require.Contains(t, doc.Disclaimer, "not guaranteed")
 
@@ -141,14 +141,15 @@ func buildFixtureReportDoc(t *testing.T, redact bool, generatedAt time.Time) *re
 	snap, err := repo.GetSnapshot(ctx, out.SnapshotID)
 	require.NoError(t, err)
 
-	reg := rules.DefaultRegistry()
+	reg := rules.DefaultRegistry(nil)
 	manifest, err := rules.LoadManifest("", reg)
 	require.NoError(t, err)
 	engineOut, err := rules.Engine{}.Analyze(rules.AnalyzeInput{
-		Snapshot:     snap,
-		Manifest:     manifest,
-		Registry:     reg,
-		Suppressions: rules.NewSuppressionIndex(nil, snap.StartedAt.Time),
+		Snapshot:       snap,
+		Manifest:       manifest,
+		Registry:       reg,
+		Suppressions:   rules.NewSuppressionIndex(nil, snap.StartedAt.Time),
+		PricingCatalog: nil,
 	})
 	require.NoError(t, err)
 

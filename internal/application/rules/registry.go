@@ -6,6 +6,7 @@ import (
 
 	"github.com/kernul-io/cloudopt/internal/application/domain"
 	"github.com/kernul-io/cloudopt/internal/application/domain/types"
+	"github.com/kernul-io/cloudopt/internal/application/pricing"
 )
 
 // Evaluator performs a deterministic check against a snapshot view.
@@ -30,6 +31,13 @@ type CandidateFinding struct {
 	Evidence    []EvidenceDraft
 	Assumptions []string
 	Confidence  types.Percentage
+	Savings     *SavingsDraft
+}
+
+// SavingsDraft becomes recommendation savings fields when persisted.
+type SavingsDraft struct {
+	Estimate          domain.SavingsEstimate
+	InvestigationOnly bool
 }
 
 // EvidenceDraft becomes domain.Evidence when persisted on an analysis run.
@@ -74,11 +82,16 @@ func (r *Registry) Get(name string) (Evaluator, error) {
 }
 
 // DefaultRegistry returns a registry with built-in evaluators.
-func DefaultRegistry() *Registry {
+func DefaultRegistry(catalog *pricing.Catalog) *Registry {
 	reg := NewRegistry()
 	reg.Register(&StoppedInstanceStorageCost{})
 	reg.Register(&UnattachedBlockVolume{})
 	reg.Register(&StaleVolumeSnapshot{})
 	reg.Register(&MissingCostAllocationTags{})
+	reg.Register(&EC2DownsizeCandidate{Catalog: catalog})
+	reg.Register(&EC2IdleInstance{Catalog: catalog})
+	reg.Register(&EBSVolumeTypeOptimize{Catalog: catalog})
+	reg.Register(&RDSDownsizeCandidate{Catalog: catalog})
+	reg.Register(&NATGatewayLowUtilization{Catalog: catalog})
 	return reg
 }

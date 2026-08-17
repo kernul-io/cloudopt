@@ -11,7 +11,7 @@ import (
 
 func TestSuppressionActiveByFingerprint(t *testing.T) {
 	snap := loadFixtureSnapshot(t)
-	reg := rules.DefaultRegistry()
+	reg := rules.DefaultRegistry(nil)
 	manifest, err := rules.LoadManifest("", reg)
 	require.NoError(t, err)
 

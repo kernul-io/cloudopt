@@ -66,6 +66,7 @@ resources:
     state: in-use
     attributes:
       size_gib: "100"
+      volume_type: gp2
   - id: res-vol-unattached
     kind: block_volume
     region_id: reg-euw1

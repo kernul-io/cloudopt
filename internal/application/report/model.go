@@ -88,19 +88,24 @@ type CurrencyTotal struct {
 }
 
 type SavingsSection struct {
-	Kind             ValueKind     `json:"kind"`
-	Note             string        `json:"note"`
-	OneTime          []SavingsLine `json:"one_time"`
-	MonthlyRecurring []SavingsLine `json:"monthly_recurring"`
-	CommitmentBased  []SavingsLine `json:"commitment_based"`
+	Kind             ValueKind          `json:"kind"`
+	Note             string             `json:"note"`
+	MonthlyTotalLow  map[string]float64 `json:"monthly_total_low_major,omitempty"`
+	MonthlyTotalHigh map[string]float64 `json:"monthly_total_high_major,omitempty"`
+	OneTime          []SavingsLine      `json:"one_time"`
+	MonthlyRecurring []SavingsLine      `json:"monthly_recurring"`
+	CommitmentBased  []SavingsLine      `json:"commitment_based"`
 }
 
 type SavingsLine struct {
-	Description string    `json:"description"`
-	Currency    string    `json:"currency,omitempty"`
-	AmountMajor float64   `json:"amount_major,omitempty"`
-	Kind        ValueKind `json:"kind"`
-	FindingID   string    `json:"finding_id,omitempty"`
+	Description       string    `json:"description"`
+	Currency          string    `json:"currency,omitempty"`
+	AmountMajor       float64   `json:"amount_major,omitempty"`
+	AmountLowMajor    float64   `json:"amount_low_major,omitempty"`
+	AmountHighMajor   float64   `json:"amount_high_major,omitempty"`
+	Kind              ValueKind `json:"kind"`
+	FindingID         string    `json:"finding_id,omitempty"`
+	InvestigationOnly bool      `json:"investigation_only,omitempty"`
 }
 
 type FindingEntry struct {

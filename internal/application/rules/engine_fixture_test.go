@@ -16,7 +16,7 @@ import (
 
 func TestFixtureAnalysisPredictableFindings(t *testing.T) {
 	snap := loadFixtureSnapshot(t)
-	reg := rules.DefaultRegistry()
+	reg := rules.DefaultRegistry(nil)
 	manifest, err := rules.LoadManifest("", reg)
 	require.NoError(t, err)
 
@@ -72,7 +72,7 @@ func TestStoppedInstanceThresholdBoundary(t *testing.T) {
 			},
 		},
 	}
-	reg := rules.DefaultRegistry()
+	reg := rules.DefaultRegistry(nil)
 	manifest, err := rules.LoadManifest("", reg)
 	require.NoError(t, err)
 
@@ -108,7 +108,7 @@ func TestMissingSignalsNotEvaluated(t *testing.T) {
 		Costs:         nil,
 		Relationships: []domain.Relationship{},
 	}
-	reg := rules.DefaultRegistry()
+	reg := rules.DefaultRegistry(nil)
 	manifest, err := rules.LoadManifest("", reg)
 	require.NoError(t, err)
 
@@ -119,7 +119,7 @@ func TestMissingSignalsNotEvaluated(t *testing.T) {
 
 func TestSuppressionExpiration(t *testing.T) {
 	snap := loadFixtureSnapshot(t)
-	reg := rules.DefaultRegistry()
+	reg := rules.DefaultRegistry(nil)
 	manifest, err := rules.LoadManifest("", reg)
 	require.NoError(t, err)
 
@@ -140,7 +140,7 @@ func TestSuppressionExpiration(t *testing.T) {
 }
 
 func TestInvalidManifestAggregatesErrors(t *testing.T) {
-	reg := rules.DefaultRegistry()
+	reg := rules.DefaultRegistry(nil)
 	m, err := rules.ParseManifest([]byte(`
 ruleset_version: ""
 rules:

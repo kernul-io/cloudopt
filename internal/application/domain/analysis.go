@@ -52,13 +52,19 @@ type Finding struct {
 
 // Recommendation describes safe remediation for a finding.
 type Recommendation struct {
-	ID         int64
-	FindingID  types.FindingID
-	Summary    string
-	Steps      []string
-	RiskLevel  string
-	EstSavings *types.Money
-	Provenance Provenance
+	ID                int64
+	FindingID         types.FindingID
+	Summary           string
+	Steps             []string
+	RiskLevel         string
+	EstSavings        *types.Money
+	EstSavingsLow     *types.Money
+	EstSavingsHigh    *types.Money
+	SavingsClass      SavingsClassification
+	InvestigationOnly bool
+	OverlapKey        string
+	SavingsInputs     map[string]string
+	Provenance        Provenance
 }
 
 // AnalysisRunStatus tracks analysis execution.

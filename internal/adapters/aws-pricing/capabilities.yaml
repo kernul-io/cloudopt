@@ -1,0 +1,12 @@
+provider: aws
+schema: pricing/v1
+pricing:
+  - id: offline_catalog_fixture
+    description: Curated versioned list-price catalog for demos and tests
+    available: true
+    api_actions: []
+supported_checks:
+  - ec2_rightsizing
+  - ebs_type_optimization
+  - rds_rightsizing
+  - nat_gateway_utilization

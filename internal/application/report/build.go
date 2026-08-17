@@ -245,26 +245,18 @@ func buildCosts(snap *domain.CollectionSnapshot) CostSection {
 	}
 }
 
-func buildSavings(snap *domain.CollectionSnapshot, findings []domain.Finding, recByFinding map[types.FindingID]domain.Recommendation) SavingsSection {
+func buildSavings(_ *domain.CollectionSnapshot, findings []domain.Finding, recByFinding map[types.FindingID]domain.Recommendation) SavingsSection {
 	sec := SavingsSection{
 		Kind: KindEstimate,
-		Note: "No guaranteed savings. Amounts below are estimates when present; overlapping findings are not summed.",
+		Note: "No guaranteed savings. Monthly totals use low/high ranges and exclude investigation-only and overlap-suppressed estimates.",
 	}
-	costByResource := map[types.ResourceID]int64{}
-	if snap != nil {
-		for _, c := range snap.Costs {
-			if c.ResourceID == domain.UnattributedResourceID {
-				continue
-			}
-			costByResource[c.ResourceID] += c.Amount.AmountMinor
-		}
-	}
+	var recs []domain.Recommendation
 	for _, f := range findings {
 		rec, ok := recByFinding[f.ID]
-		if !ok || rec.EstSavings == nil {
+		if !ok {
 			continue
 		}
-		if !findingHasAttributableCost(f, costByResource) {
+		if rec.InvestigationOnly || rec.EstSavings == nil {
 			continue
 		}
 		line := SavingsLine{
@@ -274,9 +266,23 @@ func buildSavings(snap *domain.CollectionSnapshot, findings []domain.Finding, re
 			Kind:        KindEstimate,
 			FindingID:   string(f.ID),
 		}
-		// Until step 08 classifies savings, treat all as monthly recurring estimates.
-		sec.MonthlyRecurring = append(sec.MonthlyRecurring, line)
+		if rec.EstSavingsLow != nil {
+			line.AmountLowMajor = float64(rec.EstSavingsLow.AmountMinor) / 100.0
+		}
+		if rec.EstSavingsHigh != nil {
+			line.AmountHighMajor = float64(rec.EstSavingsHigh.AmountMinor) / 100.0
+		}
+		switch rec.SavingsClass {
+		case domain.SavingsOneTime:
+			sec.OneTime = append(sec.OneTime, line)
+		case domain.SavingsCommitment:
+			sec.CommitmentBased = append(sec.CommitmentBased, line)
+		default:
+			sec.MonthlyRecurring = append(sec.MonthlyRecurring, line)
+		}
+		recs = append(recs, rec)
 	}
+	sec.MonthlyTotalLow, sec.MonthlyTotalHigh = savingsAggregate(recs)
 	sort.Slice(sec.MonthlyRecurring, func(i, j int) bool {
 		if sec.MonthlyRecurring[i].FindingID != sec.MonthlyRecurring[j].FindingID {
 			return sec.MonthlyRecurring[i].FindingID < sec.MonthlyRecurring[j].FindingID
@@ -286,16 +292,26 @@ func buildSavings(snap *domain.CollectionSnapshot, findings []domain.Finding, re
 	return sec
 }
 
-func findingHasAttributableCost(f domain.Finding, costByResource map[types.ResourceID]int64) bool {
-	if len(f.ResourceIDs) == 0 {
-		return false
-	}
-	for _, id := range f.ResourceIDs {
-		if costByResource[id] != 0 {
-			return true
+func savingsAggregate(recs []domain.Recommendation) (low, high map[string]float64) {
+	low = map[string]float64{}
+	high = map[string]float64{}
+	for _, rec := range recs {
+		if rec.InvestigationOnly || rec.EstSavings == nil || rec.SavingsClass == domain.SavingsCommitment || rec.SavingsClass == domain.SavingsOneTime {
+			continue
 		}
+		cur := rec.EstSavings.Currency
+		l := float64(rec.EstSavings.AmountMinor) / 100.0
+		h := l
+		if rec.EstSavingsLow != nil {
+			l = float64(rec.EstSavingsLow.AmountMinor) / 100.0
+		}
+		if rec.EstSavingsHigh != nil {
+			h = float64(rec.EstSavingsHigh.AmountMinor) / 100.0
+		}
+		low[cur] += l
+		high[cur] += h
 	}
-	return false
+	return low, high
 }
 
 func buildFindings(

@@ -10,6 +10,8 @@ import (
 
 	"github.com/kernul-io/cloudopt/internal/application/domain"
 	"github.com/kernul-io/cloudopt/internal/application/domain/types"
+	"github.com/kernul-io/cloudopt/internal/application/pricing"
+	"github.com/kernul-io/cloudopt/internal/application/savings"
 )
 
 // RuleStatus describes per-rule execution outcome for summaries.
@@ -39,6 +41,7 @@ type AnalyzeInput struct {
 	Suppressions   *SuppressionIndex
 	RuleFilter     []string
 	CategoryFilter []string
+	PricingCatalog *pricing.Catalog
 }
 
 // AnalyzeOutput is the deterministic evaluation result.
@@ -71,7 +74,7 @@ func (Engine) Analyze(in AnalyzeInput) (*AnalyzeOutput, error) {
 		return nil, fmt.Errorf("snapshot %q is not analyzable (status=%s)", in.Snapshot.ID, in.Snapshot.Status)
 	}
 
-	view := NewSnapshotView(in.Snapshot)
+	view := NewSnapshotView(in.Snapshot, in.PricingCatalog)
 	prov := domain.Provenance{
 		Quality:    domain.QualityDerived,
 		Source:     "rule-engine",
@@ -174,15 +177,35 @@ func (Engine) Analyze(in AnalyzeInput) (*AnalyzeOutput, error) {
 			ruleFindings = append(ruleFindings, f)
 			allFindings = append(allFindings, f)
 
-			if strings.TrimSpace(rule.Remediation) != "" {
-				allRecs = append(allRecs, domain.Recommendation{
+			if strings.TrimSpace(rule.Remediation) != "" || cand.Savings != nil {
+				rec := domain.Recommendation{
 					ID:         int64(len(allRecs) + 1),
 					FindingID:  findingID,
 					Summary:    strings.TrimSpace(rule.Remediation),
 					Steps:      remediationSteps(rule.Remediation),
 					RiskLevel:  "medium",
 					Provenance: prov,
-				})
+				}
+				if rec.Summary == "" && cand.Savings != nil {
+					rec.Summary = "Review utilization evidence and apply rightsizing during a maintenance window."
+				}
+				if cand.Savings != nil {
+					est := cand.Savings.Estimate
+					rec.SavingsClass = est.Class
+					rec.InvestigationOnly = cand.Savings.InvestigationOnly
+					rec.OverlapKey = est.OverlapKey
+					rec.SavingsInputs = est.Inputs
+					if !rec.InvestigationOnly && est.GrossMonthlyMinor > 0 {
+						rec.EstSavings = &types.Money{AmountMinor: est.GrossMonthlyMinor, Currency: est.Currency}
+						if est.LowMonthlyMinor > 0 {
+							rec.EstSavingsLow = &types.Money{AmountMinor: est.LowMonthlyMinor, Currency: est.Currency}
+						}
+						if est.HighMonthlyMinor > 0 {
+							rec.EstSavingsHigh = &types.Money{AmountMinor: est.HighMonthlyMinor, Currency: est.Currency}
+						}
+					}
+				}
+				allRecs = append(allRecs, rec)
 			}
 		}
 
@@ -207,6 +230,8 @@ func (Engine) Analyze(in AnalyzeInput) (*AnalyzeOutput, error) {
 		}
 		return allFindings[i].Fingerprint < allFindings[j].Fingerprint
 	})
+
+	savings.ApplyOverlapPolicy(allFindings, &allRecs)
 
 	return &AnalyzeOutput{
 		RulesetVersion:  in.Manifest.RulesetVersion,

@@ -23,7 +23,7 @@ func TestMigrateFromEmpty(t *testing.T) {
 
 	v, err := repo.SchemaVersion(ctx)
 	require.NoError(t, err)
-	require.Equal(t, 5, v)
+	require.Equal(t, 6, v)
 
 	canonical, err := repo.(*sqliterepository.Repository).CanonicalSchemaVersion(ctx)
 	require.NoError(t, err)
@@ -36,7 +36,7 @@ func TestMigrateIdempotent(t *testing.T) {
 	require.NoError(t, repo.Migrate(ctx))
 	v, err := repo.SchemaVersion(ctx)
 	require.NoError(t, err)
-	require.Equal(t, 5, v)
+	require.Equal(t, 6, v)
 }
 
 func TestFixtureRoundTrip(t *testing.T) {
@@ -221,7 +221,7 @@ func TestMigrateFromVersionOne(t *testing.T) {
 	require.NoError(t, sqliterepository.Migrate(ctx, db))
 	v, err := sqliterepository.SchemaVersion(ctx, db)
 	require.NoError(t, err)
-	require.Equal(t, 5, v)
+	require.Equal(t, 6, v)
 
 	// Re-open and ensure migrations are no-ops from latest version.
 	db2, err := sqliterepository.Open(path)
@@ -230,7 +230,7 @@ func TestMigrateFromVersionOne(t *testing.T) {
 	require.NoError(t, sqliterepository.Migrate(ctx, db2))
 	v2, err := sqliterepository.SchemaVersion(ctx, db2)
 	require.NoError(t, err)
-	require.Equal(t, 5, v2)
+	require.Equal(t, 6, v2)
 }
 
 func TestMarkSnapshotFailed(t *testing.T) {

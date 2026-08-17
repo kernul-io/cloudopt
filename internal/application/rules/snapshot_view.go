@@ -6,12 +6,14 @@ import (
 
 	"github.com/kernul-io/cloudopt/internal/application/domain"
 	"github.com/kernul-io/cloudopt/internal/application/domain/types"
+	"github.com/kernul-io/cloudopt/internal/application/pricing"
 )
 
 // SnapshotView indexes a collection snapshot for rule evaluation.
 type SnapshotView struct {
 	Snapshot *domain.CollectionSnapshot
 	observed types.Timestamp
+	catalog  *pricing.Catalog
 
 	resourcesByID   map[types.ResourceID]domain.Resource
 	resourcesByKind map[domain.ResourceKind][]domain.Resource
@@ -20,9 +22,10 @@ type SnapshotView struct {
 }
 
 // NewSnapshotView builds lookup indexes for evaluators.
-func NewSnapshotView(snap *domain.CollectionSnapshot) *SnapshotView {
+func NewSnapshotView(snap *domain.CollectionSnapshot, catalog *pricing.Catalog) *SnapshotView {
 	v := &SnapshotView{
 		Snapshot:        snap,
+		catalog:         catalog,
 		resourcesByID:   make(map[types.ResourceID]domain.Resource),
 		resourcesByKind: make(map[domain.ResourceKind][]domain.Resource),
 		costsByResource: make(map[types.ResourceID][]domain.CostRecord),
@@ -100,7 +103,9 @@ func (v *SnapshotView) HasSignal(name string) bool {
 	case "costs":
 		return len(v.Snapshot.Costs) > 0
 	case "metrics":
-		return len(v.Snapshot.Metrics) > 0
+		return len(v.Snapshot.Metrics) > 0 || len(v.Snapshot.UtilizationSignals) > 0
+	case "pricing":
+		return v.catalog != nil && !v.catalog.IsEmpty()
 	default:
 		return false
 	}

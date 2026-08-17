@@ -9,6 +9,7 @@ import (
 	"github.com/kernul-io/cloudopt/internal/application/domain"
 	"github.com/kernul-io/cloudopt/internal/application/domain/types"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
+	"github.com/kernul-io/cloudopt/internal/application/pricing"
 	"github.com/kernul-io/cloudopt/internal/application/rules"
 )
 
@@ -44,9 +45,14 @@ func (s *AnalyzeService) Analyze(ctx context.Context, settings AnalyzeSettings, 
 	}
 
 	reg := s.Registry
-	if reg == nil {
-		reg = rules.DefaultRegistry()
+	catalog, catErr := LoadPricingCatalog(ctx, "")
+	if catErr != nil {
+		catalog = pricing.EmptyCatalog()
 	}
+	if reg == nil {
+		reg = rules.DefaultRegistry(catalog)
+	}
+
 	manifestPath := settings.RulesManifestPath
 	if manifestPath == "" {
 		manifestPath = os.Getenv("COA_RULES_MANIFEST")
@@ -79,6 +85,7 @@ func (s *AnalyzeService) Analyze(ctx context.Context, settings AnalyzeSettings, 
 		Suppressions:   suppIndex,
 		RuleFilter:     opts.RuleIDs,
 		CategoryFilter: opts.Categories,
+		PricingCatalog: catalog,
 	})
 	if err != nil {
 		return nil, err

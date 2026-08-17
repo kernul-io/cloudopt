@@ -1,0 +1,104 @@
+{
+  "catalog_version": "2026-01-demo",
+  "source": "fixture/aws-pricing/catalog-demo.json",
+  "effective_date": "2026-01-01T00:00:00Z",
+  "currency": "USD",
+  "records": [
+    {
+      "service": "AmazonEC2",
+      "region": "us-east-1",
+      "purchase_model": "on_demand",
+      "unit": "hour",
+      "price_major": 0.096,
+      "attributes": { "instance_type": "m5.large", "tenancy": "shared", "os": "linux" }
+    },
+    {
+      "service": "AmazonEC2",
+      "region": "us-east-1",
+      "purchase_model": "on_demand",
+      "unit": "hour",
+      "price_major": 0.048,
+      "attributes": { "instance_type": "m5.medium", "tenancy": "shared", "os": "linux" }
+    },
+    {
+      "service": "AmazonEC2",
+      "region": "us-east-1",
+      "purchase_model": "on_demand",
+      "unit": "hour",
+      "price_major": 0.024,
+      "attributes": { "instance_type": "m5.small", "tenancy": "shared", "os": "linux" }
+    },
+    {
+      "service": "AmazonEC2",
+      "region": "us-east-1",
+      "purchase_model": "on_demand",
+      "unit": "hour",
+      "price_major": 0.0416,
+      "attributes": { "instance_type": "m5a.large", "tenancy": "shared", "os": "linux" }
+    },
+    {
+      "service": "AmazonEC2",
+      "region": "us-east-1",
+      "purchase_model": "on_demand",
+      "unit": "hour",
+      "price_major": 0.0104,
+      "attributes": { "instance_type": "t3.micro", "tenancy": "shared", "os": "linux" }
+    },
+    {
+      "service": "AmazonEC2",
+      "region": "us-east-1",
+      "purchase_model": "on_demand",
+      "unit": "hour",
+      "price_major": 0.0208,
+      "attributes": { "instance_type": "t3.small", "tenancy": "shared", "os": "linux" }
+    },
+    {
+      "service": "AmazonEBS",
+      "region": "us-east-1",
+      "purchase_model": "on_demand",
+      "unit": "gb_month",
+      "price_major": 0.1,
+      "attributes": { "volume_type": "gp2" }
+    },
+    {
+      "service": "AmazonEBS",
+      "region": "us-east-1",
+      "purchase_model": "on_demand",
+      "unit": "gb_month",
+      "price_major": 0.08,
+      "attributes": { "volume_type": "gp3" }
+    },
+    {
+      "service": "AmazonRDS",
+      "region": "us-east-1",
+      "purchase_model": "on_demand",
+      "unit": "hour",
+      "price_major": 0.068,
+      "attributes": { "instance_class": "db.t3.medium", "engine": "postgres" }
+    },
+    {
+      "service": "AmazonRDS",
+      "region": "us-east-1",
+      "purchase_model": "on_demand",
+      "unit": "hour",
+      "price_major": 0.034,
+      "attributes": { "instance_class": "db.t3.small", "engine": "postgres" }
+    },
+    {
+      "service": "AmazonVPC",
+      "region": "us-east-1",
+      "purchase_model": "on_demand",
+      "unit": "hour",
+      "price_major": 0.045,
+      "attributes": { "resource": "nat_gateway" }
+    },
+    {
+      "service": "AmazonEC2",
+      "region": "eu-west-1",
+      "purchase_model": "on_demand",
+      "unit": "hour",
+      "price_major": 0.1,
+      "attributes": { "instance_type": "m5.large", "tenancy": "shared", "os": "linux" }
+    }
+  ]
+}
