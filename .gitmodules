@@ -1,3 +1,4 @@
 [submodule "docs"]
 	path = docs
 	url = ../cloudopt-docs
+	branch = main
