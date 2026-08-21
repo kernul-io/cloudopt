@@ -57,9 +57,9 @@ Logs are written to **stderr** (text or JSON). Command output intended for scrip
 Quick start:
 
 ```bash
-./main version
-./main init --workspace-dir "$HOME/.cloudopt"
-./main collect --workspace-dir "$HOME/.cloudopt"
+cloudopt version
+cloudopt init --workspace-dir "$HOME/.cloudopt"
+cloudopt collect --workspace-dir "$HOME/.cloudopt"
 ```
 
 Use `./main --help` and `./main <command> --help` for flags on each command.
