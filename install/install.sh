@@ -55,7 +55,7 @@ binary_name() {
 curl_download() {
     local bin="$1"
     curl -s https://api.github.com/repos/kernul-io/cloudopt/releases/latest \
-        | grep "browser_download_url.*${bin}\." \
+        | grep "browser_download_url.*${bin}\.tar\.gz" \
         | cut -d : -f 2,3 \
         | tr -d \" \
         | xargs curl -sLo /tmp/cloudopt.tar.gz
@@ -64,7 +64,7 @@ curl_download() {
 wget_download() {
     local bin="$1"
     wget -qO - https://api.github.com/repos/kernul-io/cloudopt/releases/latest \
-        | grep "browser_download_url.*${bin}." \
+        | grep "browser_download_url.*${bin}\.tar\.gz" \
         | cut -d : -f 2,3 \
         | tr -d \" \
         | wget -qi - -O /tmp/cloudopt.tar.gz
@@ -90,7 +90,7 @@ main() {
 
     [[ ! -d ~/.local/bin ]] && mkdir -p ~/.local/bin
     tar -xf /tmp/cloudopt.tar.gz -C ~/.local/bin/
-    chmod +x ~/.local/bin/cloudopt
+    chmod +x ~/.local/bin/cloudopt*
 
     log 'CloudOpt installed successfuly to ~/.local/bin/cloudopt'
     grep "${HOME}/.local/bin" <<< "$PATH" > /dev/null || print_adjust_path
