@@ -202,7 +202,6 @@ func (c *Collector) fetchLive(ctx context.Context, start, end time.Time) ([]ceRe
 			GroupBy: []types.GroupDefinition{
 				{Type: types.GroupDefinitionTypeDimension, Key: aws.String("SERVICE")},
 				{Type: types.GroupDefinitionTypeDimension, Key: aws.String("REGION")},
-				{Type: types.GroupDefinitionTypeDimension, Key: aws.String("RESOURCE_ID")},
 			},
 			NextPageToken: token,
 		})
