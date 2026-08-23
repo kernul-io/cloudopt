@@ -1,0 +1,25 @@
+{
+  "description": "Read-only IAM roles for GCP inventory collection (reference). Bind at project or folder scope as needed.",
+  "roles": [
+    "roles/compute.viewer",
+    "roles/cloudsql.viewer",
+    "roles/container.viewer",
+    "roles/serviceusage.serviceUsageViewer",
+    "roles/resourcemanager.projectViewer"
+  ],
+  "custom_permissions": [
+    "compute.instances.list",
+    "compute.disks.list",
+    "compute.snapshots.list",
+    "compute.images.list",
+    "compute.networks.list",
+    "compute.subnetworks.list",
+    "compute.routes.list",
+    "compute.forwardingRules.list",
+    "compute.addresses.list",
+    "compute.regions.list",
+    "sqladmin.instances.list",
+    "container.clusters.list",
+    "serviceusage.services.list"
+  ]
+}

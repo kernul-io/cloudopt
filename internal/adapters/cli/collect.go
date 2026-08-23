@@ -19,6 +19,7 @@ func newCollectCommand(cfg *Config) *cobra.Command {
 		Short: "Collect read-only snapshots from configured cloud accounts",
 	}
 	cmd.AddCommand(newCollectAWSCommand(cfg))
+	cmd.AddCommand(newCollectGCPCommand(cfg))
 
 	var provider string
 	cmd.PersistentFlags().StringVar(&provider, "provider", "", "Limit collection to one provider (aws, gcp, azure, digitalocean)")
@@ -42,6 +43,42 @@ func newCollectCommand(cfg *Config) *cobra.Command {
 	cmd.PersistentFlags().Bool("offline", true, "Use offline fixtures (with --provider aws)")
 	cmd.PersistentFlags().Bool("dry-run", false, "Preflight only (with --provider aws)")
 	return cmd
+}
+
+func newCollectGCPCommand(cfg *Config) *cobra.Command {
+	var opts ports.CollectOptions
+	cmd := &cobra.Command{
+		Use:   "gcp",
+		Short: "Google Cloud Platform collection commands",
+	}
+	inventory := &cobra.Command{
+		Use:   "inventory",
+		Short: "Collect read-only GCP inventory into a canonical snapshot",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			opts.Provider = types.ProviderGCP
+			return runCollect(cmd, cfg, opts)
+		},
+	}
+	bindGCPInventoryFlags(inventory, &opts)
+	cmd.AddCommand(inventory)
+	return cmd
+}
+
+func bindGCPInventoryFlags(cmd *cobra.Command, opts *ports.CollectOptions) {
+	cmd.Flags().StringVar((*string)(&opts.AccountID), "account-id", "", "Canonical account id (default derived from ADC project)")
+	cmd.Flags().StringVar(&opts.OrganizationID, "organization-id", "", "GCP organization ID for project discovery")
+	cmd.Flags().StringVar(&opts.FolderID, "folder-id", "", "GCP folder ID for project discovery")
+	cmd.Flags().StringSliceVar(&opts.Projects, "projects", nil, "Explicit GCP project IDs to scan")
+	cmd.Flags().StringSliceVar(&opts.Regions, "regions", nil, "Explicit regions to scan")
+	cmd.Flags().StringSliceVar(&opts.RegionsAllow, "regions-allow", nil, "Allow-list regions")
+	cmd.Flags().StringSliceVar(&opts.RegionsDeny, "regions-deny", nil, "Deny-list regions")
+	cmd.Flags().StringSliceVar(&opts.Zones, "zones", nil, "Explicit zones to scan (Compute zonal resources)")
+	cmd.Flags().StringVar(&opts.ImpersonateServiceAccount, "impersonate-service-account", "", "Service account email to impersonate (ADC source credentials required)")
+	cmd.Flags().StringVar(&opts.BillingAccountID, "billing-account-id", "", "Billing account ID for preflight scope reporting only")
+	cmd.Flags().BoolVar(&opts.DryRun, "dry-run", false, "Preflight access and scope without collecting resources")
+	cmd.Flags().BoolVar(&opts.Offline, "offline", false, "Use recorded fixtures instead of live GCP APIs")
+	cmd.Flags().StringVar(&opts.FixtureRoot, "fixture-root", "", "Fixture directory for --offline (default testdata/gcp-inventory)")
+	cmd.Flags().IntVar(&opts.MaxConcurrent, "max-concurrent", 3, "Maximum concurrent project/region workers")
 }
 
 func newCollectAWSCommand(cfg *Config) *cobra.Command {

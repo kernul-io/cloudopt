@@ -21,20 +21,29 @@ type CollectResult struct {
 
 // CollectPreflight is a JSON-safe preflight summary.
 type CollectPreflight struct {
-	ProviderAccountID string   `json:"provider_account_id"`
-	CallerARN         string   `json:"caller_arn"`
-	SelectedRegions   []string `json:"selected_regions"`
-	MissingActions    []string `json:"missing_actions,omitempty"`
+	ProviderAccountID  string              `json:"provider_account_id"`
+	CallerARN          string              `json:"caller_arn,omitempty"`
+	CallerEmail        string              `json:"caller_email,omitempty"`
+	SelectedRegions    []string            `json:"selected_regions"`
+	SelectedProjects   []string            `json:"selected_projects,omitempty"`
+	AccessibleProjects []string            `json:"accessible_projects,omitempty"`
+	MissingActions     []string            `json:"missing_actions,omitempty"`
+	CollectionScope    string              `json:"collection_scope,omitempty"`
+	EnabledAPIs        map[string][]string `json:"enabled_apis,omitempty"`
 }
 
 func (r *Runtime) Collect(ctx context.Context, opts CollectOptions) (*ports.CollectResult, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	if opts.Provider != "" && opts.Provider != types.ProviderAWS {
-		return nil, fmt.Errorf("provider %q is not supported yet; use aws or --offline", opts.Provider)
+	switch opts.Provider {
+	case types.ProviderAWS, "":
+		opts.Provider = types.ProviderAWS
+	case types.ProviderGCP:
+		// supported
+	default:
+		return nil, fmt.Errorf("provider %q is not supported yet; use aws or gcp", opts.Provider)
 	}
-	opts.Provider = types.ProviderAWS
 
 	repo, err := OpenStorage(ctx, r.Settings)
 	if err != nil {
@@ -66,10 +75,15 @@ func MapCollectResult(out *ports.CollectResult) *CollectResult {
 	}
 	if out.Preflight != nil {
 		res.Preflight = &CollectPreflight{
-			ProviderAccountID: out.Preflight.ProviderAccountID,
-			CallerARN:         out.Preflight.CallerARN,
-			SelectedRegions:   out.Preflight.SelectedRegions,
-			MissingActions:    out.Preflight.MissingActions,
+			ProviderAccountID:  out.Preflight.ProviderAccountID,
+			CallerARN:          out.Preflight.CallerARN,
+			CallerEmail:        out.Preflight.CallerEmail,
+			SelectedRegions:    out.Preflight.SelectedRegions,
+			SelectedProjects:   out.Preflight.SelectedProjects,
+			AccessibleProjects: out.Preflight.AccessibleProjects,
+			MissingActions:     out.Preflight.MissingActions,
+			CollectionScope:    out.Preflight.CollectionScope,
+			EnabledAPIs:        out.Preflight.EnabledAPIs,
 		}
 	}
 	return res

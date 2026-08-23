@@ -1,0 +1,14 @@
+{
+  "inventory": {
+    "subnets": [
+      {
+        "self_link": "projects/shared-net-demo/regions/us-central1/subnetworks/shared-private",
+        "name": "shared-private",
+        "project_id": "shared-net-demo",
+        "region": "us-central1",
+        "network": "projects/shared-net-demo/global/networks/shared-vpc",
+        "cidr": "10.10.0.0/20"
+      }
+    ]
+  }
+}

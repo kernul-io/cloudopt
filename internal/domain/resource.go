@@ -6,16 +6,20 @@ import "github.com/kernul-io/cloudopt/internal/domain/types"
 type ResourceKind string
 
 const (
-	KindComputeInstance ResourceKind = "compute_instance"
-	KindInstanceType    ResourceKind = "instance_type"
-	KindBlockVolume     ResourceKind = "block_volume"
-	KindDatabase        ResourceKind = "database_instance"
-	KindNATGateway      ResourceKind = "nat_gateway"
-	KindSubnet          ResourceKind = "subnet"
-	KindVPC             ResourceKind = "vpc"
-	KindElasticIP       ResourceKind = "elastic_ip"
-	KindSnapshot        ResourceKind = "volume_snapshot"
-	KindRouteTable      ResourceKind = "route_table"
+	KindComputeInstance    ResourceKind = "compute_instance"
+	KindInstanceType       ResourceKind = "instance_type"
+	KindBlockVolume        ResourceKind = "block_volume"
+	KindDatabase           ResourceKind = "database_instance"
+	KindNATGateway         ResourceKind = "nat_gateway"
+	KindSubnet             ResourceKind = "subnet"
+	KindVPC                ResourceKind = "vpc"
+	KindElasticIP          ResourceKind = "elastic_ip"
+	KindSnapshot           ResourceKind = "volume_snapshot"
+	KindRouteTable         ResourceKind = "route_table"
+	KindMachineImage       ResourceKind = "machine_image"
+	KindForwardingRule     ResourceKind = "forwarding_rule"
+	KindKubernetesCluster  ResourceKind = "kubernetes_cluster"
+	KindKubernetesNodePool ResourceKind = "kubernetes_node_pool"
 )
 
 // Resource is a node in the inventory graph.

@@ -1,0 +1,57 @@
+provider: gcp
+schema: "1"
+inventory:
+  - id: compute_instances
+    description: Compute Engine VMs with machine type, state, and labels
+    available: true
+    api_actions:
+      - compute.instances.list
+  - id: compute_machine_types
+    description: Machine types referenced by collected instances
+    available: true
+    api_actions:
+      - compute.machineTypes.get
+  - id: persistent_disks
+    description: Persistent disks including attachment hints
+    available: true
+    api_actions:
+      - compute.disks.list
+  - id: disk_images
+    description: Custom and shared disk images
+    available: true
+    api_actions:
+      - compute.images.list
+  - id: disk_snapshots
+    description: Disk snapshots
+    available: true
+    api_actions:
+      - compute.snapshots.list
+  - id: cloud_sql
+    description: Cloud SQL instances
+    available: true
+    api_actions:
+      - sqladmin.instances.list
+  - id: vpc_network
+    description: VPC networks, subnetworks, routes, forwarding rules, external IPs, Cloud NAT
+    available: true
+    api_actions:
+      - compute.networks.list
+      - compute.subnetworks.list
+      - compute.routes.list
+      - compute.forwardingRules.list
+      - compute.addresses.list
+      - compute.routers.list
+  - id: gke_clusters
+    description: GKE clusters and node pools (inventory relationships only)
+    available: true
+    api_actions:
+      - container.clusters.list
+      - container.nodePools.list
+billing: []
+metrics: []
+pricing: []
+supported_checks:
+  - stopped_instance
+  - unattached_volume
+  - missing_tags
+  - stale_snapshot

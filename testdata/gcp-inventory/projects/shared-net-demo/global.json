@@ -1,0 +1,61 @@
+{
+  "inventory": {
+    "networks": [
+      {
+        "self_link": "projects/shared-net-demo/global/networks/shared-vpc",
+        "name": "shared-vpc",
+        "project_id": "shared-net-demo"
+      }
+    ],
+    "subnets": [
+      {
+        "self_link": "projects/shared-net-demo/regions/us-central1/subnetworks/shared-private",
+        "name": "shared-private",
+        "project_id": "shared-net-demo",
+        "region": "us-central1",
+        "network": "projects/shared-net-demo/global/networks/shared-vpc",
+        "cidr": "10.10.0.0/20"
+      }
+    ],
+    "routes": [
+      {
+        "self_link": "projects/shared-net-demo/global/routes/default-route",
+        "name": "default-route",
+        "project_id": "shared-net-demo",
+        "network": "projects/shared-net-demo/global/networks/shared-vpc",
+        "dest_range": "0.0.0.0/0",
+        "next_hop": "default-internet-gateway"
+      }
+    ],
+    "cloud_nat": [
+      {
+        "self_link": "projects/shared-net-demo/regions/us-central1/routers/shared-router/cloudNat/shared-nat",
+        "name": "shared-nat",
+        "project_id": "shared-net-demo",
+        "region": "us-central1",
+        "network": "projects/shared-net-demo/global/networks/shared-vpc",
+        "router": "shared-router"
+      }
+    ],
+    "addresses": [
+      {
+        "self_link": "projects/shared-net-demo/regions/us-central1/addresses/lb-ip",
+        "name": "lb-ip",
+        "project_id": "shared-net-demo",
+        "region": "us-central1",
+        "address": "35.190.0.10",
+        "status": "IN_USE"
+      }
+    ],
+    "forwarding_rules": [
+      {
+        "self_link": "projects/shared-net-demo/regions/us-central1/forwardingRules/shared-fr",
+        "name": "shared-fr",
+        "project_id": "shared-net-demo",
+        "region": "us-central1",
+        "ip_address": "35.190.0.10",
+        "load_balancing_scheme": "EXTERNAL"
+      }
+    ]
+  }
+}

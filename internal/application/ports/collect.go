@@ -22,6 +22,14 @@ type CollectOptions struct {
 	OutputJSON    bool
 	MaxConcurrent int
 	Progress      ProgressReporter `json:"-"`
+
+	// GCP scope (Application Default Credentials; no secrets stored).
+	OrganizationID            string
+	FolderID                  string
+	Projects                  []string
+	Zones                     []string
+	ImpersonateServiceAccount string
+	BillingAccountID          string
 }
 
 // CollectResult is returned after a successful collection or preflight.
@@ -40,6 +48,13 @@ type InventoryPreflight struct {
 	ReachableServices []string
 	MissingActions    []string
 	Capabilities      CapabilityManifest
+
+	// GCP preflight fields (empty for other providers).
+	CallerEmail        string
+	AccessibleProjects []string
+	SelectedProjects   []string
+	EnabledAPIs        map[string][]string // project ID -> enabled service names
+	CollectionScope    string
 }
 
 // CapabilityManifest describes supported inventory signals for a provider adapter.

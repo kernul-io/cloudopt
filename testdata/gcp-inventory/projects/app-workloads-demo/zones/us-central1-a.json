@@ -1,0 +1,121 @@
+{
+  "inventory": {
+    "instances": [
+      {
+        "self_link": "projects/app-workloads-demo/zones/us-central1-a/instances/app-server-1",
+        "name": "app-server-1",
+        "project_id": "app-workloads-demo",
+        "zone": "us-central1-a",
+        "region": "us-central1",
+        "machine_type": "n2-standard-4",
+        "status": "RUNNING",
+        "labels": { "env": "prod", "team": "platform" },
+        "subnetwork": "projects/shared-net-demo/regions/us-central1/subnetworks/shared-private",
+        "disks": [
+          {
+            "device_name": "boot",
+            "source": "projects/app-workloads-demo/zones/us-central1-a/disks/app-server-1-boot",
+            "boot": true
+          }
+        ]
+      },
+      {
+        "self_link": "projects/app-workloads-demo/zones/us-central1-a/instances/batch-stopped",
+        "name": "batch-stopped",
+        "project_id": "app-workloads-demo",
+        "zone": "us-central1-a",
+        "region": "us-central1",
+        "machine_type": "e2-medium",
+        "status": "TERMINATED",
+        "labels": { "env": "batch" }
+      }
+    ],
+    "disks": [
+      {
+        "self_link": "projects/app-workloads-demo/zones/us-central1-a/disks/app-server-1-boot",
+        "name": "app-server-1-boot",
+        "project_id": "app-workloads-demo",
+        "zone": "us-central1-a",
+        "size_gb": 100,
+        "type": "pd-balanced",
+        "status": "READY",
+        "users": ["projects/app-workloads-demo/zones/us-central1-a/instances/app-server-1"]
+      },
+      {
+        "self_link": "projects/app-workloads-demo/zones/us-central1-a/disks/orphan-data",
+        "name": "orphan-data",
+        "project_id": "app-workloads-demo",
+        "zone": "us-central1-a",
+        "size_gb": 500,
+        "type": "pd-standard",
+        "status": "READY",
+        "users": []
+      }
+    ],
+    "machine_types": [
+      {
+        "self_link": "projects/app-workloads-demo/zones/us-central1-a/machineTypes/n2-standard-4",
+        "name": "n2-standard-4",
+        "project_id": "app-workloads-demo",
+        "zone": "us-central1-a",
+        "vcpu": 4,
+        "memory_mb": 16384,
+        "family": "n2"
+      }
+    ],
+    "snapshots": [
+      {
+        "self_link": "projects/app-workloads-demo/global/snapshots/old-backup-2024",
+        "name": "old-backup-2024",
+        "project_id": "app-workloads-demo",
+        "source_disk": "projects/app-workloads-demo/zones/us-central1-a/disks/orphan-data",
+        "status": "READY"
+      }
+    ],
+    "sql_instances": [
+      {
+        "self_link": "projects/app-workloads-demo/instances/pg-primary",
+        "name": "pg-primary",
+        "project_id": "app-workloads-demo",
+        "region": "us-central1",
+        "database_version": "POSTGRES_15",
+        "state": "RUNNABLE",
+        "tier": "db-custom-2-7680"
+      }
+    ],
+    "gke_clusters": [
+      {
+        "self_link": "projects/app-workloads-demo/locations/us-central1/clusters/platform-gke",
+        "name": "platform-gke",
+        "project_id": "app-workloads-demo",
+        "location": "us-central1",
+        "status": "RUNNING",
+        "network": "projects/shared-net-demo/global/networks/shared-vpc",
+        "subnetwork": "projects/shared-net-demo/regions/us-central1/subnetworks/shared-private",
+        "node_pools": [
+          {
+            "self_link": "projects/app-workloads-demo/locations/us-central1/clusters/platform-gke/nodePools/default-pool",
+            "name": "default-pool",
+            "machine_type": "e2-standard-4",
+            "status": "RUNNING",
+            "node_count": 3
+          }
+        ]
+      }
+    ]
+  },
+  "next_token": "page-2",
+  "page2_inventory": {
+    "instances": [
+      {
+        "self_link": "projects/app-workloads-demo/zones/us-central1-a/instances/page-two-extra",
+        "name": "page-two-extra",
+        "project_id": "app-workloads-demo",
+        "zone": "us-central1-a",
+        "region": "us-central1",
+        "machine_type": "e2-micro",
+        "status": "RUNNING"
+      }
+    ]
+  }
+}

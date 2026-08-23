@@ -1,0 +1,43 @@
+{
+  "identity": {
+    "email": "cloudopt-demo@example.gserviceaccount.com",
+    "unique_id": "123456789012345678901",
+    "project_id": "cloudopt-demo-host",
+    "principal": "serviceAccount:cloudopt-demo@example.gserviceaccount.com"
+  },
+  "projects": [
+    {
+      "project_id": "shared-net-demo",
+      "display_name": "Shared Networking Demo",
+      "parent": "organizations/999999999999",
+      "project_number": "100001"
+    },
+    {
+      "project_id": "app-workloads-demo",
+      "display_name": "Application Workloads Demo",
+      "parent": "organizations/999999999999",
+      "project_number": "100002"
+    },
+    {
+      "project_id": "api-disabled-demo",
+      "display_name": "API Disabled Demo",
+      "parent": "organizations/999999999999",
+      "project_number": "100003"
+    }
+  ],
+  "regions": ["us-central1"],
+  "enabled_apis": {
+    "shared-net-demo": [
+      "compute.googleapis.com",
+      "serviceusage.googleapis.com"
+    ],
+    "app-workloads-demo": [
+      "compute.googleapis.com",
+      "sqladmin.googleapis.com",
+      "container.googleapis.com",
+      "serviceusage.googleapis.com"
+    ]
+  },
+  "partial_project": "app-workloads-demo-partial",
+  "disabled_api_project": "api-disabled-demo"
+}

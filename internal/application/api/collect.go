@@ -6,8 +6,10 @@ import (
 
 	awsinventory "github.com/kernul-io/cloudopt/internal/adapters/aws-inventory"
 	"github.com/kernul-io/cloudopt/internal/adapters/config"
+	gcpinventory "github.com/kernul-io/cloudopt/internal/adapters/gcp-inventory"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
 	"github.com/kernul-io/cloudopt/internal/domain"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 // CollectService orchestrates provider inventory collectors and persistence.
@@ -57,12 +59,30 @@ func (s *CollectService) resolveCollector(ctx context.Context, opts ports.Collec
 	if s.Collector != nil {
 		return s.Collector, nil
 	}
-	if opts.Offline {
-		root := opts.FixtureRoot
-		if root == "" {
-			root = "testdata/aws-inventory"
-		}
-		return awsinventory.NewFixtureCollector(root)
+	provider := opts.Provider
+	if provider == "" {
+		provider = types.ProviderAWS
 	}
-	return awsinventory.NewLiveCollector(ctx, opts.RoleARN, opts.ExternalID)
+	switch provider {
+	case types.ProviderGCP:
+		if opts.Offline {
+			root := opts.FixtureRoot
+			if root == "" {
+				root = "testdata/gcp-inventory"
+			}
+			return gcpinventory.NewFixtureCollector(root)
+		}
+		return gcpinventory.NewLiveCollector(ctx, gcpinventory.LiveOptions{
+			ImpersonateServiceAccount: opts.ImpersonateServiceAccount,
+		})
+	default:
+		if opts.Offline {
+			root := opts.FixtureRoot
+			if root == "" {
+				root = "testdata/aws-inventory"
+			}
+			return awsinventory.NewFixtureCollector(root)
+		}
+		return awsinventory.NewLiveCollector(ctx, opts.RoleARN, opts.ExternalID)
+	}
 }

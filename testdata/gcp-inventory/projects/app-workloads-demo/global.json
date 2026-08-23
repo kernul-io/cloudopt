@@ -1,0 +1,13 @@
+{
+  "inventory": {
+    "images": [
+      {
+        "self_link": "projects/app-workloads-demo/global/images/custom-golden",
+        "name": "custom-golden",
+        "project_id": "app-workloads-demo",
+        "family": "golden",
+        "status": "READY"
+      }
+    ]
+  }
+}
