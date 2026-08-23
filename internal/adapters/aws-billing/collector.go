@@ -114,20 +114,7 @@ func (c *Collector) Collect(ctx context.Context, opts ports.CostCollectOptions, 
 	obs := interval.Collected
 
 	if !opts.Offline && len(pf.MissingActions) > 0 {
-		return &ports.BillingCollectResult{
-			Interval: interval,
-			Coverage: []domain.ServiceCollectionStatus{{
-				Service: "cost_explorer",
-				Status:  domain.ServiceCollectionFailed,
-				Message: "missing IAM permissions: " + strings.Join(pf.MissingActions, ", "),
-			}},
-			Diagnostics: []domain.CostDiagnostic{{
-				Code:     "cost_explorer_denied",
-				Message:  "Cost Explorer access denied; no cost rows were inferred",
-				Severity: "error",
-			}},
-			Partial: true,
-		}, nil
+		return nil, ports.ErrMissingPermissions(pf.MissingActions)
 	}
 
 	var pages []ceResultByTime

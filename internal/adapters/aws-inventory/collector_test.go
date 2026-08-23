@@ -2,9 +2,14 @@ package awsinventory
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 	"testing"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/rds"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/aws/smithy-go"
 	"github.com/stretchr/testify/require"
 
@@ -59,6 +64,74 @@ func (f *fakeAPIErr) ErrorCode() string    { return f.code }
 func (f *fakeAPIErr) ErrorMessage() string { return "denied" }
 func (f *fakeAPIErr) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultUnknown
+}
+
+func TestCollect_missingPermissions(t *testing.T) {
+	stubSTS := &stubInventorySTS{}
+	denyEC2 := &denyDescribeInstancesEC2{}
+	collector := NewCollector(stubSTS, denyEC2, func(string) EC2API { return denyEC2 }, func(string) RDSAPI { return &noopRDS{} })
+	opts := ports.CollectOptions{Regions: []string{"us-east-1"}}
+
+	_, err := collector.Collect(context.Background(), opts, ports.NopProgress{})
+	require.Error(t, err)
+	require.True(t, ports.IsMissingPermissions(err))
+}
+
+type stubInventorySTS struct{}
+
+func (stubInventorySTS) GetCallerIdentity(context.Context, *sts.GetCallerIdentityInput, ...func(*sts.Options)) (*sts.GetCallerIdentityOutput, error) {
+	return &sts.GetCallerIdentityOutput{
+		Account: aws.String("123456789012"),
+		Arn:     aws.String("arn:aws:iam::123456789012:user/test"),
+	}, nil
+}
+
+type denyDescribeInstancesEC2 struct{}
+
+func (denyDescribeInstancesEC2) DescribeRegions(context.Context, *ec2.DescribeRegionsInput, ...func(*ec2.Options)) (*ec2.DescribeRegionsOutput, error) {
+	return &ec2.DescribeRegionsOutput{}, nil
+}
+
+func (denyDescribeInstancesEC2) DescribeInstances(context.Context, *ec2.DescribeInstancesInput, ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error) {
+	return nil, fmt.Errorf("%w: denied", ErrAccessDenied)
+}
+
+func (denyDescribeInstancesEC2) DescribeInstanceTypes(context.Context, *ec2.DescribeInstanceTypesInput, ...func(*ec2.Options)) (*ec2.DescribeInstanceTypesOutput, error) {
+	return &ec2.DescribeInstanceTypesOutput{}, nil
+}
+
+func (denyDescribeInstancesEC2) DescribeVolumes(context.Context, *ec2.DescribeVolumesInput, ...func(*ec2.Options)) (*ec2.DescribeVolumesOutput, error) {
+	return &ec2.DescribeVolumesOutput{}, nil
+}
+
+func (denyDescribeInstancesEC2) DescribeSnapshots(context.Context, *ec2.DescribeSnapshotsInput, ...func(*ec2.Options)) (*ec2.DescribeSnapshotsOutput, error) {
+	return &ec2.DescribeSnapshotsOutput{}, nil
+}
+
+func (denyDescribeInstancesEC2) DescribeVpcs(context.Context, *ec2.DescribeVpcsInput, ...func(*ec2.Options)) (*ec2.DescribeVpcsOutput, error) {
+	return &ec2.DescribeVpcsOutput{}, nil
+}
+
+func (denyDescribeInstancesEC2) DescribeSubnets(context.Context, *ec2.DescribeSubnetsInput, ...func(*ec2.Options)) (*ec2.DescribeSubnetsOutput, error) {
+	return &ec2.DescribeSubnetsOutput{}, nil
+}
+
+func (denyDescribeInstancesEC2) DescribeRouteTables(context.Context, *ec2.DescribeRouteTablesInput, ...func(*ec2.Options)) (*ec2.DescribeRouteTablesOutput, error) {
+	return &ec2.DescribeRouteTablesOutput{}, nil
+}
+
+func (denyDescribeInstancesEC2) DescribeNatGateways(context.Context, *ec2.DescribeNatGatewaysInput, ...func(*ec2.Options)) (*ec2.DescribeNatGatewaysOutput, error) {
+	return &ec2.DescribeNatGatewaysOutput{}, nil
+}
+
+func (denyDescribeInstancesEC2) DescribeAddresses(context.Context, *ec2.DescribeAddressesInput, ...func(*ec2.Options)) (*ec2.DescribeAddressesOutput, error) {
+	return &ec2.DescribeAddressesOutput{}, nil
+}
+
+type noopRDS struct{}
+
+func (noopRDS) DescribeDBInstances(context.Context, *rds.DescribeDBInstancesInput, ...func(*rds.Options)) (*rds.DescribeDBInstancesOutput, error) {
+	return &rds.DescribeDBInstancesOutput{}, nil
 }
 
 func TestCollect_cancelled(t *testing.T) {

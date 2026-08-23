@@ -39,11 +39,9 @@ func TestFixtureCostCollection(t *testing.T) {
 func TestPartialCoverageWhenCostExplorerDenied(t *testing.T) {
 	c := NewCollector(&stubSTS{}, &denyCE{})
 	opts := ports.CostCollectOptions{LookbackDays: 7}
-	out, err := c.Collect(context.Background(), opts, &domain.CollectionSnapshot{})
-	require.NoError(t, err)
-	require.True(t, out.Partial)
-	require.Empty(t, out.Costs)
-	require.NotEmpty(t, out.Diagnostics)
+	_, err := c.Collect(context.Background(), opts, &domain.CollectionSnapshot{})
+	require.Error(t, err)
+	require.True(t, ports.IsMissingPermissions(err))
 }
 
 type stubSTS struct{}

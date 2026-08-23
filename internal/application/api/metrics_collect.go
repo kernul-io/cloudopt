@@ -29,6 +29,9 @@ func (s *MetricsCollectService) Collect(ctx context.Context, opts ports.MetricsC
 	if err != nil {
 		return nil, err
 	}
+	if !opts.Offline && len(pf.MissingActions) > 0 {
+		return nil, ports.ErrMissingPermissions(pf.MissingActions)
+	}
 	if opts.DryRun {
 		return &ports.MetricsCollectResult{DryRun: true, Preflight: pf}, nil
 	}

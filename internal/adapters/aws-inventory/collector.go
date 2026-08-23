@@ -86,6 +86,9 @@ func (c *Collector) Collect(ctx context.Context, opts ports.CollectOptions, prog
 	if err != nil {
 		return nil, err
 	}
+	if !opts.Offline && len(pf.MissingActions) > 0 {
+		return nil, ports.ErrMissingPermissions(pf.MissingActions)
+	}
 	if opts.DryRun {
 		return nil, nil
 	}

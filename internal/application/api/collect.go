@@ -30,6 +30,9 @@ func (s *CollectService) Collect(ctx context.Context, opts ports.CollectOptions,
 	if err != nil {
 		return nil, err
 	}
+	if !opts.Offline && len(pf.MissingActions) > 0 {
+		return nil, ports.ErrMissingPermissions(pf.MissingActions)
+	}
 	if opts.DryRun {
 		return &ports.CollectResult{Preflight: pf, DryRun: true}, nil
 	}

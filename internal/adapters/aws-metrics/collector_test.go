@@ -39,11 +39,9 @@ func TestFixtureMetricsCollection(t *testing.T) {
 func TestPartialCoverageWhenCloudWatchDenied(t *testing.T) {
 	c := NewCollector(&stubSTS{}, &denyCW{})
 	opts := ports.MetricsCollectOptions{LookbackDays: 7}
-	out, err := c.Collect(context.Background(), opts, &domain.CollectionSnapshot{})
-	require.NoError(t, err)
-	require.True(t, out.Partial)
-	require.Empty(t, out.Series)
-	require.NotEmpty(t, out.Diagnostics)
+	_, err := c.Collect(context.Background(), opts, &domain.CollectionSnapshot{})
+	require.Error(t, err)
+	require.True(t, ports.IsMissingPermissions(err))
 }
 
 func TestCollectCancellation(t *testing.T) {

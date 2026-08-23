@@ -99,6 +99,7 @@ func (c *Collector) Collect(ctx context.Context, opts ports.MetricsCollectOption
 		return nil, err
 	}
 	pf, err := c.Preflight(ctx, opts)
+
 	if err != nil {
 		return nil, err
 	}
@@ -130,20 +131,7 @@ func (c *Collector) Collect(ctx context.Context, opts ports.MetricsCollectOption
 	obs := domaintypes.NowUTC()
 
 	if !opts.Offline && len(pf.MissingActions) > 0 {
-		return &ports.MetricsCollectOutput{
-			Window: window,
-			Coverage: []domain.ServiceCollectionStatus{{
-				Service: "cloudwatch",
-				Status:  domain.ServiceCollectionFailed,
-				Message: "missing IAM permissions: " + strings.Join(pf.MissingActions, ", "),
-			}},
-			Diagnostics: []domain.MetricDiagnostic{{
-				Code:     "cloudwatch_denied",
-				Message:  "CloudWatch access denied; no metrics were inferred",
-				Severity: "error",
-			}},
-			Partial: true,
-		}, nil
+		return nil, ports.ErrMissingPermissions(pf.MissingActions)
 	}
 
 	plans := buildPlans(inventory)
