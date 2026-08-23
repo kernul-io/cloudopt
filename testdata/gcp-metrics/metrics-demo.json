@@ -1,0 +1,30 @@
+{
+  "series": [
+    {
+      "provider_resource_id": "projects/app-workloads-demo/zones/us-central1-a/instances/app-server-1",
+      "metric_type": "compute.googleapis.com/instance/cpu/utilization",
+      "scenario": "steady_low",
+      "datapoints": [
+        { "offset_hours": -168, "v": 0.11 },
+        { "offset_hours": -120, "v": 0.12 },
+        { "offset_hours": -72, "v": 0.105 },
+        { "offset_hours": -24, "v": 0.115 }
+      ]
+    },
+    {
+      "provider_resource_id": "projects/app-workloads-demo/instances/pg-primary",
+      "metric_type": "cloudsql.googleapis.com/database/cpu/utilization",
+      "scenario": "sparse",
+      "datapoints": [
+        { "offset_hours": -96, "v": 0.18 },
+        { "offset_hours": -48, "v": 0.22 }
+      ]
+    },
+    {
+      "provider_resource_id": "projects/shared-net-demo/regions/us-central1/routers/shared-nat",
+      "metric_type": "router.googleapis.com/nat/sent_bytes_count",
+      "scenario": "idle",
+      "missing": true
+    }
+  ]
+}

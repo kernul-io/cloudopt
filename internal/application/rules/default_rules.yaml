@@ -163,3 +163,110 @@ rules:
       - pricing
     remediation: |
       Review whether VPC endpoints or consolidated egress can reduce NAT dependency before changing network topology.
+
+  - id: compute.gce_downsize_candidate
+    version: "1.0.0"
+    title: GCE downsize candidate from utilization
+    category: compute
+    severity: medium
+    evaluator: gce_downsize_candidate
+    enabled: true
+    applicability:
+      resource_kinds:
+        - compute_instance
+    thresholds:
+      max_p95_cpu_percent: "25"
+      min_sample_coverage_percent: "50"
+      safety_headroom_bps: "1500"
+    required_signals:
+      - metrics
+      - pricing
+    remediation: |
+      Validate memory, disk, and licensing constraints, then change machine type during a maintenance window.
+
+  - id: network.gcp_idle_external_ip
+    version: "1.0.0"
+    title: Idle GCP external IP address
+    category: network
+    severity: low
+    evaluator: gcp_idle_external_ip
+    enabled: true
+    applicability:
+      resource_kinds:
+        - elastic_ip
+    thresholds: {}
+    required_signals:
+      - resources
+    remediation: |
+      Release unused static external IPs or attach them to active resources.
+
+  - id: storage.gcp_disk_type_optimize
+    version: "1.0.0"
+    title: GCP pd-standard to pd-balanced optimization
+    category: storage
+    severity: low
+    evaluator: gcp_disk_type_optimize
+    enabled: true
+    applicability:
+      resource_kinds:
+        - block_volume
+    thresholds: {}
+    required_signals:
+      - resources
+      - pricing
+    remediation: |
+      Migrate attached pd-standard disks to pd-balanced after confirming IO requirements.
+
+  - id: database.cloudsql_downsize_candidate
+    version: "1.0.0"
+    title: Cloud SQL downsize candidate
+    category: database
+    severity: medium
+    evaluator: cloudsql_downsize_candidate
+    enabled: true
+    applicability:
+      resource_kinds:
+        - database_instance
+    thresholds:
+      max_p95_cpu_percent: "30"
+      safety_headroom_bps: "1500"
+    required_signals:
+      - metrics
+      - pricing
+    remediation: |
+      Validate connections and memory, then reduce Cloud SQL tier during maintenance.
+
+  - id: network.gcp_nat_low_utilization
+    version: "1.0.0"
+    title: Low-utilization Cloud NAT gateway
+    category: network
+    severity: low
+    evaluator: gcp_nat_low_utilization
+    enabled: true
+    applicability:
+      resource_kinds:
+        - nat_gateway
+    thresholds:
+      max_bytes_out_per_hour: "104857600"
+    required_signals:
+      - metrics
+      - pricing
+    remediation: |
+      Review VPC Service Controls and Private Google Access before removing Cloud NAT.
+
+  - id: billing.gcp_committed_use_coverage
+    version: "1.0.0"
+    title: Committed use discount coverage opportunity
+    category: billing
+    severity: low
+    evaluator: gcp_committed_use_coverage
+    enabled: true
+    applicability:
+      resource_kinds:
+        - compute_instance
+    thresholds:
+      min_eligible_spend_minor: "5000"
+    required_signals:
+      - costs
+    remediation: |
+      Model 1- or 3-year committed use discounts only after stabilizing baseline compute usage; commitments reduce flexibility.

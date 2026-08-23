@@ -19,6 +19,12 @@ type CostCollectOptions struct {
 	Offline      bool
 	FixtureRoot  string
 	Progress     ProgressReporter `json:"-"`
+
+	// GCP Cloud Billing export (BigQuery) scope.
+	BillingExportProject      string
+	BigQueryDataset           string
+	BigQueryTable             string
+	ImpersonateServiceAccount string
 }
 
 // BillingPreflight summarizes billing API access before collection.

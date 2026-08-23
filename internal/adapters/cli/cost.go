@@ -20,7 +20,9 @@ func runCollectCost(cmd *cobra.Command, cfg *Config, opts ports.CostCollectOptio
 	logger := logging.New(settings.LogFormat, settings.LogLevel)
 	rt := api.NewRuntime(settings)
 	runner := &Runner{Logger: logger, Run: rt}
-	opts.Provider = types.ProviderAWS
+	if opts.Provider == "" {
+		opts.Provider = types.ProviderAWS
+	}
 	opts.Progress = &stderrProgress{Logger: logger}
 
 	var out *ports.CostCollectResult

@@ -1,0 +1,20 @@
+provider: gcp
+schema: "1"
+billing:
+  - id: bigquery_billing_export
+    description: Detailed billing rows from Cloud Billing export in BigQuery
+    available: true
+    api_actions:
+      - bigquery.jobs.create
+      - bigquery.tables.getData
+  - id: cloud_billing_metadata
+    description: Billing account and SKU metadata via Cloud Billing API (read-only)
+    available: true
+    api_actions:
+      - cloudbilling.billingAccounts.get
+      - cloudbilling.skus.list
+supported_checks:
+  - cost_attribution_coverage
+  - billing_lag
+  - gcp_billing_effects
+  - committed_use_coverage

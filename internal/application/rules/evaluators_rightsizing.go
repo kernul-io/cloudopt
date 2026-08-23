@@ -40,6 +40,9 @@ func (e EC2DownsizeCandidate) Evaluate(view *SnapshotView, rule RuleSpec) Evalua
 
 	var findings []CandidateFinding
 	for _, res := range view.ResourcesOfKind(domain.KindComputeInstance) {
+		if !isAWSResource(res) {
+			continue
+		}
 		if stoppedState(res.State) {
 			continue
 		}
@@ -148,6 +151,9 @@ func (e EC2IdleInstance) Evaluate(view *SnapshotView, rule RuleSpec) EvaluatorRe
 	}
 	var findings []CandidateFinding
 	for _, res := range view.ResourcesOfKind(domain.KindComputeInstance) {
+		if !isAWSResource(res) {
+			continue
+		}
 		if stoppedState(res.State) {
 			continue
 		}
@@ -205,6 +211,9 @@ func (e EBSVolumeTypeOptimize) Evaluate(view *SnapshotView, rule RuleSpec) Evalu
 	}
 	var findings []CandidateFinding
 	for _, vol := range view.ResourcesOfKind(domain.KindBlockVolume) {
+		if !isAWSResource(vol) {
+			continue
+		}
 		vtype := strings.ToLower(vol.Attributes["volume_type"])
 		if vtype == "" {
 			vtype = "gp2"
@@ -272,6 +281,9 @@ func (e RDSDownsizeCandidate) Evaluate(view *SnapshotView, rule RuleSpec) Evalua
 	headroom, _ := rule.thresholdInt("safety_headroom_bps", 1500)
 	var findings []CandidateFinding
 	for _, db := range view.ResourcesOfKind(domain.KindDatabase) {
+		if !isAWSResource(db) {
+			continue
+		}
 		p95, coverage, _, ok := view.UtilizationMetric(db.ID, "CPUUtilization", domain.SignalP95)
 		if !ok || p95 > float64(maxP95) {
 			continue
@@ -353,6 +365,9 @@ func (e NATGatewayLowUtilization) Evaluate(view *SnapshotView, rule RuleSpec) Ev
 	}
 	var findings []CandidateFinding
 	for _, nat := range view.ResourcesOfKind(domain.KindNATGateway) {
+		if !isAWSResource(nat) {
+			continue
+		}
 		mean, _, _, ok := view.UtilizationMetric(nat.ID, "BytesOutToDestination", domain.SignalMean)
 		if !ok {
 			continue

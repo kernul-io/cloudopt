@@ -1,0 +1,8 @@
+provider: gcp
+schema: "1"
+pricing:
+  - id: cloud_billing_catalog
+    description: SKU list prices via offline catalog fixture (live Cloud Billing Catalog API deferred)
+    available: true
+    api_actions:
+      - cloudbilling.skus.list

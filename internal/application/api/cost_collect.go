@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	awsbilling "github.com/kernul-io/cloudopt/internal/adapters/aws-billing"
+	gcpbilling "github.com/kernul-io/cloudopt/internal/adapters/gcp-billing"
 	appbilling "github.com/kernul-io/cloudopt/internal/application/billing"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
 	"github.com/kernul-io/cloudopt/internal/domain"
@@ -43,7 +44,7 @@ func (s *CostCollectService) Collect(ctx context.Context, opts ports.CostCollect
 	if progress == nil {
 		progress = ports.NopProgress{}
 	}
-	progress.Step("collecting billing via Cost Explorer")
+	progress.Step(billingProgressLabel(opts))
 	out, err := source.Collect(ctx, opts, snap)
 	if err != nil {
 		return nil, err
@@ -115,14 +116,33 @@ func (s *CostCollectService) resolveSource(ctx context.Context, opts ports.CostC
 	if s.Source != nil {
 		return s.Source, nil
 	}
-	if opts.Offline {
-		root := opts.FixtureRoot
-		if root == "" {
-			root = "testdata/aws-billing"
+	switch opts.Provider {
+	case types.ProviderGCP:
+		if opts.Offline {
+			root := opts.FixtureRoot
+			if root == "" {
+				root = "testdata/gcp-billing"
+			}
+			return gcpbilling.NewFixtureBillingSource(root), nil
 		}
-		return awsbilling.NewFixtureBillingSource(root), nil
+		return gcpbilling.NewLiveBillingSource(ctx, opts)
+	default:
+		if opts.Offline {
+			root := opts.FixtureRoot
+			if root == "" {
+				root = "testdata/aws-billing"
+			}
+			return awsbilling.NewFixtureBillingSource(root), nil
+		}
+		return awsbilling.NewLiveBillingSource(ctx, opts.RoleARN, opts.ExternalID)
 	}
-	return awsbilling.NewLiveBillingSource(ctx, opts.RoleARN, opts.ExternalID)
+}
+
+func billingProgressLabel(opts ports.CostCollectOptions) string {
+	if opts.Provider == types.ProviderGCP {
+		return "collecting billing via Cloud Billing BigQuery export"
+	}
+	return "collecting billing via Cost Explorer"
 }
 
 func mapReconcileSummary(r domain.CostReconciliation) *ports.CostReconciliationSummary {

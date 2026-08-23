@@ -1,0 +1,46 @@
+package gcpmetrics
+
+import (
+	_ "embed"
+
+	"gopkg.in/yaml.v3"
+
+	"github.com/kernul-io/cloudopt/internal/application/ports"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
+)
+
+//go:embed capabilities.yaml
+var capabilitiesYAML []byte
+
+func LoadCapabilities() (ports.CapabilityManifest, error) {
+	var raw struct {
+		Provider        types.Provider `yaml:"provider"`
+		Schema          string         `yaml:"schema"`
+		Metrics         []capEntry     `yaml:"metrics"`
+		SupportedChecks []string       `yaml:"supported_checks"`
+	}
+	if err := yaml.Unmarshal(capabilitiesYAML, &raw); err != nil {
+		return ports.CapabilityManifest{}, err
+	}
+	m := ports.CapabilityManifest{
+		Provider:        raw.Provider,
+		Schema:          raw.Schema,
+		SupportedChecks: raw.SupportedChecks,
+	}
+	for _, e := range raw.Metrics {
+		m.Metrics = append(m.Metrics, ports.CapabilityEntry{
+			ID:          e.ID,
+			Description: e.Description,
+			Available:   e.Available,
+			APIActions:  e.APIActions,
+		})
+	}
+	return m, nil
+}
+
+type capEntry struct {
+	ID          string   `yaml:"id"`
+	Description string   `yaml:"description"`
+	Available   bool     `yaml:"available"`
+	APIActions  []string `yaml:"api_actions"`
+}

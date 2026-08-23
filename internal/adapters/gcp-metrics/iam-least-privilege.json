@@ -1,0 +1,4 @@
+{
+  "description": "Least-privilege roles for Cloud Monitoring metrics (reference only).",
+  "roles": ["roles/monitoring.viewer"]
+}

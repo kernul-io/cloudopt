@@ -133,7 +133,25 @@ func resourceTagValue(r domain.Resource, key string) string {
 
 func stoppedState(state string) bool {
 	s := strings.ToLower(strings.TrimSpace(state))
-	return s == "stopped" || s == "stopping"
+	switch s {
+	case "stopped", "stopping", "suspended", "terminated":
+		return true
+	default:
+		return false
+	}
+}
+
+func gcpIdleAddressState(state string) bool {
+	s := strings.ToUpper(strings.TrimSpace(state))
+	return s == "RESERVED" || s == "RESERVE"
+}
+
+func isAWSResource(res domain.Resource) bool {
+	if res.Attributes != nil && (res.Attributes["gcp_self_link"] != "" || res.Attributes["gcp_project"] != "") {
+		return false
+	}
+	id := res.ProviderResourceID
+	return strings.HasPrefix(id, "i-") || strings.HasPrefix(id, "vol-") || strings.HasPrefix(id, "db-")
 }
 
 func availableVolumeState(state string) bool {

@@ -29,7 +29,7 @@ func TestFixtureAnalysisPredictableFindings(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.Equal(t, 4, out.Summary.Failed)
-	require.Equal(t, 0, out.Summary.Passed)
+	require.Equal(t, 2, out.Summary.Passed)
 	require.Len(t, out.Findings, 7)
 
 	rulesSeen := map[string]int{}

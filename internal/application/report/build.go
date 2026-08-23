@@ -139,6 +139,14 @@ func buildScope(snap *domain.CollectionSnapshot, aliases *AliasMap) (ScopeSectio
 		}
 	}
 
+	if len(snap.Costs) == 0 && snap.Provider == types.ProviderGCP {
+		warnings = append(warnings, "No GCP billing rows were present; cost-based checks and CUD analysis may be not evaluated. Use collect gcp cost with BigQuery export or --offline fixtures.")
+	}
+	if len(snap.Costs) == 0 {
+		warnings = append(warnings, "No billing cost records were present in the snapshot; cost-based checks may be not evaluated.")
+	} else if snap.Provider == types.ProviderGCP {
+		warnings = append(warnings, "GCP costs reflect BigQuery billing export normalization (credits, SUD, CUD, and taxes as separate effects); list-price catalog does not backfill missing export rows.")
+	}
 	if len(snap.Metrics) == 0 {
 		warnings = append(warnings, "No utilization metrics were present in the snapshot; utilization-based checks may be not evaluated.")
 	} else if snap.MetricsMeta != nil && snap.MetricsMeta.Partial {

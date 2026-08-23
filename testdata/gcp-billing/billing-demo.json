@@ -1,0 +1,162 @@
+{
+  "source_totals": {
+    "USD": {
+      "amount_major": 312.75,
+      "currency": "USD"
+    }
+  },
+  "incomplete_month": true,
+  "billing_lag_days": 2,
+  "pages": [
+    {
+      "rows": [
+        {
+          "service": "Compute Engine",
+          "sku": "N2 Instance Core running in Americas",
+          "resource_name": "projects/app-workloads-demo/zones/us-central1-a/instances/app-server-1",
+          "region": "us-central1",
+          "cost": 88.0,
+          "currency": "USD",
+          "cost_type": "regular",
+          "period_start": "2025-06-01T00:00:00Z",
+          "period_end": "2025-07-01T00:00:00Z",
+          "basis": "effective",
+          "sud": true
+        },
+        {
+          "service": "Compute Engine",
+          "sku": "Custom machine type vCPU",
+          "resource_name": "projects/app-workloads-demo/zones/us-central1-a/instances/app-server-1",
+          "region": "us-central1",
+          "cost": 12.0,
+          "currency": "USD",
+          "cost_type": "regular",
+          "period_start": "2025-06-01T00:00:00Z",
+          "period_end": "2025-07-01T00:00:00Z",
+          "basis": "list"
+        },
+        {
+          "service": "Compute Engine",
+          "sku": "Storage PD Capacity",
+          "resource_name": "projects/app-workloads-demo/zones/us-central1-a/disks/orphan-data",
+          "region": "us-central1",
+          "cost": 45.0,
+          "currency": "USD",
+          "cost_type": "regular",
+          "period_start": "2025-06-01T00:00:00Z",
+          "period_end": "2025-07-01T00:00:00Z",
+          "basis": "list"
+        },
+        {
+          "service": "Compute Engine",
+          "sku": "Storage PD Capacity",
+          "resource_name": "projects/app-workloads-demo/zones/us-central1-a/instances/batch-stopped",
+          "region": "us-central1",
+          "cost": 18.5,
+          "currency": "USD",
+          "cost_type": "regular",
+          "period_start": "2025-06-01T00:00:00Z",
+          "period_end": "2025-07-01T00:00:00Z",
+          "basis": "list"
+        },
+        {
+          "service": "Cloud SQL",
+          "sku": "Cloud SQL for PostgreSQL: Zonal - vCPU",
+          "resource_name": "projects/app-workloads-demo/instances/pg-primary",
+          "region": "us-central1",
+          "cost": 62.0,
+          "currency": "USD",
+          "cost_type": "regular",
+          "period_start": "2025-06-01T00:00:00Z",
+          "period_end": "2025-07-01T00:00:00Z",
+          "basis": "list"
+        },
+        {
+          "service": "Networking",
+          "sku": "Shared VPC egress",
+          "region": "us-central1",
+          "cost": 22.0,
+          "currency": "USD",
+          "cost_type": "regular",
+          "period_start": "2025-06-01T00:00:00Z",
+          "period_end": "2025-07-01T00:00:00Z",
+          "shared_pool": true,
+          "basis": "list"
+        },
+        {
+          "service": "Compute Engine",
+          "sku": "Unattributed SKU line",
+          "region": "global",
+          "cost": 9.25,
+          "currency": "USD",
+          "cost_type": "regular",
+          "period_start": "2025-06-01T00:00:00Z",
+          "period_end": "2025-07-01T00:00:00Z",
+          "basis": "list"
+        },
+        {
+          "service": "Billing",
+          "sku": "Committed use discount credit",
+          "region": "us-central1",
+          "cost": -15.0,
+          "currency": "USD",
+          "cost_type": "credit",
+          "period_start": "2025-06-01T00:00:00Z",
+          "period_end": "2025-07-01T00:00:00Z",
+          "basis": "credit"
+        },
+        {
+          "service": "Support",
+          "sku": "Premium Support",
+          "region": "global",
+          "cost": 20.0,
+          "currency": "USD",
+          "cost_type": "regular",
+          "period_start": "2025-06-01T00:00:00Z",
+          "period_end": "2025-07-01T00:00:00Z",
+          "basis": "effective"
+        },
+        {
+          "service": "Tax",
+          "sku": "VAT",
+          "region": "global",
+          "cost": 3.0,
+          "currency": "USD",
+          "cost_type": "tax",
+          "period_start": "2025-06-01T00:00:00Z",
+          "period_end": "2025-07-01T00:00:00Z",
+          "basis": "list"
+        },
+        {
+          "service": "Compute Engine",
+          "sku": "Committed use discount coverage",
+          "resource_name": "projects/app-workloads-demo/zones/us-central1-a/instances/app-server-1",
+          "region": "us-central1",
+          "cost": 0,
+          "currency": "USD",
+          "cost_type": "regular",
+          "period_start": "2025-06-01T00:00:00Z",
+          "period_end": "2025-07-01T00:00:00Z",
+          "commitment": true,
+          "basis": "effective"
+        }
+      ]
+    },
+    {
+      "rows": [
+        {
+          "service": "Compute Engine",
+          "sku": "N2 Instance Core running in Americas",
+          "resource_name": "projects/app-workloads-demo/zones/us-central1-a/instances/app-server-1",
+          "region": "us-central1",
+          "cost": 48.0,
+          "currency": "USD",
+          "cost_type": "regular",
+          "period_start": "2025-07-01T00:00:00Z",
+          "period_end": "2025-08-01T00:00:00Z",
+          "basis": "effective"
+        }
+      ]
+    }
+  ]
+}

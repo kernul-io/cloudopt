@@ -47,6 +47,8 @@ func newCollectCommand(cfg *Config) *cobra.Command {
 
 func newCollectGCPCommand(cfg *Config) *cobra.Command {
 	var opts ports.CollectOptions
+	var costOpts ports.CostCollectOptions
+	var metricsOpts ports.MetricsCollectOptions
 	cmd := &cobra.Command{
 		Use:   "gcp",
 		Short: "Google Cloud Platform collection commands",
@@ -60,8 +62,54 @@ func newCollectGCPCommand(cfg *Config) *cobra.Command {
 		},
 	}
 	bindGCPInventoryFlags(inventory, &opts)
+	cost := &cobra.Command{
+		Use:   "cost",
+		Short: "Collect GCP billing from BigQuery export and attribute to inventory",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			costOpts.Provider = types.ProviderGCP
+			return runCollectCost(cmd, cfg, costOpts)
+		},
+	}
+	bindGCPCostFlags(cost, &costOpts)
+	metrics := &cobra.Command{
+		Use:   "metrics",
+		Short: "Collect GCP Cloud Monitoring utilization metrics for a snapshot",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			metricsOpts.Provider = types.ProviderGCP
+			return runCollectMetrics(cmd, cfg, metricsOpts)
+		},
+	}
+	bindGCPMetricsFlags(metrics, &metricsOpts)
 	cmd.AddCommand(inventory)
+	cmd.AddCommand(cost)
+	cmd.AddCommand(metrics)
 	return cmd
+}
+
+func bindGCPCostFlags(cmd *cobra.Command, opts *ports.CostCollectOptions) {
+	cmd.Flags().StringVar((*string)(&opts.AccountID), "account-id", "", "Canonical account id filter when selecting latest snapshot")
+	cmd.Flags().StringVar((*string)(&opts.SnapshotID), "snapshot-id", "", "Snapshot to attach costs to (default: latest)")
+	cmd.Flags().IntVar(&opts.LookbackDays, "lookback-days", 30, "Billing lookback window in days")
+	cmd.Flags().StringVar(&opts.BillingExportProject, "billing-export-project", "", "Project containing the BigQuery billing export dataset")
+	cmd.Flags().StringVar(&opts.BigQueryDataset, "bigquery-dataset", "", "BigQuery dataset for billing export")
+	cmd.Flags().StringVar(&opts.BigQueryTable, "bigquery-table", "", "BigQuery table for billing export")
+	cmd.Flags().StringVar(&opts.ImpersonateServiceAccount, "impersonate-service-account", "", "Service account to impersonate for billing export read")
+	cmd.Flags().BoolVar(&opts.DryRun, "dry-run", false, "Preflight billing access without collecting")
+	cmd.Flags().BoolVar(&opts.Offline, "offline", false, "Use recorded BigQuery export fixtures")
+	cmd.Flags().StringVar(&opts.FixtureRoot, "fixture-root", "", "Fixture directory for --offline (default testdata/gcp-billing)")
+}
+
+func bindGCPMetricsFlags(cmd *cobra.Command, opts *ports.MetricsCollectOptions) {
+	cmd.Flags().StringVar((*string)(&opts.AccountID), "account-id", "", "Canonical account id filter when selecting latest snapshot")
+	cmd.Flags().StringVar((*string)(&opts.SnapshotID), "snapshot-id", "", "Snapshot to attach metrics to (default: latest)")
+	cmd.Flags().IntVar(&opts.LookbackDays, "lookback-days", 14, "Metrics lookback window in days")
+	cmd.Flags().IntVar(&opts.PeriodSeconds, "period-seconds", 3600, "Monitoring alignment period in seconds")
+	cmd.Flags().StringVar(&opts.TimeZone, "timezone", "UTC", "Business-hours IANA time zone")
+	cmd.Flags().IntVar(&opts.BusinessHourStart, "business-hour-start", 9, "Business hours start (local hour, inclusive)")
+	cmd.Flags().IntVar(&opts.BusinessHourEnd, "business-hour-end", 17, "Business hours end (local hour, exclusive)")
+	cmd.Flags().BoolVar(&opts.DryRun, "dry-run", false, "Preflight metrics access without collecting")
+	cmd.Flags().BoolVar(&opts.Offline, "offline", false, "Use recorded Monitoring fixtures")
+	cmd.Flags().StringVar(&opts.FixtureRoot, "fixture-root", "", "Fixture directory for --offline (default testdata/gcp-metrics)")
 }
 
 func bindGCPInventoryFlags(cmd *cobra.Command, opts *ports.CollectOptions) {
@@ -101,6 +149,7 @@ func newCollectAWSCommand(cfg *Config) *cobra.Command {
 		Use:   "cost",
 		Short: "Collect AWS billing costs and attribute them to inventory resources",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			costOpts.Provider = types.ProviderAWS
 			return runCollectCost(cmd, cfg, costOpts)
 		},
 	}

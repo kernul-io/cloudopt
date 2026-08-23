@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"sort"
+	"strings"
 
 	"github.com/kernul-io/cloudopt/internal/domain"
 	"github.com/kernul-io/cloudopt/internal/domain/types"
@@ -121,6 +122,11 @@ func BuildInventoryIndex(snap *domain.CollectionSnapshot) InventoryIndex {
 		if res.ProviderResourceID != "" {
 			idx.ByProviderID[res.ProviderResourceID] = res.ID
 		}
+		if res.Attributes != nil {
+			if link := res.Attributes["gcp_self_link"]; link != "" {
+				idx.ByProviderID[link] = res.ID
+			}
+		}
 		for _, tag := range res.Tags {
 			if tag.Key == "Owner" {
 				idx.OwnerByRes[res.ID] = tag.Value
@@ -176,9 +182,13 @@ func attributeOne(in AttributionInput, idx InventoryIndex, interval domain.Billi
 		if id, ok := idx.ByProviderID[in.ProviderResourceID]; ok {
 			rec := base
 			rec.ResourceID = id
+			heuristic := "direct_provider_resource_id"
+			if strings.Contains(in.ProviderResourceID, "projects/") {
+				heuristic = "gcp_billing_resource_name"
+			}
 			rec.Attribution = domain.CostAttribution{
 				Method:      domain.AttributionDirectResourceID,
-				HeuristicID: "aws_ce_resource_id",
+				HeuristicID: heuristic,
 				Confidence:  0.95,
 			}
 			return []domain.CostRecord{rec}

@@ -1,0 +1,14 @@
+provider: gcp
+schema: "1"
+metrics:
+  - id: cloud_monitoring_timeseries
+    description: Cloud Monitoring time series for Compute, disks, Cloud SQL, NAT, and GKE node pools
+    available: true
+    api_actions:
+      - monitoring.timeSeries.list
+supported_checks:
+  - gce_rightsizing
+  - gce_idle
+  - cloud_sql_rightsizing
+  - cloud_nat_utilization
+  - metric_alignment

@@ -1,0 +1,104 @@
+{
+  "catalog_version": "2026.01-gcp-demo",
+  "source": "testdata/gcp-pricing/catalog-demo.json",
+  "effective_date": "2026-01-15T00:00:00Z",
+  "currency": "USD",
+  "records": [
+    {
+      "service": "ComputeEngine",
+      "region": "us-central1",
+      "purchase_model": "on_demand",
+      "unit": "hour",
+      "price_major": 0.194,
+      "attributes": { "machine_type": "n2-standard-4", "tenancy": "shared" }
+    },
+    {
+      "service": "ComputeEngine",
+      "region": "us-central1",
+      "purchase_model": "on_demand",
+      "unit": "hour",
+      "price_major": 0.097,
+      "attributes": { "machine_type": "n2-standard-2", "tenancy": "shared" }
+    },
+    {
+      "service": "ComputeEngine",
+      "region": "us-central1",
+      "purchase_model": "on_demand",
+      "unit": "hour",
+      "price_major": 0.0485,
+      "attributes": { "machine_type": "n2-standard-1", "tenancy": "shared" }
+    },
+    {
+      "service": "ComputeEngine",
+      "region": "us-central1",
+      "purchase_model": "on_demand",
+      "unit": "hour",
+      "price_major": 0.134,
+      "attributes": { "machine_type": "e2-medium", "tenancy": "shared" }
+    },
+    {
+      "service": "ComputeEngine",
+      "region": "us-central1",
+      "purchase_model": "on_demand",
+      "unit": "hour",
+      "price_major": 0.067,
+      "attributes": { "machine_type": "e2-small", "tenancy": "shared" }
+    },
+    {
+      "service": "ComputeEngine",
+      "region": "us-central1",
+      "purchase_model": "on_demand",
+      "unit": "hour",
+      "price_major": 0.055,
+      "attributes": { "machine_type": "e2-standard-4", "tenancy": "shared" }
+    },
+    {
+      "service": "PersistentDisk",
+      "region": "us-central1",
+      "purchase_model": "on_demand",
+      "unit": "gb_month",
+      "price_major": 0.04,
+      "attributes": { "disk_type": "pd-standard" }
+    },
+    {
+      "service": "PersistentDisk",
+      "region": "us-central1",
+      "purchase_model": "on_demand",
+      "unit": "gb_month",
+      "price_major": 0.1,
+      "attributes": { "disk_type": "pd-balanced" }
+    },
+    {
+      "service": "CloudSQL",
+      "region": "us-central1",
+      "purchase_model": "on_demand",
+      "unit": "hour",
+      "price_major": 0.082,
+      "attributes": { "tier": "db-custom-2-7680", "engine": "postgres" }
+    },
+    {
+      "service": "CloudSQL",
+      "region": "us-central1",
+      "purchase_model": "on_demand",
+      "unit": "hour",
+      "price_major": 0.041,
+      "attributes": { "tier": "db-custom-1-3840", "engine": "postgres" }
+    },
+    {
+      "service": "CloudNAT",
+      "region": "us-central1",
+      "purchase_model": "on_demand",
+      "unit": "hour",
+      "price_major": 0.044,
+      "attributes": { "resource": "nat_gateway" }
+    },
+    {
+      "service": "ComputeEngine",
+      "region": "us-central1",
+      "purchase_model": "committed_use",
+      "unit": "hour",
+      "price_major": 0.12,
+      "attributes": { "machine_type": "n2-standard-4", "term": "1y" }
+    }
+  ]
+}

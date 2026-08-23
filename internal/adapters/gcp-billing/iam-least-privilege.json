@@ -1,0 +1,9 @@
+{
+  "description": "Least-privilege roles for Cloud Billing export read and Cloud Monitoring metrics (reference only).",
+  "roles": [
+    "roles/bigquery.dataViewer",
+    "roles/bigquery.jobUser",
+    "roles/monitoring.viewer",
+    "roles/cloudbilling.viewer"
+  ]
+}

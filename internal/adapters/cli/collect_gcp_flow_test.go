@@ -37,5 +37,23 @@ func TestOfflineGCPCollectAnalyze(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, res.SnapshotID)
 
-	require.NoError(t, rt.Analyze(context.Background(), ports.AnalyzeOptions{Persist: true}))
+	billingRoot := filepath.Join("..", "..", "..", "testdata", "gcp-billing")
+	_, err = rt.CollectCost(context.Background(), ports.CostCollectOptions{
+		Provider:    types.ProviderGCP,
+		Offline:     true,
+		FixtureRoot: billingRoot,
+		SnapshotID:  res.SnapshotID,
+	})
+	require.NoError(t, err)
+
+	metricsRoot := filepath.Join("..", "..", "..", "testdata", "gcp-metrics")
+	_, err = rt.CollectMetrics(context.Background(), ports.MetricsCollectOptions{
+		Provider:    types.ProviderGCP,
+		Offline:     true,
+		FixtureRoot: metricsRoot,
+		SnapshotID:  res.SnapshotID,
+	})
+	require.NoError(t, err)
+
+	require.NoError(t, rt.Analyze(context.Background(), ports.AnalyzeOptions{Persist: true, SnapshotID: res.SnapshotID}))
 }

@@ -5,8 +5,10 @@ import (
 	"fmt"
 
 	awsmetrics "github.com/kernul-io/cloudopt/internal/adapters/aws-metrics"
+	gcpmetrics "github.com/kernul-io/cloudopt/internal/adapters/gcp-metrics"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
 	"github.com/kernul-io/cloudopt/internal/domain"
+	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
 
 const metricsCollectorSource = "aws-metrics/cloudwatch"
@@ -43,7 +45,7 @@ func (s *MetricsCollectService) Collect(ctx context.Context, opts ports.MetricsC
 	if progress == nil {
 		progress = ports.NopProgress{}
 	}
-	progress.Step("collecting utilization metrics via CloudWatch")
+	progress.Step(metricsProgressLabel(opts))
 	out, err := source.Collect(ctx, opts, snap)
 	if err != nil {
 		return nil, err
@@ -52,7 +54,7 @@ func (s *MetricsCollectService) Collect(ctx context.Context, opts ports.MetricsC
 		Window:      out.Window,
 		Diagnostics: out.Diagnostics,
 		Partial:     out.Partial,
-		Source:      metricsCollectorSource,
+		Source:      metricsSourceLabel(opts),
 	}
 	if err := s.Repo.ReplaceSnapshotMetrics(ctx, snap.ID, out.Series, out.Signals, meta, out.Coverage); err != nil {
 		return nil, fmt.Errorf("persist metrics: %w", err)
@@ -87,12 +89,38 @@ func (s *MetricsCollectService) resolveSource(ctx context.Context, opts ports.Me
 	if s.Source != nil {
 		return s.Source, nil
 	}
-	if opts.Offline {
-		root := opts.FixtureRoot
-		if root == "" {
-			root = "testdata/aws-metrics"
+	switch opts.Provider {
+	case types.ProviderGCP:
+		if opts.Offline {
+			root := opts.FixtureRoot
+			if root == "" {
+				root = "testdata/gcp-metrics"
+			}
+			return gcpmetrics.NewFixtureMetricsSource(root), nil
 		}
-		return awsmetrics.NewFixtureMetricsSource(root), nil
+		return gcpmetrics.NewLiveMetricsSource(ctx, "")
+	default:
+		if opts.Offline {
+			root := opts.FixtureRoot
+			if root == "" {
+				root = "testdata/aws-metrics"
+			}
+			return awsmetrics.NewFixtureMetricsSource(root), nil
+		}
+		return awsmetrics.NewLiveMetricsSource(ctx, opts.RoleARN, opts.ExternalID)
 	}
-	return awsmetrics.NewLiveMetricsSource(ctx, opts.RoleARN, opts.ExternalID)
+}
+
+func metricsProgressLabel(opts ports.MetricsCollectOptions) string {
+	if opts.Provider == types.ProviderGCP {
+		return "collecting utilization metrics via Cloud Monitoring"
+	}
+	return "collecting utilization metrics via CloudWatch"
+}
+
+func metricsSourceLabel(opts ports.MetricsCollectOptions) string {
+	if opts.Provider == types.ProviderGCP {
+		return "gcp-metrics/cloud-monitoring"
+	}
+	return metricsCollectorSource
 }
