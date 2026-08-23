@@ -54,8 +54,10 @@ binary_name() {
 
 curl_download() {
     local bin="$1"
-    curl -s https://api.github.com/repos/kernul-io/cloudopt/releases/latest \
-        | grep "browser_download_url.*${bin}\.tar\.gz" \
+    local data=$(curl -s https://api.github.com/repos/kernul-io/cloudopt/releases/latest)
+    local tag=$(jq -r '.tag_name' <<< "$data")
+    log "Latest release: $tag"
+    grep "browser_download_url.*${bin}\.tar\.gz" <<< "$data" \
         | cut -d : -f 2,3 \
         | tr -d \" \
         | xargs curl -sLo /tmp/cloudopt.tar.gz
@@ -63,8 +65,10 @@ curl_download() {
 
 wget_download() {
     local bin="$1"
-    wget -qO - https://api.github.com/repos/kernul-io/cloudopt/releases/latest \
-        | grep "browser_download_url.*${bin}\.tar\.gz" \
+    local data=$(wget -qO - https://api.github.com/repos/kernul-io/cloudopt/releases/latest)
+    local tag=$(jq -r '.tag_name' <<< "$data")
+    log "Latest release: $tag"
+    grep "browser_download_url.*${bin}\.tar\.gz" <<< "$data" \
         | cut -d : -f 2,3 \
         | tr -d \" \
         | wget -qi - -O /tmp/cloudopt.tar.gz
