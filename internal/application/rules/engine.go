@@ -70,9 +70,6 @@ func (Engine) Analyze(in AnalyzeInput) (*AnalyzeOutput, error) {
 	if in.Snapshot == nil || in.Manifest == nil || in.Registry == nil {
 		return nil, fmt.Errorf("snapshot, manifest, and registry are required")
 	}
-	if !in.Snapshot.IsAnalyzable() {
-		return nil, fmt.Errorf("snapshot %q is not analyzable (status=%s)", in.Snapshot.ID, in.Snapshot.Status)
-	}
 
 	view := NewSnapshotView(in.Snapshot, in.PricingCatalog)
 	prov := domain.Provenance{

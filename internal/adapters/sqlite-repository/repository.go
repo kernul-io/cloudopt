@@ -396,18 +396,6 @@ func (r *Repository) SaveAnalysisRun(ctx context.Context, run *domain.AnalysisRu
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	var snapStatus string
-	err = tx.QueryRowContext(ctx, `SELECT status FROM snapshots WHERE id = ?`, string(run.SnapshotID)).Scan(&snapStatus)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return ErrSnapshotNotFound
-		}
-		return err
-	}
-	if snapStatus != string(domain.SnapshotComplete) {
-		return fmt.Errorf("analysis requires a complete snapshot")
-	}
-
 	var completed *string
 	if run.CompletedAt != nil {
 		s := run.CompletedAt.Canonical()
