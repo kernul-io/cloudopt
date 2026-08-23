@@ -61,6 +61,14 @@ curl_download() {
         | cut -d : -f 2,3 \
         | tr -d \" \
         | xargs curl -sLo /tmp/cloudopt.tar.gz
+
+    grep "browser_download_url.*${bin}_checksums\.txt" <<< "$data" \
+        | cut -d : -f 2,3 \
+        | tr -d \" \
+        | xargs curl -sLo /tmp/cloudopt_checksum.txt
+
+    shasum -cqs -a256 <<< "$(cat /tmp/cloudopt_checksum.txt | cut -d' ' -f1)  /tmp/cloudopt.tar.gz" \
+        || echoexit "Checksum invalid. Try to install again later" 1
 }
 
 wget_download() {
@@ -72,6 +80,14 @@ wget_download() {
         | cut -d : -f 2,3 \
         | tr -d \" \
         | wget -qi - -O /tmp/cloudopt.tar.gz
+
+    grep "browser_download_url.*${bin}_checksums\.txt" <<< "$data" \
+        | cut -d : -f 2,3 \
+        | tr -d \" \
+        | wget -qi - -O /tmp/cloudopt_checksum.txt
+
+    shasum -cqs -a256 <<< "$(cat /tmp/cloudopt_checksum.txt | cut -d' ' -f1)  /tmp/cloudopt.tar.gz" \
+        || echoexit "Checksum invalid. Try to install again later" 1
 }
 
 print_adjust_path() {
