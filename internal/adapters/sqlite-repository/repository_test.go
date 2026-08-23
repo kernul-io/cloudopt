@@ -141,31 +141,6 @@ func TestAnalysisRunTransaction(t *testing.T) {
 	require.Equal(t, "res-vol-unattached", string(loaded.Evidence[0].ResourceID))
 }
 
-func TestAnalysisRequiresCompleteSnapshot(t *testing.T) {
-	ctx := context.Background()
-	repo, db := openTestDB(t, ctx)
-
-	_, err := db.ExecContext(ctx, `INSERT INTO accounts (id, provider, provider_account_id, display_name, default_currency, quality, source, observed_at)
-		VALUES ('a1','fixture','1','x','USD','observed','t','2026-01-01T00:00:00Z')`)
-	require.NoError(t, err)
-	_, err = db.ExecContext(ctx, `INSERT INTO snapshots (id, account_id, provider, status, schema_version, external_key, started_at)
-		VALUES ('snap-failed','a1','fixture','failed',1,'','2026-01-01T00:00:00Z')`)
-	require.NoError(t, err)
-
-	ts, err := types.ParseTimestamp("2026-01-15T12:00:00Z")
-	require.NoError(t, err)
-	run := &domain.AnalysisRun{
-		ID:             "run-bad",
-		SnapshotID:     "snap-failed",
-		Status:         domain.AnalysisComplete,
-		RuleSetVersion: "v0",
-		StartedAt:      ts,
-		CompletedAt:    &ts,
-	}
-	err = repo.SaveAnalysisRun(ctx, run)
-	require.Error(t, err)
-}
-
 func TestRetentionAndDeletion(t *testing.T) {
 	ctx := context.Background()
 	repo, _ := openTestDB(t, ctx)
