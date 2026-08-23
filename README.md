@@ -18,7 +18,7 @@ curl https://raw.githubusercontent.com/kernul-io/cloudopt/main/install/install.s
 
 **Requirements**
 
-- [Go](https://go.dev/dl/) **1.23** or newer
+- [Go](https://go.dev/dl/) **1.25** or newer
 
 **Steps**
 
