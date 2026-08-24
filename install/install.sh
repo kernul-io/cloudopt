@@ -15,6 +15,7 @@ log() {
 
 requirements() {
     command -v tar > /dev/null || echoexit 'No `tar` found locally. Please install it using your package manager' 1
+    command -v sha256sum > /dev/null || echoexit 'No `sha256sum` found locally. Please install it using your package manager' 1
     (command -v curl > /dev/null || command -v wget > /dev/null) || \
         echoexit 'No `curl` or `wget` found locally. Please, install it using your package manager'
 }
@@ -55,7 +56,7 @@ binary_name() {
 curl_download() {
     local bin="$1"
     local data=$(curl -s https://api.github.com/repos/kernul-io/cloudopt/releases/latest)
-    local tag=$(jq -r '.tag_name' <<< "$data")
+    local tag=$(grep '"tag_name":.*".*"' <<< "$data" | cut -d: -f 2 | tr -d \" | tr -d , | tr -d ' ')
     log "Latest release: $tag"
     grep "browser_download_url.*${bin}\.tar\.gz" <<< "$data" \
         | cut -d : -f 2,3 \
@@ -67,14 +68,14 @@ curl_download() {
         | tr -d \" \
         | xargs curl -sLo /tmp/cloudopt_checksum.txt
 
-    shasum -cqs -a256 <<< "$(cat /tmp/cloudopt_checksum.txt | cut -d' ' -f1)  /tmp/cloudopt.tar.gz" \
+    sha256sum -c --status --quiet <<< "$(cat /tmp/cloudopt_checksum.txt | cut -d' ' -f1)  /tmp/cloudopt.tar.gz" \
         || echoexit "Checksum invalid. Try to install again later" 1
 }
 
 wget_download() {
     local bin="$1"
     local data=$(wget -qO - https://api.github.com/repos/kernul-io/cloudopt/releases/latest)
-    local tag=$(jq -r '.tag_name' <<< "$data")
+    local tag=$(grep '"tag_name":.*".*"' <<< "$data" | cut -d: -f 2 | tr -d \" | tr -d , | tr -d ' ')
     log "Latest release: $tag"
     grep "browser_download_url.*${bin}\.tar\.gz" <<< "$data" \
         | cut -d : -f 2,3 \
@@ -86,7 +87,7 @@ wget_download() {
         | tr -d \" \
         | wget -qi - -O /tmp/cloudopt_checksum.txt
 
-    shasum -cqs -a256 <<< "$(cat /tmp/cloudopt_checksum.txt | cut -d' ' -f1)  /tmp/cloudopt.tar.gz" \
+    sha256sum -c --status --quiet <<< "$(cat /tmp/cloudopt_checksum.txt | cut -d' ' -f1)  /tmp/cloudopt.tar.gz" \
         || echoexit "Checksum invalid. Try to install again later" 1
 }
 

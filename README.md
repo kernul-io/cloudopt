@@ -7,11 +7,10 @@
 ### Linux, Mac or Windows (using `git bash`)
 
 ``` bash
-curl https://raw.githubusercontent.com/kernul-io/cloudopt/main/install/install.sh | bash
+curl -fSsL https://cloudopt.kernul.io/install | bash
 ```
 
-### Windows
-
+<!-- ### Windows -->
 <!-- comming soon -->
 
 ## Build from source
