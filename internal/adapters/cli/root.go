@@ -47,6 +47,7 @@ func NewRootCommand(cfg *Config) *cobra.Command {
 	root.AddCommand(newAnalyzeCommand(cfg))
 	root.AddCommand(newReportCommand(cfg))
 	root.AddCommand(newImportFixtureCommand(cfg))
+	root.AddCommand(newCapabilitiesCommand(cfg))
 
 	return root
 }

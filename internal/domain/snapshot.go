@@ -32,6 +32,22 @@ type CollectionSnapshot struct {
 	UtilizationSignals []UtilizationSignal
 	MetricsMeta        *MetricsCollectionMeta
 	Coverage           CollectionCoverage
+	Engagement         *EngagementMeta
+}
+
+// EngagementMeta describes member clouds in a merged multi-provider snapshot.
+type EngagementMeta struct {
+	Name    string
+	Members []EngagementMember
+}
+
+// EngagementMember is one provider account included in a multi-cloud engagement.
+type EngagementMember struct {
+	Provider          types.Provider
+	AccountID         types.AccountID
+	DisplayName       string
+	DefaultCurrency   string
+	SourceExternalKey string
 }
 
 // IsAnalyzable returns true when the snapshot finished successfully with full coverage.

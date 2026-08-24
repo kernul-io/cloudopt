@@ -27,4 +27,5 @@ const (
 	ProviderAzure        Provider = "azure"
 	ProviderDigitalOcean Provider = "digitalocean"
 	ProviderFixture      Provider = "fixture"
+	ProviderMulti        Provider = "multi"
 )

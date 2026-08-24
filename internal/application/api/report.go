@@ -8,7 +8,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kernul-io/cloudopt/internal/application/capabilities"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
+	"github.com/kernul-io/cloudopt/internal/application/pricing"
 	"github.com/kernul-io/cloudopt/internal/application/report"
 	"github.com/kernul-io/cloudopt/internal/application/rules"
 	"github.com/kernul-io/cloudopt/internal/domain"
@@ -35,7 +37,13 @@ func (s *ReportService) Generate(ctx context.Context, settings AnalyzeSettings, 
 		return nil, fmt.Errorf("load snapshot: %w", err)
 	}
 
-	reg := rules.DefaultRegistry(nil)
+	catalog, catErr := LoadPricingCatalog(ctx, "")
+	pricingLoaded := catErr == nil && catalog != nil && !catalog.IsEmpty()
+	if catErr != nil {
+		catalog = pricing.EmptyCatalog()
+		pricingLoaded = false
+	}
+	reg := rules.DefaultRegistry(catalog)
 	manifestPath := settings.RulesManifestPath
 	if manifestPath == "" {
 		manifestPath = os.Getenv("COA_RULES_MANIFEST")
@@ -60,14 +68,17 @@ func (s *ReportService) Generate(ctx context.Context, settings AnalyzeSettings, 
 
 	engine := rules.Engine{}
 	out, err := engine.Analyze(rules.AnalyzeInput{
-		Snapshot:     snap,
-		Manifest:     manifest,
-		Registry:     reg,
-		Suppressions: suppIndex,
+		Snapshot:       snap,
+		Manifest:       manifest,
+		Registry:       reg,
+		Suppressions:   suppIndex,
+		PricingCatalog: catalog,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("rule execution summary: %w", err)
 	}
+
+	manifests, _ := capabilities.AllProviderManifests()
 
 	meta, err := report.LoadMetadata(settings.ConfigDir)
 	if err != nil {
@@ -75,13 +86,15 @@ func (s *ReportService) Generate(ctx context.Context, settings AnalyzeSettings, 
 	}
 
 	doc, err := report.Build(report.BuildInput{
-		AnalyzerVersion: opts.AnalyzerVersion,
-		GeneratedAt:     time.Now().UTC(),
-		Metadata:        meta,
-		Snapshot:        snap,
-		Run:             run,
-		Executions:      out.Executions,
-		Redact:          opts.RedactIdentifiers,
+		AnalyzerVersion:   opts.AnalyzerVersion,
+		GeneratedAt:       time.Now().UTC(),
+		Metadata:          meta,
+		Snapshot:          snap,
+		Run:               run,
+		Executions:        out.Executions,
+		Redact:            opts.RedactIdentifiers,
+		PricingLoaded:     pricingLoaded,
+		ProviderManifests: manifests,
 	})
 	if err != nil {
 		return nil, err

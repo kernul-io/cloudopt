@@ -3,7 +3,7 @@ package report
 import "time"
 
 // SchemaVersion is the JSON/HTML report export contract version.
-const SchemaVersion = "1.0.0"
+const SchemaVersion = "1.1.0"
 
 // ValueKind classifies how a number or statement should be interpreted.
 type ValueKind string
@@ -17,17 +17,20 @@ const (
 
 // Document is the versioned consultant report payload (independent of persistence types).
 type Document struct {
-	SchemaVersion string           `json:"schema_version"`
-	GeneratedAt   time.Time        `json:"generated_at"`
-	Analyzer      AnalyzerMeta     `json:"analyzer"`
-	Customer      CustomerMeta     `json:"customer"`
-	Scope         ScopeSection     `json:"scope"`
-	Executive     ExecutiveSummary `json:"executive_summary"`
-	Costs         CostSection      `json:"costs"`
-	Savings       SavingsSection   `json:"potential_savings"`
-	Findings      []FindingEntry   `json:"findings"`
-	Appendix      Appendix         `json:"appendix"`
-	Disclaimer    string           `json:"disclaimer"`
+	SchemaVersion string             `json:"schema_version"`
+	GeneratedAt   time.Time          `json:"generated_at"`
+	Analyzer      AnalyzerMeta       `json:"analyzer"`
+	Customer      CustomerMeta       `json:"customer"`
+	Scope         ScopeSection       `json:"scope"`
+	Executive     ExecutiveSummary   `json:"executive_summary"`
+	Costs         CostSection        `json:"costs"`
+	Savings       SavingsSection     `json:"potential_savings"`
+	Findings      []FindingEntry     `json:"findings"`
+	Capabilities  *CapabilitySection `json:"capabilities,omitempty"`
+	Coverage      *CoverageSection   `json:"coverage,omitempty"`
+	Portfolio     *PortfolioSection  `json:"portfolio,omitempty"`
+	Appendix      Appendix           `json:"appendix"`
+	Disclaimer    string             `json:"disclaimer"`
 }
 
 type AnalyzerMeta struct {
@@ -178,4 +181,39 @@ type RuleOutcome struct {
 	RuleID  string `json:"rule_id"`
 	Status  string `json:"status"`
 	Message string `json:"message,omitempty"`
+}
+
+// CapabilitySection embeds the cross-provider matrix relevant to report scope.
+type CapabilitySection struct {
+	SchemaVersion string                `json:"schema_version"`
+	Providers     []string              `json:"providers"`
+	Rows          []CapabilityMatrixRow `json:"rows"`
+	Advertised    []string              `json:"advertised_providers,omitempty"`
+}
+
+type CapabilityMatrixRow struct {
+	Dimension   string            `json:"dimension"`
+	Capability  string            `json:"capability"`
+	Description string            `json:"description,omitempty"`
+	ByProvider  map[string]string `json:"by_provider"`
+}
+
+// CoverageSection reports completeness scores for the analyzed snapshot.
+type CoverageSection struct {
+	InventoryAttribution float64  `json:"inventory_attribution"`
+	CostAttribution      float64  `json:"cost_attribution"`
+	MetricsCoverage      float64  `json:"metrics_coverage"`
+	PricingFreshness     float64  `json:"pricing_freshness"`
+	EvaluableSpend       float64  `json:"evaluable_spend"`
+	Notes                []string `json:"notes,omitempty"`
+}
+
+// PortfolioSection summarizes spend and inventory by provider, category, owner, and project tag.
+type PortfolioSection struct {
+	Note            string           `json:"note"`
+	SpendByProvider map[string]int64 `json:"spend_by_provider_minor,omitempty"`
+	SpendByCategory map[string]int64 `json:"spend_by_category_minor,omitempty"`
+	SpendByOwner    map[string]int64 `json:"spend_by_owner_minor,omitempty"`
+	SpendByProject  map[string]int64 `json:"spend_by_project_minor,omitempty"`
+	ResourcesByProv map[string]int   `json:"resource_count_by_provider,omitempty"`
 }

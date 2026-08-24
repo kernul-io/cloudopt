@@ -59,21 +59,36 @@ type InventoryPreflight struct {
 
 // CapabilityManifest describes supported inventory signals for a provider adapter.
 type CapabilityManifest struct {
-	Provider        types.Provider
-	Schema          string
-	Inventory       []CapabilityEntry
-	Billing         []CapabilityEntry
-	Metrics         []CapabilityEntry
-	Pricing         []CapabilityEntry
-	SupportedChecks []string
+	Provider         types.Provider
+	Schema           string
+	Advertised       bool
+	Inventory        []CapabilityEntry
+	Billing          []CapabilityEntry
+	Metrics          []CapabilityEntry
+	Pricing          []CapabilityEntry
+	SupportedChecks  []string
+	CommitmentModels []string
+	KnownLimitations []string
 }
+
+// CapabilityAvailability distinguishes why a capability is not usable.
+type CapabilityAvailability string
+
+const (
+	CapabilitySupported        CapabilityAvailability = "supported"
+	CapabilityUnsupported      CapabilityAvailability = "unsupported"
+	CapabilityPermissionDenied CapabilityAvailability = "permission_denied"
+	CapabilityCollectionFailed CapabilityAvailability = "collection_failed"
+	CapabilityDataAbsent       CapabilityAvailability = "data_absent"
+)
 
 // CapabilityEntry is one named capability with availability metadata.
 type CapabilityEntry struct {
-	ID          string
-	Description string
-	Available   bool
-	APIActions  []string
+	ID           string
+	Description  string
+	Available    bool
+	Availability CapabilityAvailability
+	APIActions   []string
 }
 
 // InventoryCollector performs read-only inventory collection for one provider.

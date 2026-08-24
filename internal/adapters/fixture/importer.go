@@ -97,12 +97,21 @@ func (im *Importer) Import(ctx context.Context, path string) (types.SnapshotID, 
 	if err != nil {
 		return "", fmt.Errorf("read fixture: %w", err)
 	}
+	var header struct {
+		FormatVersion int `yaml:"format_version"`
+	}
+	if err := yaml.Unmarshal(data, &header); err != nil {
+		return "", fmt.Errorf("parse fixture: %w", err)
+	}
+	if header.FormatVersion == 2 {
+		return im.ImportEngagement(ctx, path)
+	}
+	if header.FormatVersion != 1 {
+		return "", fmt.Errorf("unsupported format_version %d", header.FormatVersion)
+	}
 	var doc fixtureFile
 	if err := yaml.Unmarshal(data, &doc); err != nil {
 		return "", fmt.Errorf("parse fixture: %w", err)
-	}
-	if doc.FormatVersion != 1 {
-		return "", fmt.Errorf("unsupported format_version %d", doc.FormatVersion)
 	}
 
 	observed, err := types.ParseTimestamp(defaultString(doc.ObservedAt, time.Now().UTC().Format(time.RFC3339Nano)))

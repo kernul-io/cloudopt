@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kernul-io/cloudopt/internal/application/capabilities"
+	"github.com/kernul-io/cloudopt/internal/application/ports"
 	"github.com/kernul-io/cloudopt/internal/application/pricing"
 	"github.com/kernul-io/cloudopt/internal/application/savings"
 	"github.com/kernul-io/cloudopt/internal/domain"
@@ -72,7 +74,8 @@ func (Engine) Analyze(in AnalyzeInput) (*AnalyzeOutput, error) {
 	}
 
 	view := NewSnapshotView(in.Snapshot, in.PricingCatalog)
-	prov := domain.Provenance{
+	snapProviders := capabilities.MemberProviders(in.Snapshot)
+	provenance := domain.Provenance{
 		Quality:    domain.QualityDerived,
 		Source:     "rule-engine",
 		ObservedAt: view.ObservedAt(),
@@ -98,6 +101,20 @@ func (Engine) Analyze(in AnalyzeInput) (*AnalyzeOutput, error) {
 		}
 
 		exec := RuleExecution{RuleID: rule.ID}
+		if len(rule.Providers) > 0 && !ruleAppliesToProviders(rule.Providers, snapProviders) {
+			exec.Status = RuleNotEvaluated
+			exec.Message = capabilities.RuleSkipReason(rule.Providers, rule.RequiredCapabilities, snapProviders, ports.CapabilityManifest{}, nil)
+			summary.NotEvaluated++
+			executions = append(executions, exec)
+			continue
+		}
+		if msg := missingRuleCapabilities(rule, snapProviders); msg != "" {
+			exec.Status = RuleNotEvaluated
+			exec.Message = msg
+			summary.NotEvaluated++
+			executions = append(executions, exec)
+			continue
+		}
 		missing := view.MissingSignals(rule.RequiredSignals)
 		if len(missing) > 0 {
 			exec.Status = RuleNotEvaluated
@@ -145,7 +162,7 @@ func (Engine) Analyze(in AnalyzeInput) (*AnalyzeOutput, error) {
 					ResourceID: draft.ResourceID,
 					Summary:    draft.Summary,
 					Detail:     draft.Detail,
-					Provenance: prov,
+					Provenance: provenance,
 				}
 				allEvidence = append(allEvidence, e)
 				evidenceIDs = append(evidenceIDs, nextEvidenceID)
@@ -169,7 +186,7 @@ func (Engine) Analyze(in AnalyzeInput) (*AnalyzeOutput, error) {
 				EvidenceIDs: evidenceIDs,
 				Assumptions: cand.Assumptions,
 				Confidence:  conf,
-				Provenance:  prov,
+				Provenance:  provenance,
 			}
 			ruleFindings = append(ruleFindings, f)
 			allFindings = append(allFindings, f)
@@ -181,7 +198,7 @@ func (Engine) Analyze(in AnalyzeInput) (*AnalyzeOutput, error) {
 					Summary:    strings.TrimSpace(rule.Remediation),
 					Steps:      remediationSteps(rule.Remediation),
 					RiskLevel:  "medium",
-					Provenance: prov,
+					Provenance: provenance,
 				}
 				if rec.Summary == "" && cand.Savings != nil {
 					rec.Summary = "Review utilization evidence and apply rightsizing during a maintenance window."
@@ -305,4 +322,45 @@ func NewAnalysisRunID() (types.AnalysisRunID, error) {
 func CompletedAt(start types.Timestamp) *types.Timestamp {
 	now := types.NewTimestamp(time.Now().UTC())
 	return &now
+}
+
+func ruleAppliesToProviders(ruleProviders []string, snapProviders []types.Provider) bool {
+	if len(ruleProviders) == 0 {
+		return true
+	}
+	set := make(map[string]struct{}, len(snapProviders)+1)
+	for _, p := range snapProviders {
+		set[string(p)] = struct{}{}
+		if p == types.ProviderFixture {
+			set[string(types.ProviderAWS)] = struct{}{}
+		}
+	}
+	for _, r := range ruleProviders {
+		if _, ok := set[r]; ok {
+			return true
+		}
+	}
+	return false
+}
+
+func missingRuleCapabilities(rule RuleSpec, snapProviders []types.Provider) string {
+	if len(rule.RequiredCapabilities) == 0 {
+		return ""
+	}
+	for _, p := range snapProviders {
+		check := p
+		if p == types.ProviderFixture {
+			check = types.ProviderAWS
+		}
+		man, err := capabilities.ManifestForProvider(check)
+		if err != nil {
+			return fmt.Sprintf("capability manifest unavailable for provider %s", p)
+		}
+		for _, ref := range rule.RequiredCapabilities {
+			if !capabilities.ProviderSupports(man, ref) {
+				return fmt.Sprintf("missing capability %q for provider %s", ref, p)
+			}
+		}
+	}
+	return ""
 }

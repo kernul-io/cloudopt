@@ -15,17 +15,19 @@ type Manifest struct {
 
 // RuleSpec configures a registered evaluator (no arbitrary code execution).
 type RuleSpec struct {
-	ID              string            `yaml:"id"`
-	Version         string            `yaml:"version"`
-	Title           string            `yaml:"title"`
-	Category        string            `yaml:"category"`
-	Severity        string            `yaml:"severity"`
-	Evaluator       string            `yaml:"evaluator"`
-	Enabled         bool              `yaml:"enabled"`
-	Applicability   ApplicabilitySpec `yaml:"applicability"`
-	Thresholds      map[string]string `yaml:"thresholds"`
-	RequiredSignals []string          `yaml:"required_signals"`
-	Remediation     string            `yaml:"remediation"`
+	ID                   string            `yaml:"id"`
+	Version              string            `yaml:"version"`
+	Title                string            `yaml:"title"`
+	Category             string            `yaml:"category"`
+	Severity             string            `yaml:"severity"`
+	Evaluator            string            `yaml:"evaluator"`
+	Enabled              bool              `yaml:"enabled"`
+	Applicability        ApplicabilitySpec `yaml:"applicability"`
+	Thresholds           map[string]string `yaml:"thresholds"`
+	RequiredSignals      []string          `yaml:"required_signals"`
+	RequiredCapabilities []string          `yaml:"required_capabilities"`
+	Providers            []string          `yaml:"providers"`
+	Remediation          string            `yaml:"remediation"`
 }
 
 // ApplicabilitySpec limits which resources a rule considers.

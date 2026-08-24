@@ -79,6 +79,39 @@ func RenderHTML(doc *Document) (string, error) {
 	}
 	b.WriteString("</section>\n")
 
+	if doc.Capabilities != nil && len(doc.Capabilities.Rows) > 0 {
+		b.WriteString("<section><h2>Provider capabilities</h2><p><em>Matrix for providers in scope; unsupported differs from permission denied or absent data.</em></p><table><thead><tr><th>Dimension</th><th>Capability</th>")
+		for _, p := range doc.Capabilities.Providers {
+			b.WriteString("<th>")
+			b.WriteString(html.EscapeString(p))
+			b.WriteString("</th>")
+		}
+		b.WriteString("</tr></thead><tbody>")
+		for _, row := range doc.Capabilities.Rows {
+			b.WriteString("<tr><td>")
+			b.WriteString(html.EscapeString(row.Dimension))
+			b.WriteString("</td><td>")
+			b.WriteString(html.EscapeString(row.Capability))
+			b.WriteString("</td>")
+			for _, p := range doc.Capabilities.Providers {
+				b.WriteString("<td>")
+				b.WriteString(html.EscapeString(row.ByProvider[p]))
+				b.WriteString("</td>")
+			}
+			b.WriteString("</tr>")
+		}
+		b.WriteString("</tbody></table></section>\n")
+	}
+
+	if doc.Coverage != nil {
+		b.WriteString("<section><h2>Data coverage</h2><ul>")
+		fmt.Fprintf(&b, "<li>Inventory attribution: %.0f%%</li>", doc.Coverage.InventoryAttribution*100)
+		fmt.Fprintf(&b, "<li>Cost attribution: %.0f%%</li>", doc.Coverage.CostAttribution*100)
+		fmt.Fprintf(&b, "<li>Metrics coverage: %.0f%%</li>", doc.Coverage.MetricsCoverage*100)
+		fmt.Fprintf(&b, "<li>Pricing freshness: %.0f%%</li>", doc.Coverage.PricingFreshness*100)
+		b.WriteString("</ul></section>\n")
+	}
+
 	b.WriteString("<section><h2>Cost summary</h2><p><em>")
 	b.WriteString(html.EscapeString(string(doc.Costs.Kind)))
 	b.WriteString(" — ")

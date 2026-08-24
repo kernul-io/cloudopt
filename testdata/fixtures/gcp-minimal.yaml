@@ -1,0 +1,58 @@
+format_version: 1
+external_key: gcp-minimal-demo
+observed_at: "2026-01-15T12:00:00Z"
+source: testdata/fixtures/gcp-minimal.yaml
+
+account:
+  id: acct-gcp-minimal
+  provider: gcp
+  provider_account_id: app-workloads-demo
+  display_name: GCP Demo Project
+  default_currency: EUR
+
+regions:
+  - id: reg-uc1
+    provider_region_id: us-central1
+    display_name: us-central1
+
+resources:
+  - id: res-gce-1
+    kind: compute_instance
+    region_id: reg-uc1
+    provider_resource_id: gce-instance-1
+    name: api-server
+    state: RUNNING
+    tags:
+      Owner: api-team
+      Project: billing-core
+    attributes:
+      gcp_project: app-workloads-demo
+      gcp_self_link: https://compute.googleapis.com/compute/v1/projects/app-workloads-demo/zones/us-central1-a/instances/api-server
+      machine_type: n2-standard-4
+  - id: res-pd-unattached
+    kind: block_volume
+    region_id: reg-uc1
+    provider_resource_id: disk-unattached
+    name: orphan-disk
+    state: READY
+    attributes:
+      gcp_project: app-workloads-demo
+      disk_type: pd-standard
+
+costs:
+  - resource_id: res-gce-1
+    service: Compute Engine
+    amount_major: 120.00
+    currency: EUR
+    granularity: monthly
+    period_start: "2026-01-01T00:00:00Z"
+    period_end: "2026-02-01T00:00:00Z"
+
+metrics:
+  - resource_id: res-gce-1
+    name: CPUUtilization
+    statistic: Average
+    points:
+      - timestamp: "2026-01-14T18:00:00Z"
+        value: 8.0
+        unit: Percent

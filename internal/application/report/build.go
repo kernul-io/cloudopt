@@ -6,6 +6,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kernul-io/cloudopt/internal/application/capabilities"
+	"github.com/kernul-io/cloudopt/internal/application/engagement"
+	"github.com/kernul-io/cloudopt/internal/application/ports"
 	"github.com/kernul-io/cloudopt/internal/application/rules"
 	"github.com/kernul-io/cloudopt/internal/domain"
 	"github.com/kernul-io/cloudopt/internal/domain/types"
@@ -13,14 +16,16 @@ import (
 
 // BuildInput aggregates persisted analysis output and rule execution details.
 type BuildInput struct {
-	AnalyzerVersion string
-	GeneratedAt     time.Time
-	Metadata        Metadata
-	Snapshot        *domain.CollectionSnapshot
-	Run             *domain.AnalysisRun
-	Executions      []rules.RuleExecution
-	RuleTitles      map[string]string
-	Redact          bool
+	AnalyzerVersion   string
+	GeneratedAt       time.Time
+	Metadata          Metadata
+	Snapshot          *domain.CollectionSnapshot
+	Run               *domain.AnalysisRun
+	Executions        []rules.RuleExecution
+	RuleTitles        map[string]string
+	Redact            bool
+	PricingLoaded     bool
+	ProviderManifests []ports.CapabilityManifest `json:"-"`
 }
 
 // Build constructs a consultant report document from analysis artifacts.
@@ -48,6 +53,9 @@ func Build(in BuildInput) (*Document, error) {
 
 	findings := buildFindings(in.Run.Findings, evidenceByID, recByFinding, in.Snapshot, aliases)
 	appendix := buildAppendix(in.Executions, in.Snapshot, aliases)
+	capSection := buildCapabilitySection(in.Snapshot, in.ProviderManifests)
+	covSection := buildCoverageSection(in.Snapshot, in.PricingLoaded)
+	portfolio := buildPortfolioSection(in.Snapshot)
 
 	summary := rules.Summary{}
 	for _, ex := range in.Executions {
@@ -99,11 +107,14 @@ func Build(in BuildInput) (*Document, error) {
 				in.Run.SnapshotID,
 			),
 		},
-		Costs:      costs,
-		Savings:    savings,
-		Findings:   findings,
-		Appendix:   appendix,
-		Disclaimer: disclaimerText,
+		Costs:        costs,
+		Savings:      savings,
+		Findings:     findings,
+		Capabilities: capSection,
+		Coverage:     covSection,
+		Portfolio:    portfolio,
+		Appendix:     appendix,
+		Disclaimer:   disclaimerText,
 	}
 	doc.Scope.DataQualityNotes = warnings
 	return doc, nil
@@ -111,7 +122,12 @@ func Build(in BuildInput) (*Document, error) {
 
 func buildScope(snap *domain.CollectionSnapshot, aliases *AliasMap) (ScopeSection, []string) {
 	var warnings []string
-	providers := []string{string(snap.Provider)}
+	memberProviders := capabilities.MemberProviders(snap)
+	providers := make([]string, 0, len(memberProviders))
+	for _, p := range memberProviders {
+		providers = append(providers, string(p))
+	}
+	sort.Strings(providers)
 	regions := make([]string, 0, len(snap.Regions))
 	for _, r := range snap.Regions {
 		label := r.DisplayName
@@ -172,20 +188,98 @@ func buildScope(snap *domain.CollectionSnapshot, aliases *AliasMap) (ScopeSectio
 		acctName = aliases.AccountAlias
 	}
 
+	var accounts []AccountScope
+	if snap.Engagement != nil && len(snap.Engagement.Members) > 0 {
+		for _, m := range snap.Engagement.Members {
+			name := m.DisplayName
+			if aliases.RedactEnabled {
+				name = aliases.AccountAlias
+			}
+			accounts = append(accounts, AccountScope{
+				DisplayName: name,
+				Alias:       aliases.AccountAlias,
+				Provider:    string(m.Provider),
+			})
+		}
+	} else {
+		accounts = []AccountScope{{
+			DisplayName: acctName,
+			Alias:       aliases.AccountAlias,
+			Provider:    string(snap.Provider),
+		}}
+	}
+
 	return ScopeSection{
 		Providers:        providers,
 		Regions:          regions,
 		ResourceCount:    len(snap.Resources),
 		ObservationStart: obsStart.Canonical(),
 		ObservationEnd:   obsEnd.Canonical(),
-		Accounts: []AccountScope{{
-			DisplayName: acctName,
-			Alias:       aliases.AccountAlias,
-			Provider:    string(snap.Provider),
-		}},
+		Accounts:         accounts,
 	}, warnings
 }
 
+func buildCapabilitySection(snap *domain.CollectionSnapshot, manifests []ports.CapabilityManifest) *CapabilitySection {
+	if len(manifests) == 0 {
+		all, err := capabilities.AllProviderManifests()
+		if err != nil {
+			return nil
+		}
+		manifests = all
+	}
+	scope := capabilities.MemberProviders(snap)
+	matrix := capabilities.MatrixForScope(manifests, scope)
+	if matrix == nil || len(matrix.Rows) == 0 {
+		return nil
+	}
+	sec := &CapabilitySection{
+		SchemaVersion: matrix.SchemaVersion,
+		Providers:     matrix.Providers,
+		Advertised:    stringifyProviders(capabilities.AdvertisedProviders(manifests)),
+	}
+	for _, row := range matrix.Rows {
+		sec.Rows = append(sec.Rows, CapabilityMatrixRow{
+			Dimension:   row.Dimension,
+			Capability:  row.Capability,
+			Description: row.Description,
+			ByProvider:  row.ByProvider,
+		})
+	}
+	return sec
+}
+
+func buildCoverageSection(snap *domain.CollectionSnapshot, pricingLoaded bool) *CoverageSection {
+	scores := capabilities.ScoreCoverage(snap, pricingLoaded)
+	return &CoverageSection{
+		InventoryAttribution: scores.InventoryAttribution,
+		CostAttribution:      scores.CostAttribution,
+		MetricsCoverage:      scores.MetricsCoverage,
+		PricingFreshness:     scores.PricingFreshness,
+		EvaluableSpend:       scores.EvaluableSpend,
+		Notes:                scores.Notes,
+	}
+}
+
+func buildPortfolioSection(snap *domain.CollectionSnapshot) *PortfolioSection {
+	p := engagement.BuildPortfolio(snap)
+	return &PortfolioSection{
+		Note:            "Totals preserve original currency; keys are grouped as dimension:currency without FX conversion.",
+		SpendByProvider: p.ByProvider,
+		SpendByCategory: p.ByCategory,
+		SpendByOwner:    p.ByOwner,
+		SpendByProject:  p.ByProjectTag,
+		ResourcesByProv: p.ResourceByProv,
+	}
+}
+
+func stringifyProviders(in []types.Provider) []string {
+	out := make([]string, 0, len(in))
+	for _, p := range in {
+		out = append(out, string(p))
+	}
+	sort.Strings(out)
+	return out
+}
 func buildCosts(snap *domain.CollectionSnapshot) CostSection {
 	totals := map[string]int64{}
 	byService := map[string]int64{}

@@ -89,6 +89,11 @@ rules:
     required_signals:
       - metrics
       - pricing
+    providers:
+      - aws
+    required_capabilities:
+      - metrics.cloudwatch_ec2
+      - pricing.offline_catalog_fixture
     remediation: |
       Validate memory and disk performance, then resize to the recommended instance type during a maintenance window.
 
@@ -107,6 +112,11 @@ rules:
     required_signals:
       - metrics
       - pricing
+    providers:
+      - aws
+    required_capabilities:
+      - metrics.cloudwatch_ec2
+      - pricing.offline_catalog_fixture
     remediation: |
       Confirm the workload is decommissioned, then stop or terminate the instance and release unused elastic IPs.
 
@@ -124,6 +134,10 @@ rules:
     required_signals:
       - resources
       - pricing
+    providers:
+      - aws
+    required_capabilities:
+      - pricing.offline_catalog_fixture
     remediation: |
       Modify volume type to gp3 after confirming baseline IOPS and throughput requirements.
 
@@ -143,6 +157,11 @@ rules:
     required_signals:
       - metrics
       - pricing
+    providers:
+      - aws
+    required_capabilities:
+      - metrics.cloudwatch_rds
+      - pricing.offline_catalog_fixture
     remediation: |
       Validate memory and connection limits, then modify the DB instance class during a maintenance window.
 
@@ -161,6 +180,11 @@ rules:
     required_signals:
       - metrics
       - pricing
+    providers:
+      - aws
+    required_capabilities:
+      - metrics.cloudwatch_nat
+      - pricing.offline_catalog_fixture
     remediation: |
       Review whether VPC endpoints or consolidated egress can reduce NAT dependency before changing network topology.
 
@@ -181,6 +205,11 @@ rules:
     required_signals:
       - metrics
       - pricing
+    providers:
+      - gcp
+    required_capabilities:
+      - metrics.cloud_monitoring_timeseries
+      - pricing.cloud_billing_catalog
     remediation: |
       Validate memory, disk, and licensing constraints, then change machine type during a maintenance window.
 
@@ -197,6 +226,8 @@ rules:
     thresholds: {}
     required_signals:
       - resources
+    providers:
+      - gcp
     remediation: |
       Release unused static external IPs or attach them to active resources.
 
@@ -214,6 +245,10 @@ rules:
     required_signals:
       - resources
       - pricing
+    providers:
+      - gcp
+    required_capabilities:
+      - pricing.cloud_billing_catalog
     remediation: |
       Migrate attached pd-standard disks to pd-balanced after confirming IO requirements.
 
@@ -233,6 +268,11 @@ rules:
     required_signals:
       - metrics
       - pricing
+    providers:
+      - gcp
+    required_capabilities:
+      - metrics.cloud_monitoring_timeseries
+      - pricing.cloud_billing_catalog
     remediation: |
       Validate connections and memory, then reduce Cloud SQL tier during maintenance.
 
@@ -251,6 +291,11 @@ rules:
     required_signals:
       - metrics
       - pricing
+    providers:
+      - gcp
+    required_capabilities:
+      - metrics.cloud_monitoring_timeseries
+      - pricing.cloud_billing_catalog
     remediation: |
       Review VPC Service Controls and Private Google Access before removing Cloud NAT.
 
@@ -268,5 +313,7 @@ rules:
       min_eligible_spend_minor: "5000"
     required_signals:
       - costs
+    providers:
+      - gcp
     remediation: |
       Model 1- or 3-year committed use discounts only after stabilizing baseline compute usage; commitments reduce flexibility.

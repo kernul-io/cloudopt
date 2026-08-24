@@ -1,0 +1,10 @@
+format_version: 2
+external_key: multicloud-demo-v1
+observed_at: "2026-01-15T12:00:00Z"
+source: testdata/fixtures/multicloud-engagement.yaml
+
+engagement:
+  name: Multi-cloud offline demo
+  members:
+    - path: aws-minimal.yaml
+    - path: gcp-minimal.yaml
