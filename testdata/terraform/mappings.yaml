@@ -1,0 +1,4 @@
+mappings:
+  - resource_id: res-renamed
+    terraform_address: aws_instance.legacy_name
+    note: explicit mapping after resource rename in AWS console

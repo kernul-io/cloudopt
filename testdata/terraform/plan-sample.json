@@ -1,0 +1,33 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.9.0",
+  "resource_changes": [
+    {
+      "address": "aws_nat_gateway.egress",
+      "type": "aws_nat_gateway",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {"subnet_id": "subnet-abc"}
+      }
+    },
+    {
+      "address": "aws_instance.app",
+      "type": "aws_instance",
+      "change": {
+        "actions": ["update"],
+        "before": {"instance_type": "t3.small"},
+        "after": {"instance_type": "m5.xlarge"}
+      }
+    },
+    {
+      "address": "aws_ebs_volume.orphan",
+      "type": "aws_ebs_volume",
+      "change": {
+        "actions": ["delete"],
+        "before": {"size": 250},
+        "after": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "format_version": "1.0",
+  "terraform_version": "1.9.0",
+  "values": {
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_instance.app",
+          "mode": "managed",
+          "type": "aws_instance",
+          "name": "app",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "values": {
+            "id": "i-0running01",
+            "instance_type": "m5.large",
+            "tags": {"Name": "app-server-1", "Owner": "platform-team", "Project": "checkout"}
+          },
+          "source_range": {"filename": "main.tf"}
+        },
+        {
+          "address": "aws_ebs_volume.orphan",
+          "mode": "managed",
+          "type": "aws_ebs_volume",
+          "name": "orphan",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "values": {
+            "id": "vol-orphan01",
+            "size": 250
+          }
+        },
+        {
+          "address": "aws_instance.ambiguous_a",
+          "mode": "managed",
+          "type": "aws_instance",
+          "name": "ambiguous_a",
+          "provider_name": "registry.terraform.io/hashicorp/aws:alias.prod",
+          "values": {
+            "id": "i-dup999",
+            "tags": {"Owner": "team-a", "Project": "shared"}
+          }
+        },
+        {
+          "address": "aws_instance.ambiguous_b",
+          "mode": "managed",
+          "type": "aws_instance",
+          "name": "ambiguous_b",
+          "provider_name": "registry.terraform.io/hashicorp/aws:alias.prod",
+          "values": {
+            "id": "i-dup999",
+            "tags": {"Owner": "team-b", "Project": "shared"}
+          }
+        }
+      ],
+      "child_modules": [
+        {
+          "resources": [
+            {
+              "address": "module.network.aws_vpc.main",
+              "mode": "managed",
+              "type": "aws_vpc",
+              "name": "main",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "values": {"id": "vpc-module01", "tags": {"Name": "module-vpc"}}
+            },
+            {
+              "address": "module.app.aws_instance.web[\"prod\"]",
+              "mode": "managed",
+              "type": "aws_instance",
+              "name": "web",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "values": {
+                "id": "i-foreach01",
+                "instance_type": "t3.small",
+                "tags": {"Name": "web-prod", "Environment": "prod"}
+              }
+            },
+            {
+              "address": "module.app.aws_instance.worker[0]",
+              "mode": "managed",
+              "type": "aws_instance",
+              "name": "worker",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "values": {"id": "i-count01", "instance_type": "t3.micro"}
+            }
+          ],
+          "child_modules": []
+        }
+      ]
+    }
+  }
+}

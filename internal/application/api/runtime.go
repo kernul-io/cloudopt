@@ -22,6 +22,7 @@ type Runtime struct {
 	lastCostCollect    *CostCollectResult
 	lastMetricsCollect *MetricsCollectResult
 	lastReconcile      *ReconcileCostResult
+	lastTerraform      *TerraformCorrelateResult
 	AnalyzerVersion    string
 }
 
