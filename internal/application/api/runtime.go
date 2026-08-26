@@ -63,12 +63,12 @@ func (r *Runtime) Init(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("initialize storage: %w", err)
 	}
-
 	if err := db.Close(); err != nil {
 		return fmt.Errorf("close storage: %w", err)
 	}
 
-	return nil
+	ws := &WorkspaceService{Settings: r.Settings}
+	return ws.SecureWorkspacePermissions()
 }
 
 func (r *Runtime) Analyze(ctx context.Context, opts ports.AnalyzeOptions) error {

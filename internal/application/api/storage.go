@@ -8,6 +8,7 @@ import (
 	"github.com/kernul-io/cloudopt/internal/adapters/config"
 	sqliterepository "github.com/kernul-io/cloudopt/internal/adapters/sqlite-repository"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
+	"github.com/kernul-io/cloudopt/internal/application/security"
 )
 
 const dbFileName = "cloudopt.db"
@@ -23,6 +24,12 @@ func OpenStorage(ctx context.Context, settings config.Settings) (ports.StorageRe
 	if err := repo.Migrate(ctx); err != nil {
 		_ = db.Close()
 		return nil, fmt.Errorf("migrate storage: %w", err)
+	}
+	canonical, _ := repo.CanonicalSchemaVersion(ctx)
+	migration, _ := repo.SchemaVersion(ctx)
+	if err := security.CheckDatabaseCompatibility(canonical, migration); err != nil {
+		_ = db.Close()
+		return nil, err
 	}
 	return repo, nil
 }

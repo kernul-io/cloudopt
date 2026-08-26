@@ -177,9 +177,13 @@ func (c *Collector) Collect(ctx context.Context, opts ports.CollectOptions, prog
 		status = domain.SnapshotPartial
 	}
 	completed := types.NowUTC()
-	snapID, err := newSnapshotID()
-	if err != nil {
-		return nil, err
+	snapID := opts.SnapshotID
+	if snapID == "" {
+		var err error
+		snapID, err = newSnapshotID()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	snap := &domain.CollectionSnapshot{

@@ -23,6 +23,10 @@ type CollectOptions struct {
 	MaxConcurrent int
 	Progress      ProgressReporter `json:"-"`
 
+	// SnapshotID optionally preallocates/resumes an in-progress collection shell.
+	SnapshotID types.SnapshotID
+	Resume     bool
+
 	// GCP scope (Application Default Credentials; no secrets stored).
 	OrganizationID            string
 	FolderID                  string

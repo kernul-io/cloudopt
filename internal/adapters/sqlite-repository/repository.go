@@ -102,6 +102,43 @@ func (r *Repository) SaveSnapshot(ctx context.Context, snap *domain.CollectionSn
 	return tx.Commit()
 }
 
+func (r *Repository) SaveInProgressSnapshot(ctx context.Context, snap *domain.CollectionSnapshot) error {
+	if snap == nil {
+		return fmt.Errorf("snapshot is nil")
+	}
+	if snap.Status != domain.SnapshotInProgress {
+		return fmt.Errorf("SaveInProgressSnapshot requires in_progress status")
+	}
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	acc := snap.Account
+	if acc.ID == "" {
+		acc = domain.Account{
+			ID:                snap.AccountID,
+			Provider:          snap.Provider,
+			ProviderAccountID: "pending",
+			DisplayName:       "collection in progress",
+			DefaultCurrency:   "USD",
+			Provenance: domain.Provenance{
+				Quality:    domain.QualityDerived,
+				Source:     "collect-lifecycle",
+				ObservedAt: snap.StartedAt,
+			},
+		}
+	}
+	if err := upsertAccount(ctx, tx, acc); err != nil {
+		return err
+	}
+	if err := insertSnapshot(ctx, tx, snap); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
 func (r *Repository) ReplaceSnapshotCosts(ctx context.Context, id types.SnapshotID, costs []domain.CostRecord, coverage []domain.ServiceCollectionStatus, sourceTotals map[string]types.Money) error {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -334,6 +371,10 @@ func (r *Repository) ListSnapshots(ctx context.Context, filter ports.ListSnapsho
 	if filter.CompleteOnly {
 		q += ` AND status = ?`
 		args = append(args, string(domain.SnapshotComplete))
+	}
+	if filter.Status != "" {
+		q += ` AND status = ?`
+		args = append(args, string(filter.Status))
 	}
 	q += ` ORDER BY started_at DESC`
 	if filter.Limit > 0 {

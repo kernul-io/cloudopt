@@ -11,6 +11,7 @@ import (
 type ListSnapshotFilter struct {
 	AccountID    types.AccountID
 	CompleteOnly bool
+	Status       domain.SnapshotStatus
 	Limit        int
 }
 
@@ -19,8 +20,10 @@ type StorageRepository interface {
 	Migrate(ctx context.Context) error
 	Close() error
 	SchemaVersion(ctx context.Context) (int, error)
+	CanonicalSchemaVersion(ctx context.Context) (int, error)
 
 	SaveSnapshot(ctx context.Context, snap *domain.CollectionSnapshot) error
+	SaveInProgressSnapshot(ctx context.Context, snap *domain.CollectionSnapshot) error
 	ReplaceSnapshotCosts(ctx context.Context, id types.SnapshotID, costs []domain.CostRecord, coverage []domain.ServiceCollectionStatus, sourceTotals map[string]types.Money) error
 	ReplaceSnapshotMetrics(ctx context.Context, id types.SnapshotID, series []domain.MetricSeries, signals []domain.UtilizationSignal, meta *domain.MetricsCollectionMeta, coverage []domain.ServiceCollectionStatus) error
 	GetSnapshot(ctx context.Context, id types.SnapshotID) (*domain.CollectionSnapshot, error)

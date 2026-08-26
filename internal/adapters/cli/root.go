@@ -49,6 +49,7 @@ func NewRootCommand(cfg *Config) *cobra.Command {
 	root.AddCommand(newImportFixtureCommand(cfg))
 	root.AddCommand(newCapabilitiesCommand(cfg))
 	root.AddCommand(newTerraformCommand(cfg))
+	root.AddCommand(newWorkspaceCommand(cfg))
 
 	return root
 }

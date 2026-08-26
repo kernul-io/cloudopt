@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/kernul-io/cloudopt/internal/application/audit"
 	"github.com/kernul-io/cloudopt/internal/application/ports"
 	"github.com/kernul-io/cloudopt/internal/domain/types"
 )
@@ -54,7 +55,8 @@ func (r *Runtime) Collect(ctx context.Context, opts CollectOptions) (*ports.Coll
 	if progress == nil {
 		progress = ports.NopProgress{}
 	}
-	svc := &CollectService{Repo: repo, Settings: r.Settings}
+	auditLog, _ := audit.NewLog(r.Settings.WorkspaceDir, r.Settings.AuditLogPath)
+	svc := &CollectService{Repo: repo, Settings: r.Settings, Audit: auditLog}
 	out, err := svc.Collect(ctx, opts, progress)
 	if err != nil {
 		return nil, err

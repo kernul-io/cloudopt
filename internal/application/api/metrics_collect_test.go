@@ -71,7 +71,11 @@ type stubStorageRepo struct{}
 func (stubStorageRepo) Migrate(context.Context) error                                  { return nil }
 func (stubStorageRepo) Close() error                                                   { return nil }
 func (stubStorageRepo) SchemaVersion(context.Context) (int, error)                     { return 1, nil }
+func (stubStorageRepo) CanonicalSchemaVersion(context.Context) (int, error)            { return 0, nil }
 func (stubStorageRepo) SaveSnapshot(context.Context, *domain.CollectionSnapshot) error { return nil }
+func (stubStorageRepo) SaveInProgressSnapshot(context.Context, *domain.CollectionSnapshot) error {
+	return nil
+}
 func (stubStorageRepo) ReplaceSnapshotCosts(context.Context, types.SnapshotID, []domain.CostRecord, []domain.ServiceCollectionStatus, map[string]types.Money) error {
 	return nil
 }

@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
@@ -27,6 +28,12 @@ type Settings struct {
 	LogLevel          string `yaml:"log_level"`
 	RulesManifestPath string `yaml:"rules_manifest_path"`
 	SuppressionsPath  string `yaml:"suppressions_path"`
+
+	RetentionCompleteSnapshots int    `yaml:"retention_complete_snapshots"`
+	IncompleteSnapshotTTLHours int    `yaml:"incomplete_snapshot_ttl_hours"`
+	MetadataEncryptionEnv      string `yaml:"metadata_encryption_env"`
+	AuditLogPath               string `yaml:"audit_log_path"`
+	TelemetryEnabled           bool   `yaml:"telemetry_enabled"`
 }
 
 // Overrides from flags and environment (higher precedence than file).
@@ -94,6 +101,11 @@ func defaultSettings(workspace string) (Settings, error) {
 		TempDir:      filepath.Join(workspace, "tmp"),
 		LogFormat:    "text",
 		LogLevel:     "info",
+
+		RetentionCompleteSnapshots: 5,
+		IncompleteSnapshotTTLHours: 24,
+		MetadataEncryptionEnv:      "COA_METADATA_KEY",
+		TelemetryEnabled:           false,
 	}, nil
 }
 
@@ -217,6 +229,15 @@ func envString(key, fallback string) string {
 	return fallback
 }
 
+// IncompleteSnapshotTTL returns the configured TTL for abandoned in-progress snapshots.
+func (s Settings) IncompleteSnapshotTTL() time.Duration {
+	h := s.IncompleteSnapshotTTLHours
+	if h <= 0 {
+		h = 24
+	}
+	return time.Duration(h) * time.Hour
+}
+
 // DefaultConfigRel is the relative path written by init under the workspace.
 func DefaultConfigRel() string {
 	return defaultConfigRel
@@ -233,5 +254,9 @@ reports_dir: %q
 temp_dir: %q
 log_format: "text"
 log_level: "info"
+retention_complete_snapshots: 5
+incomplete_snapshot_ttl_hours: 24
+metadata_encryption_env: "COA_METADATA_KEY"
+telemetry_enabled: false
 `, s.WorkspaceDir, s.ConfigDir, s.DataDir, s.ReportsDir, s.TempDir)
 }
