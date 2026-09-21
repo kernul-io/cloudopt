@@ -41,5 +41,6 @@ pricing: []
 supported_checks:
   - stopped_instance
   - unattached_volume
+  - idle_elastic_ip
   - missing_tags
   - stale_snapshot

@@ -98,6 +98,80 @@ func (e GCEDownsizeCandidate) Evaluate(view *SnapshotView, rule RuleSpec) Evalua
 	return EvaluatorResult{Findings: findings}
 }
 
+// GCEIdleInstance flags persistently idle running Compute Engine instances.
+type GCEIdleInstance struct {
+	Catalog *pricing.Catalog
+}
+
+func (GCEIdleInstance) Name() string { return "gce_idle_instance" }
+
+func (e GCEIdleInstance) Evaluate(view *SnapshotView, rule RuleSpec) EvaluatorResult {
+	minIdle, err := rule.thresholdInt("min_idle_periods", 3)
+	if err != nil {
+		return EvaluatorResult{NotEvaluated: true, Reason: err.Error()}
+	}
+	minCoverage, err := rule.thresholdInt("min_sample_coverage_percent", 50)
+	if err != nil {
+		return EvaluatorResult{NotEvaluated: true, Reason: err.Error()}
+	}
+
+	var findings []CandidateFinding
+	for _, res := range view.ResourcesOfKind(domain.KindComputeInstance) {
+		if !isGCPResource(res) || stoppedState(res.State) {
+			continue
+		}
+		idle, coverage, notes, ok := view.UtilizationMetric(res.ID, "CPUUtilization", domain.SignalIdlePeriods)
+		if !ok || idle < float64(minIdle) || coverage*100 < float64(minCoverage) {
+			continue
+		}
+
+		assumptions := []string{
+			"Idle periods are derived from sustained CPU utilization; verify schedulers and non-CPU workload signals before stopping.",
+		}
+		assumptions = append(assumptions, notes...)
+		var savingsDraft *SavingsDraft
+		if cat := firstCatalog(e.Catalog, view); cat != nil {
+			region := view.regionProviderID(res.RegionID)
+			machineType := res.Attributes["machine_type"]
+			if hourly, currency, found := cat.GCEHourlyMinor(region, machineType); found && hourly > 0 {
+				est := savings.MonthlyRightsizingFromHourly(hourly, 0, currency, 2000, pricing.RecomputeInputs("gce_idle", map[string]string{
+					"region":                region,
+					"machine_type":          machineType,
+					"baseline_hourly_minor": fmt.Sprintf("%d", hourly),
+					"target_hourly_minor":   "0",
+				}))
+				est.OverlapKey = fmt.Sprintf("compute:%s:lifecycle", res.ID)
+				est.Assumptions = append(est.Assumptions, "Assumes the VM can be stopped or deleted; disk and IP charges may continue.")
+				investigationOnly := catalogStale(cat, view.ObservedAt())
+				if investigationOnly {
+					est.GrossMonthlyMinor = 0
+					assumptions = append(assumptions, "Pricing catalog is stale; savings are withheld.")
+				}
+				savingsDraft = &SavingsDraft{Estimate: est, InvestigationOnly: investigationOnly}
+			}
+		}
+
+		findings = append(findings, CandidateFinding{
+			Title:       rule.Title,
+			Description: fmt.Sprintf("GCE instance %q shows %d idle CPU periods in the observation window.", res.Name, int(idle)),
+			ResourceIDs: []types.ResourceID{res.ID},
+			Evidence: []EvidenceDraft{{
+				Kind:       domain.EvidenceMetric,
+				ResourceID: res.ID,
+				Summary:    fmt.Sprintf("idle_periods=%d, sample coverage=%.0f%%", int(idle), coverage*100),
+				Detail: map[string]string{
+					"idle_periods":    fmt.Sprintf("%d", int(idle)),
+					"sample_coverage": fmt.Sprintf("%.4f", coverage),
+				},
+			}},
+			Assumptions: assumptions,
+			Confidence:  types.PercentageFromFloat(0.7),
+			Savings:     savingsDraft,
+		})
+	}
+	return EvaluatorResult{Findings: findings}
+}
+
 // GCPIdleExternalIP flags reserved external IPs without forwarding use.
 type GCPIdleExternalIP struct{}
 

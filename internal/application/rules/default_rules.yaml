@@ -1,4 +1,4 @@
-ruleset_version: "2026.01.1"
+ruleset_version: "2026.01.2"
 rules:
   - id: compute.stopped_instance_storage_cost
     version: "1.0.0"
@@ -188,6 +188,27 @@ rules:
     remediation: |
       Review whether VPC endpoints or consolidated egress can reduce NAT dependency before changing network topology.
 
+  - id: network.aws_idle_elastic_ip
+    version: "1.0.0"
+    title: Unassociated AWS Elastic IP address
+    category: network
+    severity: low
+    evaluator: aws_idle_elastic_ip
+    enabled: true
+    applicability:
+      resource_kinds:
+        - elastic_ip
+    thresholds: {}
+    required_signals:
+      - resources
+    providers:
+      - aws
+    required_capabilities:
+      - inventory.vpc_network
+    remediation: |
+      Release the Elastic IP if it is no longer required, or associate it with an active resource.
+      Confirm DNS and allow-list dependencies before release because the public address cannot be recovered reliably.
+
   - id: compute.gce_downsize_candidate
     version: "1.0.0"
     title: GCE downsize candidate from utilization
@@ -212,6 +233,29 @@ rules:
       - pricing.cloud_billing_catalog
     remediation: |
       Validate memory, disk, and licensing constraints, then change machine type during a maintenance window.
+
+  - id: compute.gce_idle_instance
+    version: "1.0.0"
+    title: Persistently idle GCE instance
+    category: compute
+    severity: medium
+    evaluator: gce_idle_instance
+    enabled: true
+    applicability:
+      resource_kinds:
+        - compute_instance
+    thresholds:
+      min_idle_periods: "3"
+      min_sample_coverage_percent: "50"
+    required_signals:
+      - metrics
+    providers:
+      - gcp
+    required_capabilities:
+      - metrics.cloud_monitoring_timeseries
+    remediation: |
+      Confirm the workload is no longer required, then stop or delete the instance.
+      Review persistent disks and external IPs separately because their charges may continue.
 
   - id: network.gcp_idle_external_ip
     version: "1.0.0"
