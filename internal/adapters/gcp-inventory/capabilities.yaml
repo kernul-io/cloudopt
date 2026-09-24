@@ -55,3 +55,4 @@ supported_checks:
   - unattached_volume
   - missing_tags
   - stale_snapshot
+  - orphaned_snapshot

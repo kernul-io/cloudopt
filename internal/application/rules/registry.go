@@ -87,6 +87,7 @@ func DefaultRegistry(catalog *pricing.Catalog) *Registry {
 	reg.Register(&StoppedInstanceStorageCost{})
 	reg.Register(&UnattachedBlockVolume{})
 	reg.Register(&StaleVolumeSnapshot{})
+	reg.Register(&OrphanedVolumeSnapshot{})
 	reg.Register(&MissingCostAllocationTags{})
 	reg.Register(&EC2DownsizeCandidate{Catalog: catalog})
 	reg.Register(&EC2IdleInstance{Catalog: catalog})

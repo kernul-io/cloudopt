@@ -223,3 +223,67 @@ func testTimestamp(t *testing.T, raw string) types.Timestamp {
 	require.NoError(t, err)
 	return ts
 }
+
+func TestOrphanedVolumeSnapshot(t *testing.T) {
+	vol := domain.Resource{
+		ID:                 "res-vol",
+		Kind:               domain.KindBlockVolume,
+		ProviderResourceID: "vol-123",
+	}
+	orphanAWS := domain.Resource{
+		ID:                 "res-snap-aws",
+		Kind:               domain.KindSnapshot,
+		ProviderResourceID: "snap-1",
+		State:              "completed",
+		Attributes: map[string]string{
+			"volume_id":  "vol-deleted",
+			"started_at": "2026-01-01T00:00:00Z",
+		},
+	}
+	orphanGCP := domain.Resource{
+		ID:                 "res-snap-gcp",
+		Kind:               domain.KindSnapshot,
+		ProviderResourceID: "projects/p/global/snapshots/snap-2",
+		State:              "READY",
+		Attributes: map[string]string{
+			"source_disk": "projects/p/zones/us-central1-a/disks/disk-deleted",
+			"created_at":  "2026-01-01T00:00:00Z",
+		},
+	}
+	valid := domain.Resource{
+		ID:                 "res-snap-valid",
+		Kind:               domain.KindSnapshot,
+		ProviderResourceID: "snap-3",
+		State:              "completed",
+		Attributes: map[string]string{
+			"volume_id":  "vol-123",
+			"started_at": "2026-01-01T00:00:00Z",
+		},
+	}
+	tooRecent := domain.Resource{
+		ID:                 "res-snap-recent",
+		Kind:               domain.KindSnapshot,
+		ProviderResourceID: "snap-4",
+		State:              "completed",
+		Attributes: map[string]string{
+			"volume_id":  "vol-deleted",
+			"started_at": "2026-09-23T00:00:00Z",
+		},
+	}
+
+	observed := types.NewTimestamp(time.Date(2026, 9, 24, 0, 0, 0, 0, time.UTC))
+	snap := &domain.CollectionSnapshot{
+		StartedAt:   observed,
+		CompletedAt: &observed,
+		Resources:   []domain.Resource{vol, orphanAWS, orphanGCP, valid, tooRecent},
+	}
+
+	rule := RuleSpec{
+		Title:      "Orphaned volume snapshot",
+		Thresholds: map[string]string{"min_age_days": "7"},
+	}
+	result := (OrphanedVolumeSnapshot{}).Evaluate(NewSnapshotView(snap, nil), rule)
+	require.Len(t, result.Findings, 2)
+	require.Equal(t, []types.ResourceID{"res-snap-aws"}, result.Findings[0].ResourceIDs)
+	require.Equal(t, []types.ResourceID{"res-snap-gcp"}, result.Findings[1].ResourceIDs)
+}

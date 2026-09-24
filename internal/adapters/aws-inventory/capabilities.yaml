@@ -44,3 +44,4 @@ supported_checks:
   - idle_elastic_ip
   - missing_tags
   - stale_snapshot
+  - orphaned_snapshot

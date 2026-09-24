@@ -53,6 +53,24 @@ rules:
       Review whether the snapshot is still required for recovery or compliance.
       Delete obsolete snapshots to reduce storage cost after confirming retention policy.
 
+  - id: storage.orphaned_volume_snapshot
+    version: "1.0.0"
+    title: Orphaned volume snapshot
+    category: storage
+    severity: medium
+    evaluator: orphaned_volume_snapshot
+    enabled: true
+    applicability:
+      resource_kinds:
+        - volume_snapshot
+    thresholds:
+      min_age_days: "7"
+    required_signals:
+      - resources
+    remediation: |
+      Verify the snapshot is not needed for compliance or DR.
+      Delete the snapshot if the source workload is decommissioned and no retention policy applies.
+
   - id: governance.missing_cost_allocation_tags
     version: "1.0.0"
     title: Missing ownership or cost-allocation tags
