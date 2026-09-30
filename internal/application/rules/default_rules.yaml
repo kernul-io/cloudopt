@@ -1,4 +1,4 @@
-ruleset_version: "2026.01.2"
+ruleset_version: "2026.01.3"
 rules:
   - id: compute.stopped_instance_storage_cost
     version: "1.0.0"
@@ -379,3 +379,27 @@ rules:
       - gcp
     remediation: |
       Model 1- or 3-year committed use discounts only after stabilizing baseline compute usage; commitments reduce flexibility.
+
+  - id: containers.gke_node_pool_downsize_candidate
+    version: "1.0.0"
+    title: GKE node pool downsize candidate
+    category: containers
+    severity: medium
+    evaluator: gke_node_pool_downsize_candidate
+    enabled: true
+    applicability:
+      resource_kinds:
+        - kubernetes_node_pool
+    thresholds:
+      max_p95_cpu_percent: "25"
+      min_sample_coverage_percent: "50"
+      min_node_count: "2"
+    required_signals:
+      - metrics
+    providers:
+      - gcp
+    required_capabilities:
+      - metrics.cloud_monitoring_timeseries
+    remediation: |
+      Review scaling the node pool down by one node, then observe workload placement and latency before reducing it again.
+      Validate memory utilization, pod requests, disruption budgets, scheduling constraints, and autoscaler limits first.

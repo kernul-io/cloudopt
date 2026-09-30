@@ -63,9 +63,9 @@ func (OrphanedVolumeSnapshot) Evaluate(view *SnapshotView, rule RuleSpec) Evalua
 					ResourceID: res.ID,
 					Summary:    fmt.Sprintf("source_volume_id=%s", sourceID),
 					Detail: map[string]string{
-						"snapshot_id":          res.ProviderResourceID,
-						"source_volume_id":     sourceID,
-						"state":                res.State,
+						"snapshot_id":      res.ProviderResourceID,
+						"source_volume_id": sourceID,
+						"state":            res.State,
 					},
 				},
 				{
