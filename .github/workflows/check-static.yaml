@@ -90,5 +90,5 @@ jobs:
         if: ${{ github.event_name == 'pull_request' && matrix.os == 'ubuntu-latest' }}
         id: coverage
         run: |
-          COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
+          COVERAGE=$(go tool cover -func=coverage.out | grep total | tail -n1 | awk '{print substr($3, 1, length($3)-1)}')
           echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
