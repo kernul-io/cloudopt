@@ -1,4 +1,4 @@
-ruleset_version: "2026.01.3"
+ruleset_version: "2026.01.4"
 rules:
   - id: compute.stopped_instance_storage_cost
     version: "1.0.0"
@@ -182,6 +182,30 @@ rules:
       - pricing.offline_catalog_fixture
     remediation: |
       Validate memory and connection limits, then modify the DB instance class during a maintenance window.
+
+  - id: database.rds_idle_instance
+    version: "1.0.0"
+    title: Persistently idle RDS instance
+    category: database
+    severity: medium
+    evaluator: rds_idle_instance
+    enabled: true
+    applicability:
+      resource_kinds:
+        - database_instance
+    thresholds:
+      min_idle_periods: "3"
+      min_sample_coverage_percent: "50"
+    required_signals:
+      - metrics
+    providers:
+      - aws
+    required_capabilities:
+      - metrics.cloudwatch_rds
+    remediation: |
+      Validate database connections, replicas, scheduled workloads, and retention requirements.
+      Stop the instance when short-term retention is required, or delete it after taking a final snapshot when it is no longer needed.
+      Review storage, backup, and snapshot charges separately because they may continue.
 
   - id: network.nat_gateway_low_utilization
     version: "1.0.0"
