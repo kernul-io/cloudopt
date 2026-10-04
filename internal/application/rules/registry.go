@@ -93,6 +93,7 @@ func DefaultRegistry(catalog *pricing.Catalog) *Registry {
 	reg.Register(&EC2IdleInstance{Catalog: catalog})
 	reg.Register(&EBSVolumeTypeOptimize{Catalog: catalog})
 	reg.Register(&RDSDownsizeCandidate{Catalog: catalog})
+	reg.Register(&RDSIdleInstance{Catalog: catalog})
 	reg.Register(&NATGatewayLowUtilization{Catalog: catalog})
 	reg.Register(&GCEDownsizeCandidate{Catalog: catalog})
 	reg.Register(&GCEIdleInstance{Catalog: catalog})

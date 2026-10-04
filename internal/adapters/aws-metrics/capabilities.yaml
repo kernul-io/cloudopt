@@ -25,4 +25,5 @@ metrics:
 supported_checks:
   - utilization_coverage
   - idle_compute
+  - idle_database
   - rightsizing_evidence

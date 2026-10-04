@@ -336,6 +336,114 @@ func (e RDSDownsizeCandidate) Evaluate(view *SnapshotView, rule RuleSpec) Evalua
 	return EvaluatorResult{Findings: findings}
 }
 
+// RDSIdleInstance flags persistently idle available RDS instances.
+type RDSIdleInstance struct {
+	Catalog *pricing.Catalog
+}
+
+func (RDSIdleInstance) Name() string { return "rds_idle_instance" }
+
+func (e RDSIdleInstance) Evaluate(view *SnapshotView, rule RuleSpec) EvaluatorResult {
+	minIdle, err := rule.thresholdInt("min_idle_periods", 3)
+	if err != nil {
+		return EvaluatorResult{NotEvaluated: true, Reason: err.Error()}
+	}
+	minCoverage, err := rule.thresholdInt("min_sample_coverage_percent", 50)
+	if err != nil {
+		return EvaluatorResult{NotEvaluated: true, Reason: err.Error()}
+	}
+
+	var findings []CandidateFinding
+	for _, db := range view.ResourcesOfKind(domain.KindDatabase) {
+		if isGCPResource(db) || !strings.EqualFold(strings.TrimSpace(db.State), "available") {
+			continue
+		}
+		idle, coverage, notes, ok := view.UtilizationMetric(db.ID, "CPUUtilization", domain.SignalIdlePeriods)
+		if !ok || idle < float64(minIdle) || coverage*100 < float64(minCoverage) {
+			continue
+		}
+
+		evidence := []EvidenceDraft{{
+			Kind:       domain.EvidenceMetric,
+			ResourceID: db.ID,
+			Summary:    fmt.Sprintf("idle_periods=%d, sample coverage=%.0f%%", int(idle), coverage*100),
+			Detail: map[string]string{
+				"idle_periods":    fmt.Sprintf("%d", int(idle)),
+				"sample_coverage": fmt.Sprintf("%.4f", coverage),
+			},
+		}}
+		if connections, connectionCoverage, _, found := view.UtilizationMetric(db.ID, "DatabaseConnections", domain.SignalMean); found {
+			evidence = append(evidence, EvidenceDraft{
+				Kind:       domain.EvidenceMetric,
+				ResourceID: db.ID,
+				Summary:    fmt.Sprintf("mean database connections=%.1f, sample coverage=%.0f%%", connections, connectionCoverage*100),
+				Detail: map[string]string{
+					"mean_database_connections": fmt.Sprintf("%.2f", connections),
+					"sample_coverage":           fmt.Sprintf("%.4f", connectionCoverage),
+				},
+			})
+		}
+
+		assumptions := []string{
+			"Idle periods are derived from sustained low CPU; validate connections, replicas, and scheduled workloads before stopping or deleting the database.",
+			"Stopping or deleting an RDS instance does not remove storage, backup, or snapshot charges.",
+		}
+		assumptions = append(assumptions, notes...)
+		savingsDraft := rdsIdleSavings(firstCatalog(e.Catalog, view), view, db, &assumptions)
+
+		findings = append(findings, CandidateFinding{
+			Title:       rule.Title,
+			Description: fmt.Sprintf("RDS instance %q shows %d idle CPU periods in the observation window.", db.Name, int(idle)),
+			ResourceIDs: []types.ResourceID{db.ID},
+			Evidence:    evidence,
+			Assumptions: assumptions,
+			Confidence:  types.PercentageFromFloat(0.65),
+			Savings:     savingsDraft,
+		})
+	}
+	return EvaluatorResult{Findings: findings}
+}
+
+func rdsIdleSavings(cat *pricing.Catalog, view *SnapshotView, db domain.Resource, assumptions *[]string) *SavingsDraft {
+	region := view.regionProviderID(db.RegionID)
+	instanceClass := db.Attributes["instance_class"]
+	engine := db.Attributes["engine"]
+	overlapKey := fmt.Sprintf("database:%s:lifecycle", db.ID)
+	inputs := pricing.RecomputeInputs("rds_idle", map[string]string{
+		"region":         region,
+		"instance_class": instanceClass,
+		"engine":         engine,
+	})
+	investigation := domain.SavingsEstimate{
+		Class:      domain.SavingsMonthlyRecurring,
+		OverlapKey: overlapKey,
+		Inputs:     inputs,
+	}
+	if cat == nil || cat.IsEmpty() || instanceClass == "" || engine == "" {
+		*assumptions = append(*assumptions, "Matching RDS pricing is unavailable; savings are withheld.")
+		return &SavingsDraft{Estimate: investigation, InvestigationOnly: true}
+	}
+
+	hourly, currency, found := cat.RDSHourlyMinor(region, instanceClass, engine)
+	if !found || hourly <= 0 {
+		*assumptions = append(*assumptions, "Matching RDS pricing is unavailable; savings are withheld.")
+		return &SavingsDraft{Estimate: investigation, InvestigationOnly: true}
+	}
+	inputs["baseline_hourly_minor"] = fmt.Sprintf("%d", hourly)
+	inputs["target_hourly_minor"] = "0"
+	est := savings.MonthlyRightsizingFromHourly(hourly, 0, currency, 2000, inputs)
+	est.OverlapKey = overlapKey
+	est.Assumptions = append(est.Assumptions, "Assumes compute can be stopped or removed; storage, backup, and snapshot charges may continue.")
+	if catalogStale(cat, view.ObservedAt()) {
+		est.GrossMonthlyMinor = 0
+		est.LowMonthlyMinor = 0
+		est.HighMonthlyMinor = 0
+		*assumptions = append(*assumptions, "Pricing catalog is stale; savings are withheld.")
+		return &SavingsDraft{Estimate: est, InvestigationOnly: true}
+	}
+	return &SavingsDraft{Estimate: est}
+}
+
 func smallerRDSClass(cur string) string {
 	switch cur {
 	case "db.t3.medium":
