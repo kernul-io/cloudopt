@@ -1,4 +1,4 @@
-ruleset_version: "2026.01.4"
+ruleset_version: "2026.01.5"
 rules:
   - id: compute.stopped_instance_storage_cost
     version: "1.0.0"
@@ -361,6 +361,30 @@ rules:
       - pricing.cloud_billing_catalog
     remediation: |
       Validate connections and memory, then reduce Cloud SQL tier during maintenance.
+
+  - id: database.cloudsql_idle_instance
+    version: "1.0.0"
+    title: Persistently idle Cloud SQL instance
+    category: database
+    severity: medium
+    evaluator: cloudsql_idle_instance
+    enabled: true
+    applicability:
+      resource_kinds:
+        - database_instance
+    thresholds:
+      min_idle_periods: "3"
+      min_sample_coverage_percent: "50"
+    required_signals:
+      - metrics
+    providers:
+      - gcp
+    required_capabilities:
+      - metrics.cloud_monitoring_timeseries
+    remediation: |
+      Validate database connections, replicas, scheduled workloads, and retention requirements.
+      Stop the instance when short-term retention is required, or delete it after taking a final export when it is no longer needed.
+      Review storage, backup, and snapshot charges separately because they may continue.
 
   - id: network.gcp_nat_low_utilization
     version: "1.0.0"

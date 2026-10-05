@@ -10,6 +10,7 @@ supported_checks:
   - gce_rightsizing
   - gce_idle
   - cloud_sql_rightsizing
+  - cloud_sql_idle
   - cloud_nat_utilization
   - gke_node_pool_rightsizing
   - metric_alignment

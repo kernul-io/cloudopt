@@ -326,6 +326,131 @@ func (e CloudSQLDownsizeCandidate) Evaluate(view *SnapshotView, rule RuleSpec) E
 	return EvaluatorResult{Findings: findings}
 }
 
+// CloudSQLIdleInstance flags persistently idle Cloud SQL instances.
+type CloudSQLIdleInstance struct {
+	Catalog *pricing.Catalog
+}
+
+func (CloudSQLIdleInstance) Name() string { return "cloudsql_idle_instance" }
+
+func (e CloudSQLIdleInstance) Evaluate(view *SnapshotView, rule RuleSpec) EvaluatorResult {
+	minIdle, err := rule.thresholdInt("min_idle_periods", 3)
+	if err != nil {
+		return EvaluatorResult{NotEvaluated: true, Reason: err.Error()}
+	}
+	minCoverage, err := rule.thresholdInt("min_sample_coverage_percent", 50)
+	if err != nil {
+		return EvaluatorResult{NotEvaluated: true, Reason: err.Error()}
+	}
+
+	var findings []CandidateFinding
+	var eligible, withMetrics int
+	for _, db := range view.ResourcesOfKind(domain.KindDatabase) {
+		if !isGCPResource(db) || !cloudSQLRunnable(db.State) {
+			continue
+		}
+		eligible++
+		idle, coverage, notes, ok := view.UtilizationMetric(db.ID, "CPUUtilization", domain.SignalIdlePeriods)
+		if !ok {
+			continue
+		}
+		withMetrics++
+		if idle < float64(minIdle) || coverage*100 < float64(minCoverage) {
+			continue
+		}
+
+		assumptions := []string{
+			"Idle periods are derived from sustained low CPU; validate connections, replicas, and scheduled workloads before stopping or deleting the database.",
+			"Stopping or deleting a Cloud SQL instance does not remove storage, backup, or snapshot charges.",
+		}
+		assumptions = append(assumptions, notes...)
+		savingsDraft := cloudSQLIdleSavings(firstCatalog(e.Catalog, view), view, db, &assumptions)
+
+		findings = append(findings, CandidateFinding{
+			Title:       rule.Title,
+			Description: fmt.Sprintf("Cloud SQL instance %q shows %d idle CPU periods in the observation window.", db.Name, int(idle)),
+			ResourceIDs: []types.ResourceID{db.ID},
+			Evidence: []EvidenceDraft{{
+				Kind:       domain.EvidenceMetric,
+				ResourceID: db.ID,
+				Summary:    fmt.Sprintf("idle_periods=%d, sample coverage=%.0f%%", int(idle), coverage*100),
+				Detail: map[string]string{
+					"idle_periods":    fmt.Sprintf("%d", int(idle)),
+					"sample_coverage": fmt.Sprintf("%.4f", coverage),
+				},
+			}},
+			Assumptions: assumptions,
+			Confidence:  types.PercentageFromFloat(0.65),
+			Savings:     savingsDraft,
+		})
+	}
+	if eligible > 0 && withMetrics == 0 {
+		return EvaluatorResult{NotEvaluated: true, Reason: "no CPU idle-period utilization signals for eligible Cloud SQL instances"}
+	}
+	return EvaluatorResult{Findings: findings}
+}
+
+func cloudSQLRunnable(state string) bool {
+	return strings.EqualFold(strings.TrimSpace(state), "RUNNABLE")
+}
+
+func cloudSQLEngineKey(db domain.Resource) string {
+	if db.Attributes == nil {
+		return ""
+	}
+	version := strings.ToLower(strings.TrimSpace(db.Attributes["database_version"]))
+	switch {
+	case strings.Contains(version, "postgres"):
+		return "postgres"
+	case strings.Contains(version, "mysql"):
+		return "mysql"
+	case strings.Contains(version, "sqlserver"):
+		return "sqlserver"
+	default:
+		return strings.ToLower(strings.TrimSpace(db.Attributes["engine"]))
+	}
+}
+
+func cloudSQLIdleSavings(cat *pricing.Catalog, view *SnapshotView, db domain.Resource, assumptions *[]string) *SavingsDraft {
+	region := view.regionProviderID(db.RegionID)
+	tier := db.Attributes["tier"]
+	engine := cloudSQLEngineKey(db)
+	overlapKey := fmt.Sprintf("database:%s:lifecycle", db.ID)
+	inputs := pricing.RecomputeInputs("cloudsql_idle", map[string]string{
+		"region": region,
+		"tier":   tier,
+		"engine": engine,
+	})
+	investigation := domain.SavingsEstimate{
+		Class:      domain.SavingsMonthlyRecurring,
+		OverlapKey: overlapKey,
+		Inputs:     inputs,
+	}
+	if cat == nil || cat.IsEmpty() || tier == "" || engine == "" {
+		*assumptions = append(*assumptions, "Matching Cloud SQL pricing is unavailable; savings are withheld.")
+		return &SavingsDraft{Estimate: investigation, InvestigationOnly: true}
+	}
+
+	hourly, currency, found := cat.CloudSQLHourlyMinor(region, tier, engine)
+	if !found || hourly <= 0 {
+		*assumptions = append(*assumptions, "Matching Cloud SQL pricing is unavailable; savings are withheld.")
+		return &SavingsDraft{Estimate: investigation, InvestigationOnly: true}
+	}
+	inputs["baseline_hourly_minor"] = fmt.Sprintf("%d", hourly)
+	inputs["target_hourly_minor"] = "0"
+	est := savings.MonthlyRightsizingFromHourly(hourly, 0, currency, 2000, inputs)
+	est.OverlapKey = overlapKey
+	est.Assumptions = append(est.Assumptions, "Assumes compute can be stopped or removed; storage, backup, and snapshot charges may continue.")
+	investigationOnly := catalogStale(cat, view.ObservedAt())
+	if investigationOnly {
+		est.GrossMonthlyMinor = 0
+		est.LowMonthlyMinor = 0
+		est.HighMonthlyMinor = 0
+		*assumptions = append(*assumptions, "Pricing catalog is stale; savings are withheld.")
+	}
+	return &SavingsDraft{Estimate: est, InvestigationOnly: investigationOnly}
+}
+
 // GCPNATLowUtilization flags low Cloud NAT egress relative to hourly gateway cost.
 type GCPNATLowUtilization struct {
 	Catalog *pricing.Catalog
