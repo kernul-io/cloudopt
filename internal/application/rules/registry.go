@@ -101,6 +101,7 @@ func DefaultRegistry(catalog *pricing.Catalog) *Registry {
 	reg.Register(&GCPIdleExternalIP{})
 	reg.Register(&GCPDiskTypeOptimize{Catalog: catalog})
 	reg.Register(&CloudSQLDownsizeCandidate{Catalog: catalog})
+	reg.Register(&CloudSQLIdleInstance{Catalog: catalog})
 	reg.Register(&GCPNATLowUtilization{Catalog: catalog})
 	reg.Register(&GKENodePoolDownsizeCandidate{Catalog: catalog})
 	reg.Register(&CommittedUseCoverage{})
